@@ -111,6 +111,16 @@ class ShapeSelectFrm(Frame):
                                       padx=(0, 15), pady=10)
         
         self.makeLabels()
+        
+        # position the popup next to a shape selection frame
+        selectWin.update_idletasks() # update the geometry to get correct size
+        width = selectWin.winfo_width()
+        height = selectWin.winfo_height()
+        xoffset = self.winfo_rootx() - width
+        yoffset = self.winfo_rooty() # winfo_root[x|y] returns a coord relative
+                                     # to the screen's upper left corner
+        selectWin.geometry('{}x{}+{}+{}'.format(width, height, 
+                                                xoffset, yoffset))
     
     def onSubmit(self):
         if self.var.get() != 0:
