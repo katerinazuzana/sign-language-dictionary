@@ -7,15 +7,20 @@ class ScrolledFrame(Frame):
         super().__init__(parent)
         self.configure(borderwidth=2, relief='groove')
         
-        # make a canvas and a scrollbar
-        sbar = AutoScrollbar(self, orient=VERTICAL)
+        # make a canvas with vertical and horizontal scrollbars
+        vsbar = AutoScrollbar(self, orient=VERTICAL)
+        hsbar = AutoScrollbar(self, orient=HORIZONTAL)
         canvas = Canvas(self, width=width, height=height, 
-                              yscrollcommand=sbar.set)
-        sbar.config(command=canvas.yview)
+                              yscrollcommand=vsbar.set,
+                              xscrollcommand=hsbar.set)
+        vsbar.config(command=canvas.yview)
+        hsbar.config(command=canvas.xview)
         
-        sbar.grid(column=1, row=0, sticky=N+S)
+        vsbar.grid(column=1, row=0, sticky=N+S)
+        hsbar.grid(column=0, row=1, sticky=E+W)
         canvas.grid(column=0, row=0, sticky=N+E+S+W)
         self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
         
         canvas.config(highlightthickness=0)
         self.canvas = canvas
@@ -41,7 +46,7 @@ class ScrolledFrame(Frame):
 
     def onMouseWheelDown(self, event):
         """Roll the canvas down if the mouse pointer is over it."""
-        if self.isMouseOverCanvas(): 
+        if self.isMouseOverCanvas():
             self.canvas.yview_scroll(1, 'units')
         
     def onMouseWheelUp(self, event):
@@ -55,6 +60,7 @@ class ScrolledFrame(Frame):
         return x0 < x < x1 and y0 < y < y1
     
     def getCanvasCoords(self):
+#        self.canvas.update_idletasks() # update to get correct coords
         x0 = self.canvas.winfo_rootx()
         x1 = x0 + self.canvas.winfo_width() 
         y0 = self.canvas.winfo_rooty()
