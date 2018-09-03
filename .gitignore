@@ -1,2 +1,4 @@
 **/demo_images/
 **/demo_videofiles/
+**/__pycache__/
+
