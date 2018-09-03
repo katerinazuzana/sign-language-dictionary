@@ -71,11 +71,11 @@ class ShapeSelectFrm(Frame):
         self.delBut.grid(column=1, row=1, sticky=E+W, padx=20)
     
     def onDelete(self):
-        if self.var1.get() != 0:
-            if self.var2.get() != 0:
-                self.var2.set(0)
+        if self.var2.get() != 0:
+            self.var2.set(0)
+        elif self.var1.get() != 0:
             self.var1.set(0)
-            self.redrawSelectionFrm()
+        self.redrawSelectionFrm()
     
     def createPopup(self):
         # create a popup window
