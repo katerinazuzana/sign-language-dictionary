@@ -130,13 +130,17 @@ class ShapeSelectFrm(Frame):
     def onSubmit(self):
         if self.var.get() != 0:
             selection = self.var.get()
-            if self.var1.get() == 0:         # 1st place is empty
+            place1 = self.var1.get()
+            place2 = self.var2.get()
+            if place1 == 0:         # 1st place is empty
                 self.var1.set(selection)
-            elif self.var2.get() == 0:       # only 2nd place is empty
-                self.var2.set(selection)
-            else:                            # both places are occupied
-                self.var1.set(self.var2.get()) # move 2nd to 1st
-                self.var2.set(selection)       # set 2nd to current selection
+            elif place2 == 0:       # only 2nd place is empty
+                if selection != place1:
+                    self.var2.set(selection)
+            else:                   # both places are occupied
+                if selection != place2:
+                    self.var1.set(self.var2.get()) # move 2nd to 1st
+                    self.var2.set(selection)     # set 2nd to current selection
             self.redrawSelectionFrm()
     
     def redrawSelectionFrm(self):        
