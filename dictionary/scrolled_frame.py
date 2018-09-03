@@ -40,20 +40,25 @@ class ScrolledFrame(Frame):
         interior.bind('<Configure>', configureInterior)
 
     def onMouseWheelDown(self, event):
-        self.canvas.yview_scroll(1, 'units')
-        x, y = self.winfo_pointerxy()
-
+        """Roll the canvas down if the mouse pointer is over it."""
+        if self.isMouseOverCanvas(): 
+            self.canvas.yview_scroll(1, 'units')
         
     def onMouseWheelUp(self, event):
-        self.canvas.yview_scroll(-1, 'units')
-        
+        """Roll the canvas up if the mouse pointer is over it."""
+        if self.isMouseOverCanvas():
+            self.canvas.yview_scroll(-1, 'units')
+    
+    def isMouseOverCanvas(self):
+        x0, x1, y0, y1 = self.getCanvasCoords()
+        x, y = self.winfo_pointerxy()
+        return x0 < x < x1 and y0 < y < y1
+    
+    def getCanvasCoords(self):
         x0 = self.canvas.winfo_rootx()
         x1 = x0 + self.canvas.winfo_width() 
         y0 = self.canvas.winfo_rooty()
         y1 = y0 + self.canvas.winfo_height()
-        
-        x, y = self.winfo_pointerxy()
-        print(x0 < x < x1, y0 < y < y1)
-        
+        return x0, x1, y0, y1
         
         
