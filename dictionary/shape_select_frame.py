@@ -93,6 +93,7 @@ class ShapeSelectFrm(Frame):
         self.selectWin.columnconfigure(0, weight=1)
         
         self.selectWin.protocol('WM_DELETE_WINDOW', self.onPopupClose)
+        self.selectWin.attributes('-topmost', True)
         
         # set the instructions label
         Label(self.selectWin, 
