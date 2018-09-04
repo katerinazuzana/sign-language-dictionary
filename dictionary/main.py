@@ -19,6 +19,8 @@ from radio_buttons import RadioFrm
 from placement_frame import PlacementFrm
 from search_engine import SearchEngine
 
+import math
+
 
 class Dictionary():
     """A Czech Sign Language Dictionary application.
@@ -49,6 +51,7 @@ class Dictionary():
                         video frame
     THUMB_PADX -- horizontal spacing of the thumbnail videos
     THUMB_PADY -- space between the main video and the thumbnails
+    TAB_PAD -- initial notebook's tab padding
     BGCOLOR -- background color
     """
 
@@ -60,6 +63,7 @@ class Dictionary():
     HIGHLIGHT_BORDER = 4
     THUMB_PADX = 10
     THUMB_PADY = 10
+    TAB_PAD = 32
     BGCOLOR = 'white'
 
     def __init__(self, dbpath, vfdir, imgdir):
@@ -155,15 +159,16 @@ class Dictionary():
         self.notebook.grid(column=1, row=0, sticky=N+E+S+W)
         
         # style
-        style = ttk.Style()
-        style.configure('TNotebook.Tab', padding=(32, 0, 32, 0))
+        self.style = style = ttk.Style()
+        style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0, 
+                                                  self.TAB_PAD, 0))        
         style.configure('.', font=appfont)
         style.configure('TNotebook', background=self.BGCOLOR)
         style.configure('TNotebook.Tab', background='ghost white')
         # activeTabBg
         style.map('TNotebook.Tab', background=[('selected', self.BGCOLOR)])
         # 'TNotebook': {'congfigure': {'tabmargins': [2, 5, 2, 0] } }
-
+        
         # create the category-selection frame
         self.catfrm = CatFrm(self.dbpath, 
                              self.searchEng.search, 
@@ -179,6 +184,11 @@ class Dictionary():
                              padx=self.BORDER)
         self.signfrm.grid(column=0, row=0, sticky=N+E+S+W)
         self.notebook.add(self.signfrm, text='Překlad z ČZJ do ČJ')
+        
+        # bind tab padding recalculation to notebook resizing
+        self.notebook.update_idletasks()
+        self.notebook.initialWidth = self.notebook.winfo_width()
+        self.notebook.bind('<Configure>', self.onResize)
         
         # create an active hand shapes offer
         Label(self.signfrm, 
@@ -211,6 +221,14 @@ class Dictionary():
                ).grid(column=1, row=4, 
                                 sticky=E+S, 
                                 padx=(15, 0))
+    
+    def onResize(self, event):
+        """Dynamically set tab padding to streach tabs over whole notebook."""
+        width = self.notebook.winfo_width()
+        extraPadding = math.ceil((width - self.notebook.initialWidth) / 4)
+        self.style.configure('TNotebook.Tab', 
+                             padding=(self.TAB_PAD + extraPadding, 0, 
+                                      self.TAB_PAD + extraPadding, 0))
     
     def showResult(self, result):
         successFlag, alist = result        
