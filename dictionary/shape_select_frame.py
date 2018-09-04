@@ -32,6 +32,7 @@ class ShapeSelectFrm(Frame):
         self.var2 = IntVar()
         self.var2.set(0)
         
+        self.selectWin = None
         self.sel1 = None
         self.sep = None
         self.sel2 = None
@@ -64,7 +65,7 @@ class ShapeSelectFrm(Frame):
         self.sep.grid(column=1, row=0, sticky=N+S)
         
     def makeButtons(self):    
-        self.selectBut = Button(self, text='Vybrat', command=self.createPopup)
+        self.selectBut = Button(self, text='Vybrat', command=self.openPopup)
         self.selectBut.grid(column=1, row=0, sticky=E+W, padx=20)
         
         self.delBut = Button(self, text='Zrušit', command=self.onDelete)
@@ -77,32 +78,42 @@ class ShapeSelectFrm(Frame):
             self.var1.set(0)
         self.redrawSelectionFrm()
     
+    def openPopup(self):
+        if not self.selectWin:
+            self.createPopup()
+    
+    def onPopupClose(self):
+        self.selectWin.destroy() # deletes window from display
+        self.selectWin = None
+    
     def createPopup(self):
         # create a popup window
-        selectWin = Toplevel()
-        selectWin.title(self.popuptitle)
-        selectWin.columnconfigure(0, weight=1)
+        self.selectWin = Toplevel()
+        self.selectWin.title(self.popuptitle)
+        self.selectWin.columnconfigure(0, weight=1)
+        
+        self.selectWin.protocol('WM_DELETE_WINDOW', self.onPopupClose)
         
         # set the instructions label
-        Label(selectWin, 
+        Label(self.selectWin, 
               text=self.popuptext).grid(column=0, row=0, 
                                         padx=10, pady=10, 
                                         sticky=W)
         
         # make a scrolled frame for displaying labels with images
-        self.scrollfrm = ScrolledFrame(selectWin, 
+        self.scrollfrm = ScrolledFrame(self.selectWin, 
                              self.numcols*(self.labwidth + 2*self.labborder) + 
                              (self.numcols-1)*self.sepwidth,
                               
                              self.numrows*(self.labheight + 2*self.labborder) + 
                              (self.numrows-1)*self.sepwidth)
         self.scrollfrm.grid(column=0, row=1, padx=10)
-        selectWin.rowconfigure(1, weight=1)
+        self.selectWin.rowconfigure(1, weight=1)
         
         self.makeLabels()
         
         # make Submit and Quit buttons in their own frame
-        buttonsfrm = Frame(selectWin)
+        buttonsfrm = Frame(self.selectWin)
         buttonsfrm.grid(column=0, row=2, sticky=E)
         Button(buttonsfrm, 
                text='Použít', 
@@ -111,21 +122,21 @@ class ShapeSelectFrm(Frame):
                                       padx=(0, 15), pady=10)
         Button(buttonsfrm, 
                text='Zavřít', 
-               command=selectWin.destroy).grid(column=1, row=0, 
-                                      sticky=E+W, 
-                                      padx=(0, 15), pady=10)
+               command=self.onPopupClose).grid(column=1, row=0, 
+                                          sticky=E+W, 
+                                          padx=(0, 15), pady=10)
         
         # position the popup next to a shape selection frame
-        selectWin.update_idletasks()
-        width = selectWin.winfo_reqwidth()
-        height = selectWin.winfo_reqheight()
+        self.selectWin.update_idletasks()
+        width = self.selectWin.winfo_reqwidth()
+        height = self.selectWin.winfo_reqheight()
         xoffset = self.winfo_rootx() - width
         yoffset = self.winfo_rooty() # winfo_root[x|y] returns a coord relative
                                      # to the screen's upper left corner
-        selectWin.geometry('+{}+{}'.format(xoffset, yoffset))
+        self.selectWin.geometry('+{}+{}'.format(xoffset, yoffset))
         
         # disable enlarging the popup window
-        selectWin.maxsize(width = width, height = height)
+        self.selectWin.maxsize(width = width, height = height)
     
     def onSubmit(self):
         if self.var.get() != 0:
