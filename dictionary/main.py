@@ -42,6 +42,8 @@ class Dictionary():
         
     Constants:
     BORDER -- the main frame border
+    WIN_MIN_WIDTH -- minimal width of the main application window
+    WIN_MIN_HEIGHT -- minimal height of the main application window
     VIDEO_WIDTH -- width of the canvas where the main video is played
     VIDEO_HEIGHT -- height of the canvas where the main video is played
     THUMB_WIDTH -- width of the thumbnail videos
@@ -56,6 +58,8 @@ class Dictionary():
     """
 
     BORDER = 40
+    WIN_MIN_WIDTH = 1030
+    WIN_MIN_HEIGHT = 700
     VIDEO_WIDTH = 540
     VIDEO_HEIGHT = 310
     THUMB_WIDTH = 160
@@ -94,7 +98,8 @@ class Dictionary():
         # build the application window
         self.root = Tk()
         self.root.title('Slovník českého znakového jazyka')
-        self.root.minsize(width = 700, height = 700)
+        self.root.minsize(width = self.WIN_MIN_WIDTH, 
+                          height = self.WIN_MIN_HEIGHT)
         
         self.root.columnconfigure(1, weight=1)
         self.root.rowconfigure(0, weight=1)
