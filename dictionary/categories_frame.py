@@ -50,10 +50,10 @@ class CatFrm(Frame):
         # set up the options available in category combobox
         self.catcb['values'] = self.findCats()
         
-        self.catcb.bind('<<ComboboxSelected>>', 
-                        (lambda event: self.catHandler(self.catvar)))
+        self.catcb.bind('<<ComboboxSelected>>', self.catHandler)
         self.catcb.grid(column=0, row=0, 
-                        sticky=N+E+S+W, pady=(self.topSpace, self.verticalSpace))
+                        sticky=N+E+S+W, 
+                        pady=(self.topSpace, self.verticalSpace))
 
         # create subcategory combobox, initially disabled
         self.subcatvar = StringVar()
@@ -63,8 +63,7 @@ class CatFrm(Frame):
                              state='disabled',
                              width=self.width)
         
-        self.subcatcb.bind('<<ComboboxSelected>>',
-                           (lambda event: self.subcatHandler(self.subcatvar)))
+        self.subcatcb.bind('<<ComboboxSelected>>', self.subcatHandler)
         self.subcatcb.grid(column=0, row=1, 
                            sticky=N+E+S+W, pady=(0, self.verticalSpace))
         
@@ -86,7 +85,7 @@ class CatFrm(Frame):
             find = cursor.fetchall()
         return self.listOfTuplesToList(find)
     
-    def catHandler(self, catvar):
+    def catHandler(self, event):
         """Update the subcategory combobox and the scrolled list. 
         
         Receive the category combobox variable and according to its value,
@@ -95,11 +94,11 @@ class CatFrm(Frame):
         Update the options in the scrolledlist to all words
         of the selectected category.
         """
-        subcats = self.findSubcats(catvar.get())       
+        subcats = self.findSubcats(self.catvar.get())       
         self.subcatcb['values'] = subcats
         self.subcatcb.config(state='readonly')
         self.subcatvar.set('-- Zvolte podkategorii --')
-        wordlist = self.findWordsInCat(catvar.get())
+        wordlist = self.findWordsInCat(self.catvar.get())
         wordlist = self.mySort(wordlist)      
         self.scrolledlist.setOptions(wordlist)
     
@@ -124,10 +123,10 @@ class CatFrm(Frame):
             find = cursor.fetchall()
         return self.listOfTuplesToList(find)
 
-    def subcatHandler(self, subcatvar):
+    def subcatHandler(self, event):
         """Update the options in the scrolledlist to the words
         of the selectected subcategory."""
-        wordlist = self.findWordsInSubcat(subcatvar.get())
+        wordlist = self.findWordsInSubcat(self.subcatvar.get())
         wordlist = self.mySort(wordlist)
         self.scrolledlist.setOptions(wordlist)
         
