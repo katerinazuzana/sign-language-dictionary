@@ -70,8 +70,9 @@ class EntFrm(Frame):
         self.ent.entry.bind('<FocusOut>', self.onFocusOut)
 
     def onEntryReturn(self, event):
-        """"""
-        self.startSearch(event)
+        """Start the search only if there is some text in the entry."""
+        if self.var.get() not in ("", self.defaultText):
+            self.startSearch()
 
     def startSearch(self, event=None):
         """Hide the listbox, set focus on the entry and do the search."""
