@@ -31,11 +31,15 @@ class CatFrm(Frame):
         super().__init__(parent, **options)
         self.dbpath = dbpath
         self.searchfcn = searchfcn
-        self.width = 35    # scrolled list width in characters
-        self.height = 12   # scrolled list height in lines
+        self.width = 35
+        self.height = 15   # scrolled list height in lines
+        self.verticalSpace = 40  # space between widgets
+        self.topSpace = 33       # additional padding at the top of the frame
         self.makeWidgets()
        
     def makeWidgets(self):    
+        self.columnconfigure(0, weight=1)
+        
         # create category combobox
         self.catvar = StringVar()
         self.catvar.set('-- Zvolte kategorii --')
@@ -48,7 +52,8 @@ class CatFrm(Frame):
         
         self.catcb.bind('<<ComboboxSelected>>', 
                         (lambda event: self.catHandler(self.catvar)))
-        self.catcb.pack(side=TOP, fill=X, expand=YES, pady=(0, 40))
+        self.catcb.grid(column=0, row=0, 
+                        sticky=N+E+S+W, pady=(self.topSpace, self.verticalSpace))
 
         # create subcategory combobox, initially disabled
         self.subcatvar = StringVar()
@@ -60,14 +65,17 @@ class CatFrm(Frame):
         
         self.subcatcb.bind('<<ComboboxSelected>>',
                            (lambda event: self.subcatHandler(self.subcatvar)))
-        self.subcatcb.pack(side=TOP, fill=X, expand=YES, pady=(0, 40))
+        self.subcatcb.grid(column=0, row=1, 
+                           sticky=N+E+S+W, pady=(0, self.verticalSpace))
         
         # create empty scrolledlist
         self.scrolledlist = ScrolledList([], self.searchfcn, 
                                              self.width, 
                                              self.height, 
                                              self)
-        self.scrolledlist.pack(side=TOP, fill=BOTH, expand=YES)
+        self.scrolledlist.grid(column=0, row=2, sticky=N+E+S+W,
+                               pady=(0, self.verticalSpace))
+        self.rowconfigure(2, weight=1)
 
     def findCats(self):
         """Look up available categories in the database and return
