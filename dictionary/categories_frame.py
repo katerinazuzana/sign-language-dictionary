@@ -89,8 +89,7 @@ class CatFrm(Frame):
     def catHandler(self, event):
         """Update the subcategory combobox and the scrolled list. 
         
-        Receive the category combobox variable and according to its value,
-        set up the options available in the subcategory combobox.
+        Set up the options available in the subcategory combobox.
         Reset the subcategory combobox variable to its default value.
         Update the options in the scrolledlist to all words
         of the selectected category.
@@ -103,8 +102,7 @@ class CatFrm(Frame):
         self.scrolledlist.setOptions(wordlist)
     
     def findSubcats(self):
-        """Receive a string with the selected category and return a list
-        of corresponding subcategories looked up in the database."""
+        """Find subcategories corresponding to the selected category."""
         cat = self.catvar.get().lstrip()
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
