@@ -38,7 +38,7 @@ class EntFrm(Frame):
         bfrm.rowconfigure(0, weight=1)
         
         Button(bfrm, text='Vyhledat',
-                     command=(lambda: self.startSearch(self.var.get()))
+                     command=self.startSearch
               ).grid(column=0, row=0, sticky=N+E+S+W)
         
         # create a list of all the words contained in the database
@@ -58,28 +58,29 @@ class EntFrm(Frame):
         self.var.set(self.defaultText)
         self.ent.entry.config(fg='grey')
         
-        self.ent.entry.bind('<Return>',
-                      (lambda event: self.startSearch(self.var.get())))
-        self.ent.listbox.bind('<Return>',
-                      (lambda event: self.startSearch(self.var.get())))
-        self.ent.listbox.bind('<Double-Button>',
-                      (lambda event: self.startSearch(self.var.get())))
+        self.ent.entry.bind('<Return>', self.onEntryReturn)
+        self.ent.listbox.bind('<Return>', self.startSearch)
+        self.ent.listbox.bind('<Double-Button>', self.startSearch)
                 
         # on mouse click, delete the default text in the entry
-        self.ent.entry.bind('<Button-1>', (lambda event: self.onEntryClick()))
+        self.ent.entry.bind('<Button-1>', self.onEntryClick)
         # when the user starts typing in the entry, delete the default text
-        self.ent.entry.bind('<Key>', (lambda event: self.onTyping(event)))
+        self.ent.entry.bind('<Key>', self.onTyping)
         # on focus out of the entry, insert the default text back
-        self.ent.entry.bind('<FocusOut>', (lambda event: self.onFocusOut()))
+        self.ent.entry.bind('<FocusOut>', self.onFocusOut)
 
-    def startSearch(self, var):
+    def onEntryReturn(self, event):
+        """"""
+        self.startSearch(event)
+
+    def startSearch(self, event=None):
         """Hide the listbox, set focus on the entry and do the search."""
         self.ent.listbox.grid_forget()
         self.ent.entry.focus_set()
         self.ent.entry.icursor(END)
         self.searchfcn(self.var.get())
         
-    def onEntryClick(self):
+    def onEntryClick(self, event):
         """Delete the default text in the entry, if present."""
         if self.var.get() == self.defaultText:
             self.var.set('')
@@ -93,7 +94,7 @@ class EntFrm(Frame):
         else:
             self.ent.update_autocomplete(event)
     
-    def onFocusOut(self):
+    def onFocusOut(self, event):
         """Insert the default text back into the entry, if it's empty.
         Hide the listbox.
         """
