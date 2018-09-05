@@ -119,11 +119,11 @@ class AutocompleteEntry(tk.Frame, object):
             text = self.text.get()
             if not self._case_sensitive:
                 text = text.lower()
-            if not text:
+            if len(text) <= 1: # originaly was: if not text
                 self.listbox.grid_forget()
             else:
                 for entry in self._entries:
-                    if text in entry.strip():
+                    if text.lstrip() in entry.strip():
                         self.listbox.insert(tk.END, entry)
 
             listbox_size = self.listbox.size()
@@ -161,7 +161,7 @@ class AutocompleteEntry(tk.Frame, object):
         widget = event.widget
         if widget.curselection() != ():
             value = widget.get(int(widget.curselection()[0]))
-            self.text.set(value)
+            self.text.set(value.lstrip())
         
     def _focus_on_listbox(self, event):
         """Internal method.

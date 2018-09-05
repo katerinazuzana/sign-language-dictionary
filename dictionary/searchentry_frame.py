@@ -47,6 +47,7 @@ class EntFrm(Frame):
             cursor.execute('SELECT word FROM words')
             allwords = cursor.fetchall()
         entries = self.listOfTuplesToList(allwords)
+        entries = self.leftPadItems(entries)
         
         # create the autocomplete entry
         self.ent = AutocompleteEntry(self)
@@ -79,7 +80,7 @@ class EntFrm(Frame):
         self.ent.listbox.grid_forget()
         self.ent.entry.focus_set()
         self.ent.entry.icursor(END)
-        self.searchfcn(self.var.get())
+        self.searchfcn(self.var.get().lstrip())
         
     def onEntryClick(self, event):
         """Delete the default text in the entry, if present."""
@@ -111,6 +112,13 @@ class EntFrm(Frame):
             res.append(item[0])
         return res
 
+    def leftPadItems(self, alist):
+        """Add a space to the begining of each string in a given list."""
+        return [self.leftPad(item) for item in alist]
+    
+    def leftPad(self, word):
+        """Add a space to the begining of a given string.""" 
+        return " " + word
 
 
 
