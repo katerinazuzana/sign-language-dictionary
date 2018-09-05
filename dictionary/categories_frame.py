@@ -42,7 +42,7 @@ class CatFrm(Frame):
         
         # create category combobox
         self.catvar = StringVar()
-        self.catvar.set('-- Zvolte kategorii --')
+        self.catvar.set(' -- Zvolte kategorii --')
         self.catcb = ttk.Combobox(self, textvariable=self.catvar, 
                                         width=self.width,
                                         state='readonly')
@@ -57,7 +57,7 @@ class CatFrm(Frame):
 
         # create subcategory combobox, initially disabled
         self.subcatvar = StringVar()
-        self.subcatvar.set('-- Zvolte podkategorii --')
+        self.subcatvar.set(' -- Zvolte podkategorii --')
         self.subcatcb = ttk.Combobox(self,
                              textvariable=self.subcatvar,
                              state='disabled',
@@ -98,8 +98,8 @@ class CatFrm(Frame):
         subcats = self.findSubcats()       
         self.subcatcb['values'] = subcats
         self.subcatcb.config(state='readonly')
-        self.subcatvar.set('-- Zvolte podkategorii --')
-        wordlist = self.findWordsInCat()
+        self.subcatvar.set(' -- Zvolte podkategorii --')
+        wordlist = self.findWords(self.catvar)
         self.scrolledlist.setOptions(wordlist)
     
     def findSubcats(self):
@@ -114,15 +114,20 @@ class CatFrm(Frame):
         find = self.listOfTuplesToList(find)
         return self.leftPadItems(find)
 
-    def findWordsInCat(self):
-        """Receive a string with the selected category and return a list
-        of this category's words looked up in the database."""
-        cat = self.catvar.get().lstrip()
+    def findWords(self, var):
+        """Return a list of the words contained in a given (sub)category."""
+        vartext = var.get().lstrip()
+        if var == self.catvar:
+            # looking up the words from a category
+            SQLquery = 'SELECT word FROM words WHERE category IN \
+                       (SELECT lowerlevel FROM cathierarchy WHERE upperlevel=?)'
+        else:
+            # looking up the words from a subcategory
+            SQLquery = 'SELECT word FROM words WHERE category=?'
+        
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT word FROM words WHERE category IN \
-                            (SELECT lowerlevel FROM cathierarchy WHERE \
-                            upperlevel=?)', (cat,))
+            cursor.execute(SQLquery, (vartext,))
             find = cursor.fetchall()
         find = self.listOfTuplesToList(find)
         find = self.mySort(find)
@@ -131,20 +136,8 @@ class CatFrm(Frame):
     def subcatHandler(self, event):
         """Update the options in the scrolledlist to the words
         of the selectected subcategory."""
-        wordlist = self.findWordsInSubcat()
+        wordlist = self.findWords(self.subcatvar)
         self.scrolledlist.setOptions(wordlist)
-        
-    def findWordsInSubcat(self):
-        """Receive a string with the selected subcategory and return a list
-        of this subcategory's words looked up in the database."""
-        subcat = self.subcatvar.get().lstrip()
-        with sqlite3.connect(self.dbpath) as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT word FROM words WHERE category=?',(subcat,))
-            find = cursor.fetchall()
-        find = self.listOfTuplesToList(find)
-        find = self.mySort(find)
-        return self.leftPadItems(find)
         
     def mySort(self, alist):
         return sorted(alist, key = lambda x: (x[0].isdigit(), x.lower()))
