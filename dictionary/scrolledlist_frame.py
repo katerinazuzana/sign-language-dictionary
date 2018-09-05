@@ -46,8 +46,8 @@ class ScrolledList(Frame):
 
     def handler(self, event):
         index = self.listbox.curselection()
-        selection = self.listbox.get(index)  # fetch the selection text
-        self.searchfcn(selection)            # and call the search
+        selection = self.listbox.get(index)    # fetch the selection text
+        self.searchfcn(selection.lstrip())     # and call the search
 
     def setOptions(self, options):
         """Update the options of the scrolled list.

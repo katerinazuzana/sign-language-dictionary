@@ -83,7 +83,8 @@ class CatFrm(Frame):
             cursor = conn.cursor()
             cursor.execute('SELECT DISTINCT upperlevel FROM cathierarchy')
             find = cursor.fetchall()
-        return self.listOfTuplesToList(find)
+        find = self.listOfTuplesToList(find)
+        return self.leftPadItems(find)
     
     def catHandler(self, event):
         """Update the subcategory combobox and the scrolled list. 
@@ -94,50 +95,56 @@ class CatFrm(Frame):
         Update the options in the scrolledlist to all words
         of the selectected category.
         """
-        subcats = self.findSubcats(self.catvar.get())       
+        subcats = self.findSubcats()       
         self.subcatcb['values'] = subcats
         self.subcatcb.config(state='readonly')
         self.subcatvar.set('-- Zvolte podkategorii --')
-        wordlist = self.findWordsInCat(self.catvar.get())
-        wordlist = self.mySort(wordlist)      
+        wordlist = self.findWordsInCat()
         self.scrolledlist.setOptions(wordlist)
     
-    def findSubcats(self, cat):
+    def findSubcats(self):
         """Receive a string with the selected category and return a list
         of corresponding subcategories looked up in the database."""
+        cat = self.catvar.get().lstrip()
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT lowerlevel FROM cathierarchy WHERE \
                             upperlevel=?', (cat,))
             find = cursor.fetchall()
-        return self.listOfTuplesToList(find)
+        find = self.listOfTuplesToList(find)
+        return self.leftPadItems(find)
 
-    def findWordsInCat(self, cat):
+    def findWordsInCat(self):
         """Receive a string with the selected category and return a list
         of this category's words looked up in the database."""
+        cat = self.catvar.get().lstrip()
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT word FROM words WHERE category IN \
                             (SELECT lowerlevel FROM cathierarchy WHERE \
                             upperlevel=?)', (cat,))
             find = cursor.fetchall()
-        return self.listOfTuplesToList(find)
+        find = self.listOfTuplesToList(find)
+        find = self.mySort(find)
+        return self.leftPadItems(find)
 
     def subcatHandler(self, event):
         """Update the options in the scrolledlist to the words
         of the selectected subcategory."""
-        wordlist = self.findWordsInSubcat(self.subcatvar.get())
-        wordlist = self.mySort(wordlist)
+        wordlist = self.findWordsInSubcat()
         self.scrolledlist.setOptions(wordlist)
         
-    def findWordsInSubcat(self, subcat):
+    def findWordsInSubcat(self):
         """Receive a string with the selected subcategory and return a list
         of this subcategory's words looked up in the database."""
+        subcat = self.subcatvar.get().lstrip()
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT word FROM words WHERE category=?',(subcat,))
             find = cursor.fetchall()
-        return self.listOfTuplesToList(find)
+        find = self.listOfTuplesToList(find)
+        find = self.mySort(find)
+        return self.leftPadItems(find)
         
     def mySort(self, alist):
         return sorted(alist, key = lambda x: (x[0].isdigit(), x.lower()))
@@ -149,7 +156,13 @@ class CatFrm(Frame):
             res.append(item[0])
         return res
         
-        
+    def leftPadItems(self, alist):
+        """Add a space to the begining of each string in a given list."""
+        return [self.leftPad(item) for item in alist]
+    
+    def leftPad(self, word):
+        """Add a space to the begining of a given string.""" 
+        return " " + word   
 
         
         
