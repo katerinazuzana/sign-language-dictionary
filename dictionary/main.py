@@ -14,11 +14,8 @@ from categories_frame import CatFrm
 from searchentry_frame import EntFrm
 from video_frame import VideoFrm
 from altoptions_frame import AltsFrm
-from shape_select_frame import ShapeSelectFrm, PassiveShapeSelectFrm
-from radio_buttons import RadioFrm
-from placement_frame import PlacementFrm
+from sign_input_frame import SignInputFrm
 from search_engine import SearchEngine
-
 import math
 
 
@@ -109,7 +106,6 @@ class Dictionary():
         self.frame.grid(column=0, row=0, sticky=N+E+S+W)
                 
         self.frame.columnconfigure(0, minsize=self.VIDEO_WIDTH)
-#        self.frame.columnconfigure(2, weight=1)
         self.frame.rowconfigure(0, weight=1)
         self.frame.rowconfigure(3, minsize=self.VIDEO_HEIGHT)
         self.frame.rowconfigure(4, minsize= self.THUMB_HEIGHT +
@@ -152,13 +148,6 @@ class Dictionary():
                            sticky=N+E+S+W,
                            pady=(self.THUMB_PADY, self.BORDER))
 
-        # create a vertical separator
-#        self.sep = ttk.Separator(self.frame, orient='vertical')
-#        self.sep.grid(row=0, column=1, 
-#                      rowspan=5, 
-#                      padx=self.BORDER, 
-#                      sticky=N+E+S+W)
-
         # create the notebook
         self.notebook = ttk.Notebook(self.root)
         self.notebook.grid(column=1, row=0, sticky=N+E+S+W)
@@ -172,7 +161,6 @@ class Dictionary():
         style.configure('TNotebook.Tab', background='ghost white')
         # activeTabBg
         style.map('TNotebook.Tab', background=[('selected', self.BGCOLOR)])
-        # 'TNotebook': {'congfigure': {'tabmargins': [2, 5, 2, 0] } }
         
         # create the category-selection frame
         self.catfrm = CatFrm(self.dbpath, 
@@ -185,8 +173,12 @@ class Dictionary():
         self.notebook.add(self.catfrm, text='Výběr podle kategorií')
         
         # create the sign-input frame
-        self.signfrm = Frame(self.notebook, bg=self.BGCOLOR, 
-                             padx=self.BORDER)
+        self.signfrm = SignInputFrm(self.notebook, 
+                                    self.BGCOLOR, 
+                                    self.imgdir, 
+                                    self.searchEng.signSearch, 
+                                    bg=self.BGCOLOR, 
+                                    padx=self.BORDER)
         self.signfrm.grid(column=0, row=0, sticky=N+E+S+W)
         self.notebook.add(self.signfrm, text='Překlad z ČZJ do ČJ')
         
@@ -194,38 +186,6 @@ class Dictionary():
         self.notebook.update_idletasks()
         self.notebook.initialWidth = self.notebook.winfo_width()
         self.notebook.bind('<Configure>', self.onResize)
-        
-        # create an active hand shapes offer
-        Label(self.signfrm, 
-              text='Tvar aktivní ruky', 
-              bg=self.BGCOLOR
-              ).grid(column=0, row=0, columnspan=2, sticky=W, pady=(20, 3))
-        
-        self.actshapes = ShapeSelectFrm(self.signfrm, self.imgdir, self.BGCOLOR)
-        self.actshapes.grid(column=0, row=1, 
-                            columnspan=2, sticky=N+E+S+W, pady=(0, 20))
-        
-        # create radio-buttons
-        self.radiofrm = RadioFrm(self.signfrm, self.imgdir, self.BGCOLOR)
-        self.radiofrm.grid(column=0, row=2, 
-                           columnspan=2, sticky=N+S+W, pady=(0, 20))
-        
-        # create canvas for sign-placement input
-        Label(self.signfrm, 
-              text='Místo artikulace znaku', 
-              bg=self.BGCOLOR
-              ).grid(column=0, row=3, columnspan=2, sticky=W, pady=(0, 3))
-        
-        placementfrm = PlacementFrm(self.signfrm)
-        placementfrm.grid(column=0, row=4, sticky=W)
-        
-        # create the Search button
-        Button(self.signfrm, 
-               text='Vyhledat', 
-               command=self.searchEng.signSearch
-               ).grid(column=1, row=4, 
-                                sticky=E+S, 
-                                padx=(15, 0))
     
     def onResize(self, event):
         """Dynamically set tab padding to streach tabs over whole notebook."""
