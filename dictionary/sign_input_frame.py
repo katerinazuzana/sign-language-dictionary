@@ -12,6 +12,7 @@ class SignInputFrm(Frame):
         self.signSearchFcn = signSearchFcn
         self.bgcolor = options.get('bg', self['bg'])
         self.makeWidgets()
+        self.focus_set()
        
     def makeWidgets(self):
 
