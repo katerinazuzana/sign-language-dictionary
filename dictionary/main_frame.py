@@ -40,7 +40,7 @@ class MainFrm(Frame):
     THUMB_PADY = 10
     
     def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, 
-                 altsmax, font, **options):
+                 altsmax, **options):
         super().__init__(parent, **options)
 
         self.dbpath = dbpath
@@ -51,7 +51,6 @@ class MainFrm(Frame):
         self.alts = None   # the frame where alternative options are displayed
                            # when the given word is not found in the database
         self.altsmax = altsmax
-        self.option_add('*Font', font)
         
         self.bgcolor = options.get('bg', self['bg'])
 

@@ -58,6 +58,7 @@ class Dictionary():
         # build the application window
         self.root = Tk()
         self.root.title('Slovník českého znakového jazyka')
+        self.root.option_add('*Font', self.font)
         self.root.minsize(width = self.WIN_MIN_WIDTH, 
                           height = self.WIN_MIN_HEIGHT)
         
@@ -70,8 +71,7 @@ class Dictionary():
                              self.vfdir, 
                              self.imgdir, 
                              self.searchEng.search, 
-                             self.altsmax, 
-                             self.font, 
+                             self.altsmax,  
                              bg=self.BGCOLOR, 
                              padx=self.BORDER)
         self.mainfrm.grid(column=0, row=0, sticky=N+E+S+W)
