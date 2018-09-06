@@ -27,7 +27,8 @@ class SignInputFrm(Frame):
                            sticky=N+S+W, pady=(0, 20))
 
         # create canvas for sign-placement input
-        placementfrm = PlacementFrm(self, 
+        placementfrm = PlacementFrm(self,
+                                    self.imgdir, 
                                     self.bgcolor, 
                                     bg=self.bgcolor)
         placementfrm.grid(column=0, row=2, sticky=W)
