@@ -7,6 +7,8 @@ class PlacementFrm(Frame):
         self.makeWidgets()
         
     def makeWidgets(self):
+        self.rowconfigure(1, weight=1)
+        
         Label(self, 
               text='Místo artikulace znaku', 
               bg=self.bgcolor
@@ -16,11 +18,18 @@ class PlacementFrm(Frame):
                                    height=250, 
                                    borderwidth=2, 
                                    relief='groove')
-        self.canvas.grid(column=0, row=1)
+        self.canvas.grid(column=0, row=1, rowspan=2)
         
-        searchButton = Button(self, 
-                              text='Vyhledat', 
-                              command=self.master.onSearchPress,
-                              ).grid(column=1, row=1, sticky=S, padx=(15, 0))
+        Button(self, 
+               text='Zrušit', 
+               command=self.onDelete,
+               ).grid(column=1, row=1, sticky=S+W, padx=(15, 0))
         
+        Button(self, 
+               text='Vyhledat', 
+               command=self.master.onSearchPress,
+               ).grid(column=1, row=2, sticky=S+W, padx=(15, 0), pady=(8, 0))
+        
+    def onDelete(self):
+        pass
     
