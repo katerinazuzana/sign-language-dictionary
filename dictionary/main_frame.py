@@ -68,6 +68,7 @@ class MainFrm(Frame):
         self.entfrm = EntFrm(self.dbpath, 
                              self.searchfcn,  
                              self, 
+                             self.imgdir, 
                              bg=self.bgcolor)
         self.entfrm.grid(column=0, row=0,
                          rowspan=2, 

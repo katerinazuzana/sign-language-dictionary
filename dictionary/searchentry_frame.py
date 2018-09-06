@@ -1,6 +1,7 @@
 from tkinter import *
 import os
 import sqlite3
+from PIL import Image, ImageTk
 from autocomplete_entry import AutocompleteEntry
 
 
@@ -12,7 +13,7 @@ class EntFrm(Frame):
     can be called on Return/Search button press.
     """
     
-    def __init__(self, dbpath, searchfcn, parent, **options):
+    def __init__(self, dbpath, searchfcn, parent, imgdir, **options):
         """Create the AutocompleteEntry and the Search button.
         
         Arguments:
@@ -25,6 +26,8 @@ class EntFrm(Frame):
         self.dbpath = dbpath
         self.searchfcn = searchfcn
         self.defaultText = 'Zadejte výraz'
+        self.iconPath = os.path.join(imgdir, 'search_icon.png')
+        self.iconSize = 30
         self.makeWidgets()
 
     def makeWidgets(self):
@@ -32,12 +35,17 @@ class EntFrm(Frame):
         self.rowconfigure(0, minsize=140)
         
         # create the search button
-        bfrm = Frame(self, height=30, width=90)
+        bfrm = Frame(self, height=30, width=60)
         bfrm.grid_propagate(0)  # don't shrink
         bfrm.grid(column=1, row=0, sticky=N)
         bfrm.rowconfigure(0, weight=1)
         
-        Button(bfrm, text='Vyhledat',
+        with Image.open(self.iconPath) as img:
+            img = img.resize((self.iconSize, self.iconSize), 
+                             Image.LANCZOS)
+            self.iconImg = ImageTk.PhotoImage(img)
+        
+        Button(bfrm, image=self.iconImg,
                      command=self.startSearch
               ).grid(column=0, row=0, sticky=N+E+S+W)
         
