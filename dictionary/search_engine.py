@@ -4,13 +4,13 @@ from difflib import SequenceMatcher
 
 class SearchEngine():
 
-    def __init__(self, showResultFcn, dbpath, vfdir, altsmax):
-        self.showResultFcn = showResultFcn
+    def __init__(self, dbpath, vfdir, altsmax):
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.altsmax = altsmax
         
         self.allwords = []
+        self.showResultFcn = None
 
         # create a list of video file names for searching with unknown suffix
         # used in findVideoFile() method

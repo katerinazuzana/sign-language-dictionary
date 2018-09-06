@@ -7,7 +7,10 @@ from scrolledlist_frame import ScrolledList
 
 
 class CatFrm(Frame):
-    """A frame containing:
+    """A frame where a word for translation might be selected from 
+    a category or a subcategory of words.
+    
+    Contains:
     a category-combobox for choosing a category,
     a subcategory-combobox for choosing a corresponding subcategory,
     a scrolledlist displaying the words from the choosen (sub)category.
