@@ -3,9 +3,9 @@ from PIL import Image, ImageTk
 import os
 
 class PlacementFrm(Frame):
-    def __init__(self, parent, imgdir, bgcolor, **options):
+    def __init__(self, parent, imgdir, **options):
         super().__init__(parent, **options)
-        self.bgcolor = bgcolor
+        self.bgcolor = options.get('bg', self['bg'])
         
         self.hintIconPath = os.path.join(imgdir, 'hint_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')

@@ -51,11 +51,9 @@ class MainFrm(Frame):
         self.alts = None   # the frame where alternative options are displayed
                            # when the given word is not found in the database
         self.altsmax = altsmax
-        
         self.bgcolor = options.get('bg', self['bg'])
 
         self.makeWidgets()
-
 
     def makeWidgets(self):
         self.columnconfigure(0, minsize=self.VIDEO_WIDTH)

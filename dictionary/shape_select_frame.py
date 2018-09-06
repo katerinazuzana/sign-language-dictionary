@@ -5,10 +5,10 @@ from PIL import Image, ImageTk
 from scrolled_frame import ScrolledFrame
 
 class ShapeSelectFrm(Frame):
-    def __init__(self, parent, imgdir, bgcolor, **options):
-        super().__init__(parent, bg=bgcolor)
+    def __init__(self, parent, imgdir, **options):
+        super().__init__(parent, **options)
         self.imgdir = imgdir
-        self.bgcolor = bgcolor
+        self.bgcolor = options.get('bg', self['bg'])
         
         self.selectIconPath = os.path.join(imgdir, 'select_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
@@ -337,8 +337,8 @@ class ShapeSelectFrm(Frame):
 
 
 class PassiveShapeSelectFrm(ShapeSelectFrm):
-    def __init__(self, parent, imgdir, bgcolor, **options):
-        super().__init__(parent, imgdir, bgcolor, **options)
+    def __init__(self, parent, imgdir, **options):
+        super().__init__(parent, imgdir, **options)
          
         self.shapes = [1, 2, 4, 6, 9, 12, 13, 14, 16, 17, 23, 28, 41]
         self.numrows = 3

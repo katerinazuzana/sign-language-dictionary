@@ -45,6 +45,7 @@ class Dictionary():
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.imgdir = imgdir
+        
         self.altsmax = 10  # maximum number of alternative options
         self.font = ('Helvetica', 12)
         
@@ -61,7 +62,7 @@ class Dictionary():
         self.root.option_add('*Font', self.font)
         self.root.minsize(width = self.WIN_MIN_WIDTH, 
                           height = self.WIN_MIN_HEIGHT)
-        
+             
         self.root.columnconfigure(1, weight=1)
         self.root.rowconfigure(0, weight=1)
         
@@ -108,8 +109,7 @@ class Dictionary():
         self.notebook.add(self.catfrm, text='Výběr podle kategorií')
         
         # create the sign-input frame
-        self.signfrm = SignInputFrm(self.notebook, 
-                                    self.BGCOLOR, 
+        self.signfrm = SignInputFrm(self.notebook,  
                                     self.imgdir, 
                                     self.searchEng.signSearch, 
                                     bg=self.BGCOLOR, 

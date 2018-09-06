@@ -2,10 +2,10 @@ from tkinter import *
 from shape_select_frame import PassiveShapeSelectFrm
 
 class RadioFrm(Frame):
-    def __init__(self, parent, imgdir, bgcolor, **options):
-        super().__init__(parent, bg=bgcolor, **options)
+    def __init__(self, parent, imgdir, **options):
+        super().__init__(parent, **options)
         self.imgdir = imgdir
-        self.bgcolor = bgcolor
+        self.bgcolor = options.get('bg', self['bg'])
         self.var = StringVar()
         
         values = [('jednoruční znak', 'single hand'), 
@@ -24,7 +24,9 @@ class RadioFrm(Frame):
         
         self.var.set('single hand')
         
-        self.passhapes = PassiveShapeSelectFrm(self, self.imgdir, self.bgcolor)
+        self.passhapes = PassiveShapeSelectFrm(self, 
+                                               self.imgdir, 
+                                               bg=self.bgcolor)
         self.passhapes.grid(column=0, row=3, pady=(6, 0))
         self.passhapes.deactivate()
         
