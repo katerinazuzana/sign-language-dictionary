@@ -72,7 +72,8 @@ class Dictionary():
                              self.vfdir, 
                              self.imgdir, 
                              self.searchEng.search, 
-                             self.altsmax,  
+                             self.altsmax, 
+                             self.BORDER, 
                              bg=self.BGCOLOR, 
                              padx=self.BORDER)
         self.mainfrm.grid(column=0, row=0, sticky=N+E+S+W)

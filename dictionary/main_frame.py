@@ -30,7 +30,6 @@ class MainFrm(Frame):
     THUMB_PADY -- space between the main video and the thumbnails
     """
     
-    BORDER = 40
     VIDEO_WIDTH = 540
     VIDEO_HEIGHT = 310
     THUMB_WIDTH = 160
@@ -40,7 +39,7 @@ class MainFrm(Frame):
     THUMB_PADY = 10
     
     def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, 
-                 altsmax, **options):
+                 altsmax, border, **options):
         super().__init__(parent, **options)
 
         self.dbpath = dbpath
@@ -51,6 +50,7 @@ class MainFrm(Frame):
         self.alts = None   # the frame where alternative options are displayed
                            # when the given word is not found in the database
         self.altsmax = altsmax
+        self.BORDER = border
         self.bgcolor = options.get('bg', self['bg'])
 
         self.makeWidgets()
