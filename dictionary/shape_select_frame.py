@@ -10,6 +10,10 @@ class ShapeSelectFrm(Frame):
         self.imgdir = imgdir
         self.bgcolor = bgcolor
         
+        self.selectIconPath = os.path.join(imgdir, 'select_icon.png')
+        self.delIconPath = os.path.join(imgdir, 'del_icon.png')
+        self.iconSize = 30
+        
         self.labwidth = 65
         self.labheight = 80
         self.labborder = 3
@@ -71,11 +75,23 @@ class ShapeSelectFrm(Frame):
         self.sep = Frame(self.selectionfrm, bg=self.bgcolor)
         self.sep.grid(column=1, row=0, sticky=N+S)
         
-    def makeButtons(self):    
-        self.selectBut = Button(self, text='Vybrat', command=self.openPopup)
+    def makeButtons(self):
+        # create select button
+        with Image.open(self.selectIconPath) as img:
+            img = img.resize((self.iconSize, self.iconSize), Image.LANCZOS)
+            self.selectImg = ImageTk.PhotoImage(img)
+        self.selectBut = Button(self, 
+                                image=self.selectImg, 
+                                command=self.openPopup)
         self.selectBut.grid(column=1, row=1, sticky=E+W, padx=20)
         
-        self.delBut = Button(self, text='Zrušit', command=self.onDelete)
+        # create delete button
+        with Image.open(self.delIconPath) as img:
+            img = img.resize((self.iconSize, self.iconSize), Image.LANCZOS)
+            self.delImg = ImageTk.PhotoImage(img)
+        self.delBut = Button(self, 
+                             image=self.delImg, 
+                             command=self.onDelete)      
         self.delBut.grid(column=1, row=2, sticky=E+W, padx=20)
     
     def onDelete(self):
@@ -236,24 +252,22 @@ class ShapeSelectFrm(Frame):
                      pady=self.labborder)
             self.labels.append(lab)    
             
-            # on label click
+            # on label click, change the color of highlighting
             def clickHandler(i):
                 return lambda event: self.onLabClick(i)            
             lab.bind('<Button-1>', clickHandler(i))
             
-            # on label double-click
+            # on label double-click, the label is fetched
             def doubleClickHandler(i):
                 return lambda event: self.onLabDoubleClick(i)            
             lab.bind('<Double-Button-1>', doubleClickHandler(i))
             
-            # when the mouse cursor enters a label,
-            # 
+            # when the cursor enters a label, the label is highlighted
             def enterHandler(i):
                 return lambda event: self.onLabEnter(i)
             lab.bind('<Enter>', enterHandler(i))
             
-            # when the mouse cursor leaves a label,
-            # 
+            # when the cursor leaves a label, highlighting is removed
             def leaveHandler(i):
                 return lambda event: self.onLabLeave(i)
             lab.bind('<Leave>', leaveHandler(i))
@@ -345,19 +359,11 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
                             bg=self.bgcolor, 
                             borderwidth=2, 
                             relief='groove')
-        self.selectionfrm.grid(column=0, row=0, rowspan=2)
+        self.selectionfrm.grid(column=0, row=1, rowspan=2) # 0. row is empty
         self.selectionfrm.columnconfigure(0, 
                           minsize = self.labwidth + 2 * self.labborder)
         self.selectionfrm.rowconfigure(0, 
                           minsize = self.labheight + 2 * self.labborder)
-    
-    def makeButtons(self):  
-        # differs from ShapeSelectFrm in row numbers  
-        self.selectBut = Button(self, text='Vybrat', command=self.openPopup)
-        self.selectBut.grid(column=1, row=0, sticky=E+W, padx=20)
-        
-        self.delBut = Button(self, text='Zrušit', command=self.onDelete)
-        self.delBut.grid(column=1, row=1, sticky=E+W, padx=20)
     
     def onSubmit(self):
         if self.var.get() != 0:

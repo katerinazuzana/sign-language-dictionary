@@ -6,7 +6,12 @@ class PlacementFrm(Frame):
     def __init__(self, parent, imgdir, bgcolor, **options):
         super().__init__(parent, **options)
         self.bgcolor = bgcolor
+        
         self.hintIconPath = os.path.join(imgdir, 'hint_icon.png')
+        self.delIconPath = os.path.join(imgdir, 'del_icon.png')
+        self.delIconSize = 30
+        self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
+        self.searchIconSize = 40
         
         self.hintSize = 14
         self.hintText = 'Klepnutím a tažením nakreslete elipsu.' + \
@@ -33,18 +38,30 @@ class PlacementFrm(Frame):
         self.hintIcon.bind('<Enter>', self.openHint)
         self.hintIcon.bind('<Leave>', self.closeHint)
         
-        # create a canvas and buttons
+        # create a canvas
         self.canvas = Canvas(self, width=240, 
                                    height=250, 
                                    borderwidth=2, 
                                    relief='groove')
         self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)        
+        
+        # create delete button
+        with Image.open(self.delIconPath) as img:
+            img = img.resize((self.delIconSize, self.delIconSize), 
+                             Image.LANCZOS)
+            self.delImg = ImageTk.PhotoImage(img)
         Button(self, 
-               text='Zrušit', 
+               image=self.delImg, 
                command=self.onDelete
                ).grid(column=2, row=1, sticky=S+W, padx=(15, 0))
+        
+        # create search sign button
+        with Image.open(self.searchIconPath) as img:
+            img = img.resize((self.searchIconSize, self.searchIconSize), 
+                             Image.LANCZOS)
+            self.searchImg = ImageTk.PhotoImage(img)
         Button(self, 
-               text='Vyhledat', 
+               image=self.searchImg, 
                command=self.master.onSearchPress
                ).grid(column=2, row=2, sticky=S+W, padx=(15, 0), pady=(8, 0))
     
