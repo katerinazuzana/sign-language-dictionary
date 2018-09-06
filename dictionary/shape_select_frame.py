@@ -22,7 +22,7 @@ class ShapeSelectFrm(Frame):
         
         self.shapes = [i+1 for i in range(51)]
                 
-        self.popuptitle = 'Tvar aktivní ruky'
+        self.title = 'Tvar aktivní ruky'
         self.popuptext = 'Zvolte tvar aktivní ruky'
         
         self.var = IntVar()
@@ -36,9 +36,16 @@ class ShapeSelectFrm(Frame):
         self.sel1 = None
         self.sep = None
         self.sel2 = None
-                
+              
+        self.makeLabel()
         self.makeSelectionFrm()
         self.makeButtons()
+    
+    def makeLabel(self):
+        Label(self, 
+              text=self.title, 
+              bg=self.bgcolor
+              ).grid(column=0, row=0, columnspan=2, sticky=W, pady=(20, 3))
         
     def makeSelectionFrm(self):
         selfrmwidth = 2*self.labwidth + 4*self.labborder + self.sepwidth + 2*2
@@ -50,7 +57,7 @@ class ShapeSelectFrm(Frame):
                             bg=self.bgcolor, 
                             borderwidth=2, 
                             relief='groove')
-        self.selectionfrm.grid(column=0, row=0, rowspan=2)
+        self.selectionfrm.grid(column=0, row=1, rowspan=2)
         self.selectionfrm.columnconfigure(0, 
                           minsize = self.labwidth + 2 * self.labborder)
         self.selectionfrm.rowconfigure(0, 
@@ -66,10 +73,10 @@ class ShapeSelectFrm(Frame):
         
     def makeButtons(self):    
         self.selectBut = Button(self, text='Vybrat', command=self.openPopup)
-        self.selectBut.grid(column=1, row=0, sticky=E+W, padx=20)
+        self.selectBut.grid(column=1, row=1, sticky=E+W, padx=20)
         
         self.delBut = Button(self, text='Zrušit', command=self.onDelete)
-        self.delBut.grid(column=1, row=1, sticky=E+W, padx=20)
+        self.delBut.grid(column=1, row=2, sticky=E+W, padx=20)
     
     def onDelete(self):
         if self.var2.get() != 0:
@@ -89,7 +96,7 @@ class ShapeSelectFrm(Frame):
     def createPopup(self):
         # create a popup window
         self.selectWin = Toplevel()
-        self.selectWin.title(self.popuptitle)
+        self.selectWin.title(self.title)
         self.selectWin.columnconfigure(0, weight=1)
         
         self.selectWin.protocol('WM_DELETE_WINDOW', self.onPopupClose)
@@ -322,8 +329,11 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         self.shapes = [1, 2, 4, 6, 9, 12, 13, 14, 16, 17, 23, 28, 41]
         self.numrows = 3
         
-        self.popuptitle = 'Tvar pasivní ruky'
+        self.title = 'Tvar pasivní ruky'
         self.popuptext = 'Zvolte tvar pasivní ruky'
+    
+    def makeLabel(self):
+        pass
     
     def makeSelectionFrm(self):
         selfrmwidth = self.labwidth + 2*self.labborder + 2*2
@@ -340,6 +350,14 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
                           minsize = self.labwidth + 2 * self.labborder)
         self.selectionfrm.rowconfigure(0, 
                           minsize = self.labheight + 2 * self.labborder)
+    
+    def makeButtons(self):  
+        # differs from ShapeSelectFrm in row numbers  
+        self.selectBut = Button(self, text='Vybrat', command=self.openPopup)
+        self.selectBut.grid(column=1, row=0, sticky=E+W, padx=20)
+        
+        self.delBut = Button(self, text='Zrušit', command=self.onDelete)
+        self.delBut.grid(column=1, row=1, sticky=E+W, padx=20)
     
     def onSubmit(self):
         if self.var.get() != 0:
