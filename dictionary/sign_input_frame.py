@@ -19,27 +19,17 @@ class SignInputFrm(Frame):
         # create an active hand shapes offer
         self.actshapes = ShapeSelectFrm(self, self.imgdir, self.bgcolor)
         self.actshapes.grid(column=0, row=0, 
-                            columnspan=2, sticky=N+E+S+W, pady=(0, 20))
+                            sticky=N+E+S+W, pady=(0, 20))
         
         # create radio-buttons
         self.radiofrm = RadioFrm(self, self.imgdir, self.bgcolor)
         self.radiofrm.grid(column=0, row=1, 
-                           columnspan=2, sticky=N+S+W, pady=(0, 20))
-        
+                           sticky=N+S+W, pady=(0, 20))
+
         # create canvas for sign-placement input
-        Label(self, 
-              text='Místo artikulace znaku', 
-              bg=self.bgcolor
-              ).grid(column=0, row=2, columnspan=2, sticky=W, pady=(0, 3))
-        
-        placementfrm = PlacementFrm(self)
-        placementfrm.grid(column=0, row=3, sticky=W)
-        
-        # create the Search button
-        Button(self, 
-               text='Vyhledat', 
-               command=self.searchfcn
-               ).grid(column=1, row=3, 
-                                sticky=E+S, 
-                                padx=(15, 0))
+        placementfrm = PlacementFrm(self, 
+                                    self.searchfcn,
+                                    self.bgcolor, 
+                                    bg=self.bgcolor)
+        placementfrm.grid(column=0, row=2, sticky=W)
 
