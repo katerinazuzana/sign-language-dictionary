@@ -9,9 +9,8 @@ class PlacementFrm(Frame):
         self.hintIconPath = os.path.join(imgdir, 'hint_icon.png')
         
         self.hintSize = 14
-        self.hint = None
         self.hintText = 'Klepnutím a tažením nakreslete elipsu.' + \
-                        ' Nápovědu zavřete kliknutím na ikonu.'
+                        ' Tady bude další instrukce.'
         self.makeWidgets()
         
     def makeWidgets(self):
@@ -27,12 +26,12 @@ class PlacementFrm(Frame):
         with Image.open(self.hintIconPath) as img:
             img = img.resize((self.hintSize, self.hintSize), Image.LANCZOS)
             self.icon = ImageTk.PhotoImage(img)
-        self.hintButton = Button(self, 
-                                 image=self.icon, 
-                                 command=self.onHintPress)
-        self.hintButton.grid(column=1, row=0, 
-                             sticky=W, 
-                             padx=(8, 0), pady=(0, 3))
+        self.hintIcon = Label(self, image=self.icon)
+        self.hintIcon.grid(column=1, row=0, 
+                           sticky=W, 
+                           padx=(8, 0))
+        self.hintIcon.bind('<Enter>', self.openHint)
+        self.hintIcon.bind('<Leave>', self.closeHint)
         
         # create a canvas and buttons
         self.canvas = Canvas(self, width=240, 
@@ -49,31 +48,21 @@ class PlacementFrm(Frame):
                command=self.master.onSearchPress
                ).grid(column=2, row=2, sticky=S+W, padx=(15, 0), pady=(8, 0))
     
-    def onHintPress(self):
-        if not self.hint:
-            self.openHint()
-        else:
-            self.closeHint()
-    
-    def openHint(self):
+    def openHint(self, event):
         self.hint = Toplevel()
         Message(self.hint, 
              text=self.hintText, 
-             width=200, 
+             width=150, 
              font=('Helvetica', 10),
              bg=self.bgcolor).grid()
         
-        xoffset = self.hintButton.winfo_rootx() + self.hintSize
-        yoffset = self.hintButton.winfo_rooty() + self.hintSize
+        xoffset = self.hintIcon.winfo_rootx() + self.hintSize
+        yoffset = self.hintIcon.winfo_rooty() + self.hintSize
         self.hint.geometry('+{}+{}'.format(xoffset, yoffset))
         self.hint.overrideredirect(True)
-        
-        self.hint.focus_set()
-        self.hint.bind('<FocusOut>', lambda: self.closeHint())
     
-    def closeHint(self):
+    def closeHint(self, event):
         self.hint.destroy()
-        self.hint = None
         
     def onDelete(self):
         pass
