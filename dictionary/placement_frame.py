@@ -1,9 +1,8 @@
 from tkinter import *
 
 class PlacementFrm(Frame):
-    def __init__(self, parent, searchfcn, bgcolor, **options):
+    def __init__(self, parent, bgcolor, **options):
         super().__init__(parent, **options)
-        self.searchfcn = searchfcn
         self.bgcolor = bgcolor
         self.makeWidgets()
         
@@ -21,8 +20,7 @@ class PlacementFrm(Frame):
         
         searchButton = Button(self, 
                               text='Vyhledat', 
-                              command=self.onSearchPress
+                              command=self.master.onSearchPress,
                               ).grid(column=1, row=1, sticky=S, padx=(15, 0))
         
-    def onSearchPress(self):
-        pass
+    

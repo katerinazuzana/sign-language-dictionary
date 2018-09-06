@@ -6,12 +6,12 @@ from placement_frame import PlacementFrm
 
 class SignInputFrm(Frame):
 
-    def __init__(self, parent, bgcolor, imgdir, searchfcn, **options):
+    def __init__(self, parent, bgcolor, imgdir, signSearchFcn, **options):
         
         super().__init__(parent, **options)
         self.bgcolor = bgcolor
         self.imgdir = imgdir
-        self.searchfcn = searchfcn
+        self.signSearchFcn = signSearchFcn
         self.makeWidgets()
        
     def makeWidgets(self):
@@ -28,8 +28,20 @@ class SignInputFrm(Frame):
 
         # create canvas for sign-placement input
         placementfrm = PlacementFrm(self, 
-                                    self.searchfcn,
                                     self.bgcolor, 
                                     bg=self.bgcolor)
         placementfrm.grid(column=0, row=2, sticky=W)
+
+    def onSearchPress(self):
+    
+        signComponents = ((self.actshapes.sel1, self.actshapes.sel1), 
+                          (self.radiofrm.var.get(), 
+                           self.radiofrm.passhapes.sel1), 
+                          (None,))
+        # TODO fetch the ellipse
+        self.signSearchFcn(*signComponents)
+        
+
+
+
 

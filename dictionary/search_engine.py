@@ -104,7 +104,7 @@ class SearchEngine():
             res.append(item[0])
         return res
   
-    def signSearch(self):
+    def signSearch(self, *args):
         pass
 
 
