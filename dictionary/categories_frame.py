@@ -34,7 +34,7 @@ class CatFrm(Frame):
         super().__init__(parent, **options)
         self.dbpath = dbpath
         self.searchfcn = searchfcn
-        self.width = 35
+        self.width = 33
         self.height = 15   # scrolled list height in lines
         self.verticalSpace = 40  # space between widgets
         self.topSpace = 33       # additional padding at the top of the frame
@@ -55,7 +55,7 @@ class CatFrm(Frame):
         
         self.catcb.bind('<<ComboboxSelected>>', self.catHandler)
         self.catcb.grid(column=0, row=0, 
-                        sticky=N+E+S+W, 
+                        sticky=N+E+S+W,
                         pady=(self.topSpace, self.verticalSpace))
 
         # create subcategory combobox, initially disabled
@@ -68,14 +68,15 @@ class CatFrm(Frame):
         
         self.subcatcb.bind('<<ComboboxSelected>>', self.subcatHandler)
         self.subcatcb.grid(column=0, row=1, 
-                           sticky=N+E+S+W, pady=(0, self.verticalSpace))
+                           sticky=N+E+S+W, 
+                           pady=(0, self.verticalSpace))
         
         # create empty scrolledlist
         self.scrolledlist = ScrolledList([], self.searchfcn, 
                                              self.width, 
                                              self.height, 
                                              self)
-        self.scrolledlist.grid(column=0, row=2, sticky=N+E+S+W,
+        self.scrolledlist.grid(column=0, row=2, sticky=N+E+S+W, 
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
 

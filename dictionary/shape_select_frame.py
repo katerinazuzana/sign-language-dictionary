@@ -83,7 +83,7 @@ class ShapeSelectFrm(Frame):
         self.selectBut = Button(self, 
                                 image=self.selectImg, 
                                 command=self.openPopup)
-        self.selectBut.grid(column=1, row=1, sticky=E+W, padx=20)
+        self.selectBut.grid(column=1, row=1, sticky=W, padx=20)
         
         # create delete button
         with Image.open(self.delIconPath) as img:
@@ -92,7 +92,7 @@ class ShapeSelectFrm(Frame):
         self.delBut = Button(self, 
                              image=self.delImg, 
                              command=self.onDelete)      
-        self.delBut.grid(column=1, row=2, sticky=E+W, padx=20)
+        self.delBut.grid(column=1, row=2, sticky=W, padx=20)
     
     def onDelete(self):
         if self.var2.get() != 0:

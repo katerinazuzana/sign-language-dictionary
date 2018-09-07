@@ -28,9 +28,9 @@ class Dictionary():
     """
 
     BORDER = 40
-    WIN_MIN_WIDTH = 1030
+    WIN_MIN_WIDTH = 985
     WIN_MIN_HEIGHT = 700
-    TAB_PAD = 32
+    TAB_PAD = 23
     BGCOLOR = 'white'
 
     def __init__(self, dbpath, vfdir, imgdir):
@@ -87,9 +87,17 @@ class Dictionary():
         self.notebook.grid(column=1, row=0, sticky=N+E+S+W)
         
         # style
-        self.style = style = ttk.Style()       
+        self.style = style = ttk.Style()
+        style.theme_use('clearlooks')
+        
+        style.configure('TCombobox', padding=(0, -4, 0, -4))
+        style.configure('TCombobox', background=self.BGCOLOR)
+        
         style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0, 
-                                                  self.TAB_PAD, 0))        
+                                                  self.TAB_PAD, 0))
+        style.map('TNotebook.Tab', padding=[('selected', (self.TAB_PAD, 0, 
+                                             self.TAB_PAD, 0))])
+            
         # tabs' font:
         style.configure('.', font=self.font)
         # color visible only at the notebook border:
@@ -130,7 +138,9 @@ class Dictionary():
         self.style.configure('TNotebook.Tab', 
                              padding=(self.TAB_PAD + extraPadding, 0, 
                                       self.TAB_PAD + extraPadding, 0))
-    
+        self.style.map('TNotebook.Tab', padding=[('selected', 
+                                     (self.TAB_PAD + extraPadding, 0, 
+                                      self.TAB_PAD + extraPadding, 0))])
         
 
 if __name__ == '__main__':

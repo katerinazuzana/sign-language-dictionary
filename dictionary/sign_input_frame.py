@@ -19,7 +19,7 @@ class SignInputFrm(Frame):
         # create an active hand shapes offer
         self.actshapes = ShapeSelectFrm(self, self.imgdir, bg=self.bgcolor)
         self.actshapes.grid(column=0, row=0, 
-                            sticky=N+E+S+W, pady=(0, 20))
+                            sticky=N+S+W, pady=(0, 20))
         
         # create radio-buttons
         self.radiofrm = RadioFrm(self, self.imgdir, bg=self.bgcolor)
