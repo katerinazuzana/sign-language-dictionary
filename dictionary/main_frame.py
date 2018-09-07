@@ -128,7 +128,7 @@ class MainFrm(Frame):
             self.alts = None
             self.video = VideoFrm(width=self.VIDEO_WIDTH,
                                   height=self.VIDEO_HEIGHT,
-                                  parent=self.frame)
+                                  parent=self)
             self.video.grid(column=0, row=3)        
         # play the video file
         self.video.play(video_source=videofile)
@@ -210,6 +210,13 @@ class MainFrm(Frame):
                             self, 
                             bg=self.bgcolor)
         self.alts.grid(column=0, row=3, sticky=N+E+S+W)
+    
+    def showEnterText(self):
+        self.deleteThumbnails()
+        self.video.destroy()
+        if self.alts != None:
+            self.alts.destroy()
+        self.labvar.set('Zadejte výraz, který chcete vyhledat')
 
 
 

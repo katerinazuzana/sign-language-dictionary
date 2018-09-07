@@ -85,10 +85,14 @@ class EntFrm(Frame):
 
     def startSearch(self, event=None):
         """Hide the listbox, set focus on the entry and do the search."""
-        self.ent.listbox.grid_forget()
-        self.ent.entry.focus_set()
-        self.ent.entry.icursor(END)
-        self.searchfcn(self.var.get().lstrip())
+        if self.var.get() in ('', self.defaultText):
+            # the user didn't enter any text
+            self.master.showEnterText()
+        else:
+            self.ent.listbox.grid_forget()
+            self.ent.entry.focus_set()
+            self.ent.entry.icursor(END)
+            self.searchfcn(self.var.get().lstrip())
         
     def onEntryClick(self, event):
         """Delete the default text in the entry, if present."""
