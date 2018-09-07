@@ -139,12 +139,12 @@ class ShapeSelectFrm(Frame):
         # make Submit and Quit buttons in their own frame
         buttonsfrm = Frame(self.selectWin)
         buttonsfrm.grid(column=0, row=2, sticky=E)
-        Button(buttonsfrm, 
+        ttk.Button(buttonsfrm, 
                text='Použít', 
                command=self.onSubmit).grid(column=0, row=0, 
                                       sticky=E+W, 
                                       padx=(0, 15), pady=10)
-        Button(buttonsfrm, 
+        ttk.Button(buttonsfrm, 
                text='Zavřít', 
                command=self.onPopupClose).grid(column=1, row=0, 
                                           sticky=E+W, 
