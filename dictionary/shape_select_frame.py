@@ -28,6 +28,7 @@ class ShapeSelectFrm(Frame):
                 
         self.title = 'Tvar aktivní ruky'
         self.popuptext = 'Zvolte tvar aktivní ruky'
+        self.popupBgColor = '#efebe7'
         
         self.var = IntVar()
         self.var.set(0)
@@ -111,7 +112,7 @@ class ShapeSelectFrm(Frame):
     
     def createPopup(self):
         # create a popup window
-        self.selectWin = Toplevel()
+        self.selectWin = Toplevel(bg=self.popupBgColor)
         self.selectWin.title(self.title)
         self.selectWin.columnconfigure(0, weight=1)
         
@@ -120,7 +121,8 @@ class ShapeSelectFrm(Frame):
         
         # set the instructions label
         Label(self.selectWin, 
-              text=self.popuptext).grid(column=0, row=0, 
+              text=self.popuptext, 
+              bg=self.popupBgColor).grid(column=0, row=0, 
                                         padx=10, pady=10, 
                                         sticky=W)
         
@@ -137,7 +139,7 @@ class ShapeSelectFrm(Frame):
         self.makeLabels()
         
         # make Submit and Quit buttons in their own frame
-        buttonsfrm = Frame(self.selectWin)
+        buttonsfrm = Frame(self.selectWin, bg=self.popupBgColor)
         buttonsfrm.grid(column=0, row=2, sticky=E)
         ttk.Button(buttonsfrm, 
                text='Použít', 
