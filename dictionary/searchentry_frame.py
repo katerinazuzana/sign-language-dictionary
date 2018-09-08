@@ -36,7 +36,7 @@ class EntFrm(Frame):
         
         # create the search button
         bfrm = Frame(self, height=30, width=60)
-        bfrm.grid_propagate(0)  # don't shrink
+        bfrm.grid_propagate(0)  # size of child doesn't affect size of parent
         bfrm.grid(column=1, row=0, sticky=N)
         bfrm.rowconfigure(0, weight=1)
         
