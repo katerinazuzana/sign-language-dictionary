@@ -90,8 +90,13 @@ class Dictionary():
         self.style = style = ttk.Style()
         style.theme_use('clearlooks')
         
-        style.configure('TCombobox', padding=(0, -4, 0, -4))
-        style.configure('TCombobox', background=self.BGCOLOR)
+        style.configure('TCombobox', padding=(0, -4, 0, -4), 
+                                     background=self.BGCOLOR)
+        
+        style.configure('Treeview', background=self.BGCOLOR, 
+                                    padding=(0, 2, 0, 4))
+        style.map('Treeview', background=[('selected', 'lightgrey')])
+        style.configure('Treeview.Item', padding=(-15, -5, 0, 0))
         
         style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0, 
                                                   self.TAB_PAD, 0))

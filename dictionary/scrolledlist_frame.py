@@ -1,53 +1,51 @@
 from tkinter import *
+from tkinter import ttk
 from autoscrollbar import AutoScrollbar
 
 
 class ScrolledList(Frame):
-    """A scrolled list displaying a list of words passed in as 'options'
-    argument. When a word is double-clicked, the searchfcn is called
-    on the choosen word.
+    """A scrolled list displaying a list of words. When a word is 
+    double-clicked, the searchfcn is called on the choosen word.
     """
     
-    def __init__(self, options, searchfcn, width, height, parent):
-        """Create a scrolled list.
+    def __init__(self, parent, height, searchfcn):
+        """Create an empty scrolled list.
         
         Arguments:
-        options -- a list of strings
         searchfcn -- a function that takes a string as an argument
-        width -- [int] width of the scrolled list in characters
         height -- [int] height of the scrolled list in lines
         parent -- the parent tkinter widget
         """
         super().__init__(parent)
         self.searchfcn = searchfcn
-        self.width = width
         self.height = height
-        self.makeWidgets(options)
+        self.makeWidgets()
 
-    def makeWidgets(self, options):
-        # create a scrollbar and a listbox
+    def makeWidgets(self):
+        # create a scrollbar and a treeview
         sbar = AutoScrollbar(self, orient=VERTICAL)
-        listbox = Listbox(self, width=self.width, height=self.height)
+        treeview = ttk.Treeview(self,                                 
+                                height=self.height,  
+                                selectmode='browse', 
+                                show='tree')
         # cross link them
-        sbar.config(command=listbox.yview)    
-        listbox.config(yscrollcommand=sbar.set)
+        sbar.config(command=treeview.yview)    
+        treeview.config(yscrollcommand=sbar.set)
         
         sbar.grid(column=1, row=0)
-        listbox.grid(column=0, row=0, sticky=N+E+S+W)
+        treeview.grid(column=0, row=0, sticky=N+E+S+W)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-        
-        for option in options:
-            listbox.insert(END, option)
             
-        listbox.bind('<Double-1>', self.handler)
-        listbox.bind('<Return>', self.handler)
-        self.listbox = listbox
+        treeview.bind('<Double-1>', self.handler)
+        treeview.bind('<Return>', self.handler)
+        self.treeview = treeview
 
     def handler(self, event):
-        index = self.listbox.curselection()
-        selection = self.listbox.get(index)    # fetch the selection text
-        self.searchfcn(selection.lstrip())     # and call the search
+        """Fetch the selection text and call the search."""
+        iid = self.treeview.selection()[0]
+        selection = self.treeview.item(iid, option='text')
+        self.searchfcn(selection)       
 
     def setOptions(self, options):
         """Update the options of the scrolled list.
@@ -55,7 +53,8 @@ class ScrolledList(Frame):
         Arguments:
         options -- a list of strings
         """
-        self.listbox.delete(0, END)
-        for option in options:             
-            self.listbox.insert(END, option)
+        items = self.treeview.get_children()
+        self.treeview.delete(*items)
+        for option in options:
+            self.treeview.insert("", END, text=option)
 

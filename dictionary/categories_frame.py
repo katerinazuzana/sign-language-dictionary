@@ -72,10 +72,9 @@ class CatFrm(Frame):
                            pady=(0, self.verticalSpace))
         
         # create empty scrolledlist
-        self.scrolledlist = ScrolledList([], self.searchfcn, 
-                                             self.width, 
-                                             self.height, 
-                                             self)
+        self.scrolledlist = ScrolledList(self, 
+                                         self.height, 
+                                         self.searchfcn)
         self.scrolledlist.grid(column=0, row=2, sticky=N+E+S+W, 
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
@@ -132,8 +131,7 @@ class CatFrm(Frame):
             cursor.execute(SQLquery, (vartext,))
             find = cursor.fetchall()
         find = self.listOfTuplesToList(find)
-        find = self.mySort(find)
-        return self.leftPadItems(find)
+        return self.mySort(find)
 
     def subcatHandler(self, event):
         """Update the options in the scrolledlist to the words
