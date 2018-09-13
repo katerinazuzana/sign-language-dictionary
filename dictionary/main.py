@@ -65,7 +65,7 @@ class Dictionary():
              
         self.root.columnconfigure(1, weight=1)
         self.root.rowconfigure(0, weight=1)
-        
+
         # create the main frame
         self.mainfrm = MainFrm(self.root, 
                              self.dbpath, 
@@ -89,6 +89,9 @@ class Dictionary():
         # style
         self.style = style = ttk.Style()
         style.theme_use('clearlooks')
+        
+        style.configure('Gray.TEntry', foreground='gray')
+        style.configure('Black.TEntry', foreground='black')
         
         style.configure('TCombobox', padding=(0, -4, 0, -4), 
                                      background=self.BGCOLOR)

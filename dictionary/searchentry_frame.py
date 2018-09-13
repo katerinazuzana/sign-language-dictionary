@@ -58,29 +58,28 @@ class EntFrm(Frame):
         entries = self.leftPadItems(entries)
         
         # create the autocomplete entry
-        self.ent = AutocompleteEntry(self)
-        self.ent.build(entries, max_entries=4, no_results_message=None)
-        self.ent.grid(column=0, row=0, sticky=N+E+W)
-        
-        # set the entry variable
-        self.var = self.ent.text
+        self.var = StringVar()
         self.var.set(self.defaultText)
-        self.ent.entry.config(fg='grey')
+        self.ent = AutocompleteEntry(self, 
+                                     entries, 
+                                     self.startSearch, 
+                                     maxEntries=6, 
+                                     textvariable=self.var)
+        self.ent.grid(column=0, row=0, sticky=N+E+W)
+        self.ent.config(style="Gray.TEntry")
         
-        self.ent.entry.bind('<Return>', self.onEntryReturn)
-        self.ent.listbox.bind('<Return>', self.startSearch)
-        self.ent.listbox.bind('<Double-Button>', self.startSearch)
+        self.ent.bind('<Return>', self.onEntryReturn)
                 
         # on mouse click, delete the default text in the entry
-        self.ent.entry.bind('<Button-1>', self.onEntryClick)
+        self.ent.bind('<Button-1>', self.onEntryClick)
         # when the user starts typing in the entry, delete the default text
-        self.ent.entry.bind('<Key>', self.onTyping)
+        self.ent.bind('<Key>', self.onTyping)
         # on focus out of the entry, insert the default text back
-        self.ent.entry.bind('<FocusOut>', self.onFocusOut)
+        self.ent.bind('<FocusOut>', self.onFocusOut)
 
     def onEntryReturn(self, event):
         """Start the search only if there is some text in the entry."""
-        if self.var.get() not in ("", self.defaultText):
+        if self.var.get() not in ('', self.defaultText):
             self.startSearch()
 
     def startSearch(self, event=None):
@@ -89,24 +88,24 @@ class EntFrm(Frame):
             # the user didn't enter any text
             self.master.showEnterText()
         else:
-            self.ent.listbox.grid_forget()
-            self.ent.entry.focus_set()
-            self.ent.entry.icursor(END)
-            self.searchfcn(self.var.get().lstrip())
+            self.ent.hideListboxWin()
+            self.ent.focus_set()
+            self.ent.icursor(END)
+            self.searchfcn(self.var.get())
         
     def onEntryClick(self, event):
         """Delete the default text in the entry, if present."""
         if self.var.get() == self.defaultText:
             self.var.set('')
-            self.ent.entry.config(fg='black')
+            self.ent.config(style="Black.TEntry")
     
     def onTyping(self, event):
         """Delete the default text in the entry, if present."""
         if self.var.get() == self.defaultText:
-            self.var.set('')
-            self.ent.entry.config(fg='black')
+            self.ent.var.set('')
+            self.ent.config(style="Black.TEntry")
         else:
-            self.ent.update_autocomplete(event)
+            self.ent.update(event)
     
     def onFocusOut(self, event):
         """Insert the default text back into the entry, if it's empty.
@@ -114,8 +113,8 @@ class EntFrm(Frame):
         """
         if self.var.get() == '':
             self.var.set(self.defaultText)
-            self.ent.entry.config(fg='grey')
-            self.ent.listbox.grid_forget()
+            self.ent.config(style="Gray.TEntry")
+            self.ent.hideListboxWin()
     
     def listOfTuplesToList(self, listOfTuples):    
         """Convert a list of 1-tuples into a simple list."""
