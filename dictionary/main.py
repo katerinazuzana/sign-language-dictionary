@@ -81,7 +81,7 @@ class Dictionary():
         # when the searchEng is done searching, it calls a function to show
         # the result - this function is defined in the mainfrm object
         self.searchEng.showResultFcn = self.mainfrm.showResult
-
+        
         # create notebook
         self.notebook = ttk.Notebook(self.root)
         self.notebook.grid(column=1, row=0, sticky=N+E+S+W)
@@ -138,7 +138,7 @@ class Dictionary():
         self.notebook.update_idletasks()
         self.notebook.initialWidth = self.notebook.winfo_width()
         self.notebook.bind('<Configure>', self.onResize)
-    
+        
     def onResize(self, event):
         """Dynamically set tab padding to streach tabs over whole notebook."""
         width = self.notebook.winfo_width()

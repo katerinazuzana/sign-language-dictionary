@@ -56,12 +56,8 @@ class AutocompleteEntry(ttk.Entry):
         self.listboxWin.columnconfigure(0, minsize=self.winfo_width())
         self.listbox.grid(column=0, row=0, sticky=E+W)
         
-        # window properties and placement
         self.listboxWin.overrideredirect(True)
-#        self.listboxWin.attributes('-topmost', True)
-        xoffset = self.winfo_rootx()
-        yoffset = self.winfo_rooty() + 29
-        self.listboxWin.geometry('+{}+{}'.format(xoffset, yoffset))
+        self.placeListboxWin()
         
         self.listbox.bind("<<ListboxSelect>>", self.setEntry)
         self.listbox.bind("<Up>", self.focusOnEntry)
@@ -70,27 +66,32 @@ class AutocompleteEntry(ttk.Entry):
         
         # bind listbox window movement to the main app window movement
         # autocomplete entry -> search entry frm -> main frm -> root win
-        self.master.master.master.bind('<Configure>', self.drag)
+        self.master.master.master.bind('<Configure>', self.placeListboxWin)
+        
+        # on focus out of the listboxWin, hide it
+        # (binding to <FocusOut> event on .overrideredirect(True) window
+        # doesn't work in Linux)
+#        root = self.master.master.master
+#        children = root.winfo_children()
+#        notebook = (child for child in children if type(child) == ttk.Notebook)
+#        next(notebook).bind('<FocusIn>', self.hideListboxWin)
     
-    def drag(self, event):
+    def placeListboxWin(self, event=None):
         xoffset = self.winfo_rootx()
-        yoffset = self.winfo_rooty() + 29
+        yoffset = self.winfo_rooty() + self.winfo_height() - 1
         self.listboxWin.geometry('+{}+{}'.format(xoffset, yoffset))
     
     def showListboxWin(self):
-        xoffset = self.winfo_rootx()
-        yoffset = self.winfo_rooty() + 29
-        self.listboxWin.geometry('+{}+{}'.format(xoffset, yoffset))
+        self.placeListboxWin()
         self.listboxWin.deiconify()
     
-    def hideListboxWin(self):
+    def hideListboxWin(self, event=None):
         """Hide the listbox window if present."""
         if self.listboxWin and self.listboxWin.state() == 'normal':
             self.listboxWin.withdraw()
 
     def setEntry(self, event):
-        """Set the textvariable corresponding to `self.entry`
-        to the value currently selected."""
+        """Set the entry variable to the value currently selected."""
         self.var.set(self.listbox.get(ACTIVE).lstrip())
         
     def focusOnListbox(self, event):
