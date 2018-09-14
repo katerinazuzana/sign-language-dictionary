@@ -64,17 +64,17 @@ class AutocompleteEntry(ttk.Entry):
         self.listbox.bind('<Return>', self.startSearch)
         self.listbox.bind('<Double-Button>', self.startSearch)
         
-        # bind listbox window movement to the main app window movement
+        # get the main app window
         # autocomplete entry -> search entry frm -> main frm -> root win
-        self.master.master.master.bind('<Configure>', self.placeListboxWin)
+        root = self.master.master.master
         
-        # on focus out of the listboxWin, hide it
-        # (binding to <FocusOut> event on .overrideredirect(True) window
-        # doesn't work in Linux)
-#        root = self.master.master.master
-#        children = root.winfo_children()
-#        notebook = (child for child in children if type(child) == ttk.Notebook)
-#        next(notebook).bind('<FocusIn>', self.hideListboxWin)
+        # bind listbox window movement to the main app window movement
+        root.bind('<Configure>', self.placeListboxWin)
+        
+        # on mouse click out of listboxWin, hide it
+        # (binding to <FocusOut> event on .overrideredirect(True) 
+        # window doesn't work in Linux)
+        root.bind('<Button-1>', self.onRootClick)
     
     def placeListboxWin(self, event=None):
         xoffset = self.winfo_rootx()
@@ -107,6 +107,10 @@ class AutocompleteEntry(ttk.Entry):
             self.focus_set()
             self.icursor(END)
 
+    def onRootClick(self, event):
+        if event.widget not in (self, self.listbox):
+            self.hideListboxWin()
+    
     def getOptions(self):
         return [option for option in self.entries 
                 if self.match(option, self.var.get())]
