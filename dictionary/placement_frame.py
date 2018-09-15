@@ -1,6 +1,8 @@
 from tkinter import *
 from PIL import Image, ImageTk
 import os
+from drawing_canvas import DrawingCanvas
+
 
 class PlacementFrm(Frame):
     def __init__(self, parent, imgdir, **options):
@@ -39,10 +41,11 @@ class PlacementFrm(Frame):
         self.hintIcon.bind('<Leave>', self.closeHint)
         
         # create a canvas
-        self.canvas = Canvas(self, width=240, 
-                                   height=250, 
-                                   borderwidth=2, 
-                                   relief='groove')
+        self.canvas = DrawingCanvas(self, 
+                                    width=240, 
+                                    height=250, 
+                                    borderwidth=2, 
+                                    relief='groove')
         self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)        
         
         # create delete button
@@ -82,7 +85,12 @@ class PlacementFrm(Frame):
         self.hint.destroy()
         
     def onDelete(self):
-        pass
+        self.canvas.delete(ALL)
+        self.canvas.ellipse = None
+        self.canvas.drawMode = True
+        self.canvas.moveMode = False
+        self.canvas.scaleMode = False
+        self.canvas.rotateMode = False
 
 
 
