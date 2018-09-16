@@ -69,9 +69,9 @@ class DrawingCanvas(Canvas):
             print(self.ellipse)
             
             # convert ellipse representation from oval to polygon
-            polygon = self.ovalToPolygon(self.ellipse)
-            self.delete(self.id) # delete oval
-            self.id = polygon
+#            polygon = self.ovalToPolygon(self.ellipse)
+#            self.delete(self.id) # delete oval
+#            self.id = polygon
             
             self.drawMode = False
             self.moveMode = True
@@ -116,7 +116,6 @@ class DrawingCanvas(Canvas):
         self.scaleMode = True
         print('in scale mode')
         
-        # draw marks
         self.drawMarks()
     
     def switchToRotateMode(self):
@@ -125,23 +124,114 @@ class DrawingCanvas(Canvas):
         print('in rotate mode')
 
     def drawMarks(self):
-        self.marks = {}
-        for mark, center in self.ellipse.marks.items():
+        self.marks = {}     # pictures drawn on canvas
+        for mark, center in self.ellipse.markCoords.items():
             markId = self.create_rectangle(center.real - self.markSize, 
                                   center.imag - self.markSize, 
                                   center.real + self.markSize, 
                                   center.imag + self.markSize, 
-                                  **self.markSettings)
+                                  **self.markSettings, 
+                                  tags='marks')
             self.marks[mark] = markId
             
             def onEnter(mark):
                 return lambda ev: self.config(cursor = self.markCursors[mark])
             self.tag_bind(markId, '<Enter>', onEnter(mark))
             
-            def onLeave():
-                return lambda ev: self.config(cursor = '')
-            self.tag_bind(markId, '<Leave>', onLeave())
+            self.tag_bind(markId, '<Leave>', 
+                          lambda ev: self.config(cursor = ''))
     
+            def onPress(mark):
+                return lambda ev: self.startScale(ev, mark)
+            self.tag_bind(markId, '<ButtonPress-1>', onPress(mark))
+
+    def startScale(self, event, mark):
+        self.scaleFrom = event
+        self.start = event
+        self.movingMark = mark
+        
+        # cursor keep the same shape during whole scaling
+        # even when it moves out of the mark
+        self.config(cursor = self.markCursors[mark])
+        self.tag_unbind(self.marks[mark], '<Leave>')
+        
+        self.bind('<B1-Motion>', self.doScale)
+        self.bind('<ButtonRelease-1>', self.stopScale)
+    
+    def doScale(self, event):
+        
+        # recalculate the marks' positions
+        self.recalcCornerMarks(event)
+        self.ellipse.recalcMiddleMarks()
+            
+        # redraw the marks
+        self.delete('marks')
+        self.drawMarks()
+        
+        # redraw the ellipse
+        self.delete(self.id)
+        topLeftPoint = (self.ellipse.markCoords['tl'].real, 
+                        self.ellipse.markCoords['tl'].imag)
+        bottomRightPoint = (self.ellipse.markCoords['br'].real, 
+                            self.ellipse.markCoords['br'].imag)
+        self.id = self.create_oval(*topLeftPoint, 
+                                   *bottomRightPoint, 
+                                   **self.settings)
+        self.tag_lower(self.id) # draw the ellipse under the marks
+        
+        self.start = event
+    
+    def stopScale(self, event):
+        self.scaleTo = event
+        # recalculate the ellipse parameters
+        
+        # reset the cursor shape
+        self.config(cursor = '')
+        self.tag_bind(self.marks[self.movingMark], '<Leave>', 
+                          lambda ev: self.config(cursor = ''))
+        # set the bindings to the initial ones
+        self.bind('<B1-Motion>', self.onMove)
+        self.bind('<ButtonRelease-1>', self.onRelease)
+        
+    def recalcCornerMarks(self, event):
+        """Recalculate the coordinates of the corner marks."""
+        mouseMoveX = event.x - self.start.x
+        mouseMoveY = event.y - self.start.y        
+        
+        # only horizontal movement:                
+        if self.movingMark == 'r':
+            for m in ('tr', 'br'):
+                self.ellipse.markCoords[m] += complex(mouseMoveX, 0)
+        elif self.movingMark == 'l':
+            for m in ('tl', 'bl'):
+                self.ellipse.markCoords[m] += complex(mouseMoveX, 0)
+        
+        # only vertical movement:                      
+        elif self.movingMark == 't':
+            for m in ('tl', 'tr'):
+                self.ellipse.markCoords[m] += complex(0, mouseMoveY)
+        elif self.movingMark == 'b':
+            for m in ('bl', 'br'):
+                self.ellipse.markCoords[m] += complex(0, mouseMoveY)
+        
+        else:
+            # a corner mark is moving
+            moves = [(0         , mouseMoveY), 
+                     (mouseMoveX,          0), 
+                     (mouseMoveX, mouseMoveY)]
+            
+            if self.movingMark == 'tr':
+                order = ('tl', 'br', 'tr')
+            elif self.movingMark == 'bl':
+                order = ('br', 'tl', 'bl')     
+            elif self.movingMark == 'tl':
+                order = ('tr', 'bl', 'tl')
+            elif self.movingMark == 'br':
+                order = ('bl', 'tr', 'br')
+
+            for m, move in zip(order, moves):
+                self.ellipse.markCoords[m] += complex(*move)
+
 
 
 class Ellipse():
@@ -154,18 +244,39 @@ class Ellipse():
         self.b = (rightLower.y - leftUpper.y) // 2
         self.angle = 0
         
-        # calculate positions of scale marks (ellipse not rotated)
-        self.marks = {}
-        self.marks['r']  = complex(self.centerX + self.a, self.centerY         )
-        self.marks['tr'] = complex(self.centerX + self.a, self.centerY - self.b)
-        self.marks['t']  = complex(self.centerX         , self.centerY - self.b)
-        self.marks['tl'] = complex(self.centerX - self.a, self.centerY - self.b)
-        self.marks['l']  = complex(self.centerX - self.a, self.centerY         )
-        self.marks['bl'] = complex(self.centerX - self.a, self.centerY + self.b)
-        self.marks['b']  = complex(self.centerX         , self.centerY + self.b)
-        self.marks['br'] = complex(self.centerX + self.a, self.centerY + self.b)
+        # calculate initial positions of scale marks (ellipse not rotated)
+        self.markCoords = {}
+        self.markCoords['r']  = complex(self.centerX + self.a, 
+                                        self.centerY         )
+        self.markCoords['tr'] = complex(self.centerX + self.a, 
+                                        self.centerY - self.b)
+        self.markCoords['t']  = complex(self.centerX         , 
+                                        self.centerY - self.b)
+        self.markCoords['tl'] = complex(self.centerX - self.a, 
+                                        self.centerY - self.b)
+        self.markCoords['l']  = complex(self.centerX - self.a, 
+                                        self.centerY         )
+        self.markCoords['bl'] = complex(self.centerX - self.a, 
+                                        self.centerY + self.b)
+        self.markCoords['b']  = complex(self.centerX         , 
+                                        self.centerY + self.b)
+        self.markCoords['br'] = complex(self.centerX + self.a, 
+                                        self.centerY + self.b)
         
+    def recalcMiddleMarks(self):
+        """Recalculate the coors of the middle marks."""
+        for m in ('r', 't', 'l', 'b'):
+            c1, c2 = self.getCorners(m)
+            self.markCoords[m] = (self.markCoords[c1] + self.markCoords[c2]) / 2
+            self.markCoords[m] = complex(int(round(self.markCoords[m].real)), 
+                                         int(round(self.markCoords[m].imag)))
         
+    def getCorners(self, middle):
+        """Return corner marks' names corresponding to a given middle mark."""
+        if middle in ('r', 'l'):
+            return 't' + middle, 'b' + middle
+        if middle in ('t', 'b'):
+            return middle + 'r', middle + 'l'
 
     def moved(self, fromCoords, toCoords):
         """Recalculate the parameters after the ellipse has moved."""
@@ -173,6 +284,8 @@ class Ellipse():
         shiftY = toCoords[1] - fromCoords[1]            
         self.centerX = self.centerX + shiftX
         self.centerY = self.centerY + shiftY
+    
+
 
     def __str__(self):
         return 'Ellipse: centerX = {}, centerY = {}, a = {}, b = {}, angle = {}'.format(self.centerX, self.centerY, self.a, self.b, self.angle)
