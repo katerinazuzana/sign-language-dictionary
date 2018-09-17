@@ -56,10 +56,22 @@ class DrawingCanvas(Canvas):
                                        event.x, event.y, 
                                        **self.settings)
         elif self.moveMode:
-            # if mouse is over the ellipse, move the ellipse
-            dx, dy = (event.x - self.start.x), (event.y - self.start.y)
-            self.move(CURRENT, dx, dy)
-            self.start = event
+            if self.id in self.find_withtag(CURRENT):
+                # if ellipse is under mouse cursor
+                
+                # move the ellipse
+                dx, dy = (event.x - self.start.x), (event.y - self.start.y)
+                self.move(CURRENT, dx, dy)
+            
+                # recalculate marks
+                self.recalcCornerMarksOnMove(event)
+                self.ellipse.recalcMiddleMarks()
+            
+                # redraw the marks
+                self.delete('marks')
+                self.drawMarks()
+            
+                self.start = event
         
     def onRelease(self, event):
         if self.drawMode:
@@ -67,6 +79,7 @@ class DrawingCanvas(Canvas):
             rightLower = event
             self.ellipse = Ellipse(self.leftUpper, rightLower)
             print(self.ellipse)
+            self.drawMarks()
             
             # convert ellipse representation from oval to polygon
 #            polygon = self.ovalToPolygon(self.ellipse)
@@ -75,6 +88,7 @@ class DrawingCanvas(Canvas):
             
             self.drawMode = False
             self.moveMode = True
+            self.scaleMode = True
             # set cursor: self.ellipse.config
         
         elif self.moveMode:
@@ -83,15 +97,19 @@ class DrawingCanvas(Canvas):
             self.ellipse.moved(self.startCoords, endCoords)
             print(self.ellipse)
 
+    def recalcCornerMarksOnMove(self, event):
+        """Recalculate the coordinates of the corner marks."""
+        mouseMoveX = event.x - self.start.x
+        mouseMoveY = event.y - self.start.y
+        for m in self.ellipse.markCoords.keys():
+            self.ellipse.markCoords[m] += complex(mouseMoveX, mouseMoveY)
+
     def onDoubleClick(self, event):
         """Change mode."""
         if self.coords(CURRENT):
-            if self.moveMode: self.switchToScaleMode()
-            elif self.scaleMode: self.switchToRotateMode()
-            elif self.rotateMode: # switch to move mode
-                self.rotateMode = False
-                self.moveMode = True
-                print('in move mode')
+            if self.scaleMode: self.switchToRotateMode()
+            else:   # currently in rotate mode
+                self.switchToScaleMode()
     
     def ovalToPolygon(self, ellipse, steps=40):
         """
@@ -111,18 +129,18 @@ class DrawingCanvas(Canvas):
         
         return self.create_polygon(tuple(points), **self.settings)
 
-    def switchToScaleMode(self):
-        self.moveMode = False               
-        self.scaleMode = True
-        print('in scale mode')
-        
-        self.drawMarks()
-    
     def switchToRotateMode(self):
         self.scaleMode = False               
         self.rotateMode = True
         print('in rotate mode')
 
+    def switchToScaleMode(self):
+        self.rotateMode = False               
+        self.scaleMode = True
+        print('in scale mode')
+        
+        self.drawMarks()
+    
     def drawMarks(self):
         self.marks = {}     # pictures drawn on canvas
         for mark, center in self.ellipse.markCoords.items():
@@ -161,7 +179,7 @@ class DrawingCanvas(Canvas):
     def doScale(self, event):
         
         # recalculate the marks' positions
-        self.recalcCornerMarks(event)
+        self.recalcCornerMarksOnScale(event)
         self.ellipse.recalcMiddleMarks()
             
         # redraw the marks
@@ -193,7 +211,7 @@ class DrawingCanvas(Canvas):
         self.bind('<B1-Motion>', self.onMove)
         self.bind('<ButtonRelease-1>', self.onRelease)
         
-    def recalcCornerMarks(self, event):
+    def recalcCornerMarksOnScale(self, event):
         """Recalculate the coordinates of the corner marks."""
         mouseMoveX = event.x - self.start.x
         mouseMoveY = event.y - self.start.y        
