@@ -18,9 +18,7 @@ class DrawingCanvas(Canvas):
         self.scMarkSettings = {'width': 1, 
                                'outline': 'darkgreen', 
                                'fill': 'green'}
-        self.rotMarkSettings = {'width': 1, 
-                                'outline': 'black', 
-                                'fill': 'black'}
+        self.rotMarkSettings = {'fill': 'black'}
         self.scMarkCursors = {'r' : 'right_side', 
                             'tr': 'top_right_corner', 
                             't' : 'top_side', 
@@ -35,68 +33,37 @@ class DrawingCanvas(Canvas):
         self.ellipse = None     # ellipse object
         
         self.drawMode = True
-        self.moveMode = False
         self.scaleMode = False
         self.rotateMode = False
 
         self.bind('<ButtonPress-1>', self.onPress)
-        self.bind('<B1-Motion>', self.onMove)
+        self.bind('<B1-Motion>', self.onMotion)
         self.bind('<ButtonRelease-1>', self.onRelease)
         self.bind('<Double-Button-1>', self.onDoubleClick)
     
     def onPress(self, event):
-        self.start = event
+        
         if self.drawMode:
             # remember the topleft corner of rectangle encapsulating the ellipse
-            self.topLeft = event
+            self.topLeft = Point(event)
     
-    def onMove(self, event):
+    def onMotion(self, event):
         """
         """
         if self.drawMode:
             # draw an ellipse
             if self.id: self.delete(self.id)
-            self.id = self.create_oval(self.start.x, self.start.y, 
+            self.id = self.create_oval(self.topLeft.x, self.topLeft.y, 
                                        event.x, event.y, 
                                        **self.settings, 
                                        tags='ellipse')
-        elif self.moveMode:
-            if self.id in self.find_withtag('ellipse'):
-                # if ellipse is under mouse cursor:
-                
-                # change the ellipse' topLeft and bottomRight points
-                self.recalcCornersOnMove(event)
-                
-                # recalculate the marks' positions
-                self.ellipse.calcMarkCoords()
-                
-                # redraw the ellipse
-                self.delete(self.id)
-                self.id = self.create_oval(self.ellipse.topLeft.x, 
-                                           self.ellipse.topLeft.y, 
-                                           self.ellipse.bottomRight.x, 
-                                           self.ellipse.bottomRight.y, 
-                                           **self.settings, 
-                                           tags='ellipse')
-                
-                # redraw the marks
-                self.delete('marks')
-                self.drawMarks(mode='scale')
-                
-                # reset start point
-                self.start = event
         
     def onRelease(self, event):
         if self.drawMode:
             
             # create an ellipse object
-            bottomRight = event
-            self.ellipse = Ellipse(Point(self.topLeft), Point(bottomRight))
-            
-            # convert ellipse representation from oval to polygon
-#            polygon = self.ovalToPolygon(self.ellipse)
-#            self.delete(self.id) # delete oval
-#            self.id = polygon
+            bottomRight = Point(event)
+            self.ellipse = Ellipse(self.topLeft, bottomRight)
             
             # set cursor
             self.tag_bind('ellipse', '<Enter>', 
@@ -104,17 +71,12 @@ class DrawingCanvas(Canvas):
             self.tag_bind('ellipse', '<Leave>', 
                                      lambda ev: self.config(cursor=''))
             
+            # binding that enables moving the ellipse
+            self.tag_bind('ellipse', '<ButtonPress-1>', self.startMove)
+            
             # change mode
             self.drawMode = False
-            self.moveMode = True
             self.switchToScaleMode()
-
-    def recalcCornersOnMove(self, event):
-        """Recalculate the coords of the topLeft and bottomRight corners."""
-
-        shift = Point(event) - Point(self.start)
-        self.ellipse.topLeft += shift
-        self.ellipse.bottomRight += shift
 
     def onDoubleClick(self, event):
         """Change mode."""
@@ -137,34 +99,64 @@ class DrawingCanvas(Canvas):
     
     def drawMarks(self, mode):
         if mode == 'scale':
+            createFcn = self.create_rectangle
             settings = self.scMarkSettings
         elif mode == 'rotate':
+            createFcn = self.create_oval
             settings = self.rotMarkSettings
     
         for mark, position in self.ellipse.markCoords.items():
             topLeft = position - (self.markSize, self.markSize)
             bottomRight = position + (self.markSize, self.markSize)
             
-            markId = self.create_rectangle(topLeft.x, topLeft.y, 
-                                           bottomRight.x, bottomRight.y, 
-                                           **settings, 
-                                           tags='marks')
+            markId = createFcn(topLeft.x, topLeft.y, 
+                               bottomRight.x, bottomRight.y, 
+                               **settings, 
+                               tags='marks')
             self.markIds[mark] = markId
             
-            def onEnter(mark):
-                return lambda ev: self.config(cursor = self.scMarkCursors[mark])
-            self.tag_bind(markId, '<Enter>', onEnter(mark))
-            
-            self.tag_bind(markId, '<Leave>', 
-                          lambda ev: self.config(cursor = ''))
+            if mode == 'scale':
+                def onEnter(mark):
+                    return lambda ev: self.config(cursor = 
+                                                  self.scMarkCursors[mark])
+                self.tag_bind(markId, '<Enter>', onEnter(mark))
     
-            def onPress(mark):
-                return lambda ev: self.startScale(ev, mark)
-            self.tag_bind(markId, '<ButtonPress-1>', onPress(mark))
+                def onPress(mark):
+                    return lambda ev: self.startScale(ev, mark)
+                self.tag_bind(markId, '<ButtonPress-1>', onPress(mark))
+            
+        if mode == 'rotate':
+            self.tag_bind('marks', '<Enter>', 
+                                   lambda ev: self.config(cursor = 'exchange'))
+            self.tag_bind('marks', '<ButtonPress-1>', self.startRotate)
+            
+        self.tag_bind('marks', '<Leave>', lambda ev: self.config(cursor = ''))
+    
+    def startMove(self, event):
+        self.startPoint = Point(event)
+        self.bind('<B1-Motion>', self.doMove)
+        self.bind('<ButtonRelease-1>', self.stopMove)
+    
+    def doMove(self, event):
 
+        # change the ellipse' topLeft and bottomRight points
+        self.endPoint = Point(event)
+        self.recalcCornersOnMove()
+        
+        # recalculate the marks' positions
+        self.ellipse.calcMarkCoords()
+                
+        self.redrawItems()
+        self.startPoint = Point(event)
+    
+    def stopMove(self, event):
+        # reset binding
+        self.bind('<B1-Motion>', self.onMotion)
+        self.bind('<ButtonRelease-1>', self.onRelease)
+            
     def startScale(self, event, mark):
         
-        self.start = event
+        self.startPoint = Point(event)
         self.movingMark = mark
         
         # make cursor keep the same shape during whole scaling
@@ -178,59 +170,119 @@ class DrawingCanvas(Canvas):
     def doScale(self, event):
         
         # change the ellipse' topLeft and bottomRight points
-        self.recalcCornersOnScale(event)
+        self.endPoint = Point(event)
+        self.recalcCornersOnScale()
         
         # recalculate the marks' positions
         self.ellipse.calcMarkCoords()
-                
-        # redraw the ellipse
-        self.delete(self.id)
-        self.id = self.create_oval(self.ellipse.topLeft.x, 
-                                   self.ellipse.topLeft.y, 
-                                   self.ellipse.bottomRight.x, 
-                                   self.ellipse.bottomRight.y, 
-                                   **self.settings, 
-                                   tags='ellipse')
         
-        # redraw the marks
-        self.delete('marks')
-        self.drawMarks(mode='scale')
-        
-        # reset start point
-        self.start = event
+        self.redrawItems()
+        self.startPoint = Point(event)
     
     def stopScale(self, event):
 
         # reset the cursor shape
         self.config(cursor = '')
         self.tag_bind(self.markIds[self.movingMark], '<Leave>', 
-                      lambda ev: self.config(cursor = ''))        
+                      lambda ev: self.config(cursor = ''))
         # set the bindings to the initial ones
-        self.bind('<B1-Motion>', self.onMove)
+        self.bind('<B1-Motion>', self.onMotion)
         self.bind('<ButtonRelease-1>', self.onRelease)
     
-    def ovalToPolygon(self, ellipse, steps=40):
+    def startRotate(self, event):
+        
+        self.startPoint = Point(event)
+        
+        # make cursor keep the same shape during whole scaling
+        # even when it moves out of the mark
+        self.config(cursor = 'exchange')
+        self.tag_unbind('marks', '<Leave>')
+        
+        self.bind('<B1-Motion>', self.doRotate)
+        self.bind('<ButtonRelease-1>', self.stopRotate)
+    
+    def doRotate(self, event):
+        
+        # calculate the angle difference
+        startAngle = self.startPoint.getAngle(self.ellipse.center)
+        endAngle = Point(event).getAngle(self.ellipse.center)
+        diffAngle = endAngle - startAngle
+        
+        # update the ellipse' angle and topLeft and bottomRight points
+        self.ellipse.changeAngle(diffAngle)
+        
+        # recalculate the ellipse parameters and the marks' positions
+        self.ellipse.calcMarkCoords(mode='rotate')
+        
+        self.redrawItems()
+        self.startPoint = Point(event)
+    
+    def stopRotate(self, event):
+
+        # reset the cursor shape
+        self.config(cursor = '')
+        self.tag_bind('marks', '<Leave>', lambda ev: self.config(cursor=''))
+        # set the bindings to the initial ones
+        self.bind('<B1-Motion>', self.onMotion)
+        self.bind('<ButtonRelease-1>', self.onRelease)    
+    
+    def redrawItems(self):
+         
+        # redraw the ellipse
+        self.delete(self.id)
+        if self.ellipse.angle == 0:
+            self.id = self.create_oval(self.ellipse.topLeft.x, 
+                                   self.ellipse.topLeft.y, 
+                                   self.ellipse.bottomRight.x, 
+                                   self.ellipse.bottomRight.y, 
+                                   **self.settings, 
+                                   tags='ellipse')
+        else:
+            # get a tuple of points covering (densely enough) the ellipse border
+            polygonPoints = self.getPolygonPoints()
+            # draw the rotated ellipse - as a polygon
+            self.id = self.create_polygon(polygonPoints, 
+                                      **self.settings, 
+                                      tags='ellipse')
+        
+        # redraw the marks
+        if self.scaleMode: mode = 'scale'
+        else: mode = 'rotate'
+        self.delete('marks')
+        self.drawMarks(mode=mode)
+    
+    def getPolygonPoints(self, steps=80):
         """
+        
         better keep the number of steps a multiple of four
         to ensure precise values for the ellipse parameters
+        
+        Returns:
+        a tuple of points' coords: (x0, y0, x1, y1, ...)
         """
         points = []
         for i in range(steps):
             # calculate the angle for this step
             theta = 2 * math.pi * float(i) / steps
+            
+            # point is of type Point
+            point = self.ellipse.center + math.cos(theta) * self.ellipse.a + \
+                                          math.sin(theta) * self.ellipse.b
+            points.append(point.x)
+            points.append(point.y)        
+        return tuple(points)
+    
+    def recalcCornersOnMove(self):
+        """Recalculate the coords of the topLeft and bottomRight corners."""
 
-            x = ellipse.center.x + ellipse.a * math.cos(theta)
-            y = ellipse.center.y + ellipse.b * math.sin(theta)
-
-            points.append(round(x))
-            points.append(round(y))
+        shift = self.endPoint - self.startPoint
+        self.ellipse.topLeft += shift
+        self.ellipse.bottomRight += shift
         
-        return self.create_polygon(tuple(points), **self.settings)
-        
-    def recalcCornersOnScale(self, event):
+    def recalcCornersOnScale(self):
         """Recalculate the coords of the topLeft and bottomRight corners."""
         
-        mouseMove = Point(event) - Point(self.start)
+        mouseMove = self.endPoint - self.startPoint
         
         # only horizontal movement:                
         if self.movingMark == 'r':
@@ -267,25 +319,45 @@ class Ellipse():
         """
     
         self.topLeft = topLeft
-        self.bottomRight = bottomRight        
+        self.bottomRight = bottomRight
+        
+        self.angle = 0       
         
         # calculate initial positions of scale marks (ellipse not rotated)
         self.markCoords = {}
         self.calcMarkCoords()
     
     def calcParams(self):
-        """Calculate the ellipse parameters."""
+        """Calculate the ellipse parameters.
         
-        self.center = (self.topLeft + self.bottomRight) // 2
+        Calculate the 'center', 'a', and 'b' parameters from 
+        'topLeft', 'bottomRight', and 'angle'.
+        """
+        
+        self.center = (self.topLeft + self.bottomRight) * 0.5
         self.ab = self.bottomRight - self.center
-        self.a = self.ab.projectOn((1, 0))
-        self.b = self.ab.projectOn((0, 1))
-        self.angle = 0
         
-    def calcMarkCoords(self):
+        # unit vector in the direction of a-semiaxis -- tuple: (float, float)
+        unitA = (math.cos(self.angle), math.sin(self.angle))
+        # unit vector in the direction of b-semiaxis -- tuple
+        unitB = (- math.sin(self.angle), math.cos(self.angle))
+        self.a = self.ab.projectOn(unitA)
+        self.b = self.ab.projectOn(unitB)        
+    
+    def changeAngle(self, diffAngle):
+        
+        self.angle = self.angle + diffAngle
+        self.a = self.a.rotate(diffAngle)
+        self.b = self.b.rotate(diffAngle)
+        
+        # probably not needed:
+        self.topLeft = self.topLeft.rotate(diffAngle, self.center)
+        self.bottomRight = self.bottomRight.rotate(diffAngle, self.center)
+        
+    def calcMarkCoords(self, mode=None):
         """Calculate the coords of the scaling/rotating marks."""
         
-        self.calcParams()
+        if mode != 'rotate': self.calcParams()
         self.markCoords['r']  = self.center + self.a
         self.markCoords['tr'] = self.center + self.a - self.b
         self.markCoords['t']  = self.center          - self.b
@@ -293,7 +365,7 @@ class Ellipse():
         self.markCoords['l']  = self.center - self.a
         self.markCoords['bl'] = self.center - self.a + self.b
         self.markCoords['b']  = self.center          + self.b
-        self.markCoords['br'] = self.center + self.a + self.b
+        self.markCoords['br'] = self.center + self.a + self.b   
 
     def __str__(self):
         return 'Ellipse: center = {}, a = {}, b = {}, angle = {}'.format(self.center, self.a, self.b, self.angle)
@@ -303,7 +375,6 @@ class Ellipse():
 class Point():
     """Class representing a point (a vector) in 2D plane.
     
-    The coordinates of the point are integers.
     """
     def __init__(self, *args):
         
@@ -316,8 +387,8 @@ class Point():
             self.y = event.y
         else:
             x, y = args[0], args[1]
-            self.x = int(x)
-            self.y = int(y)
+            self.x = x
+            self.y = y
     
     def __repr__(self):
         return 'Point({}, {})'.format(self.x, self.y)
@@ -340,9 +411,6 @@ class Point():
         """Incremental addition."""
         return self + other
 
-    def __floordiv__(self, other):
-        return Point(self.x // other, self.y // other)
-
     def __mul__(self, other):
         """Multiply the vector by a number, or do a scalar product 
         of two vectors.
@@ -352,7 +420,7 @@ class Point():
         """
         if type(other) in (int, float):
             # multiplication of the vector by a number
-            return Point(round(self.x * other), round(self.y * other))
+            return Point(self.x * other, self.y * other)
         else:
             # scalar product of vectors
             try:
@@ -365,9 +433,37 @@ class Point():
         return self.__mul__(other)
 
     def projectOn(self, other):
-        """Projection of self on other."""
-        return (self * Point(*other)) * Point(*other)
+        """Projection of 'self' into a direction of a unit vector 'other'.
+        
+        Arguments:
+        other -- 2-tuple 
+        """
+        other = Point(*other)
+        scalProduct = self.x * other.x + self.y * other.y
+        return scalProduct * other
     
+    def __complex__(self):
+        """Type conversion to a complex number."""
+        return self.x + 1j*self.y
+    
+    def rotate(self, alpha, center=None):
+        """Rotate the point by angle alpha around a given center.
+        
+        Arguments:
+        center [Point] - the axis of rotation
+        alpha [float] - angle in radians
+        """
+        if not center: center = Point(0, 0) 
+        cSelf = complex(self)
+        cCenter = complex(center)
+        
+        phaseFactor = cmath.exp(alpha*1j)
+        cRotatedPoint = phaseFactor * (cSelf - cCenter) + cCenter
+        return Point(cRotatedPoint.real, cRotatedPoint.imag)
+    
+    def getAngle(self, center):
+        """Return the point's angel coord with respect to a given center."""
+        return cmath.phase(complex(self) - complex(center))
 
 
 
