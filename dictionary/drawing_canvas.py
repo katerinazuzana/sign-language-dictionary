@@ -18,15 +18,18 @@ class DrawingCanvas(Canvas):
         self.scMarkSettings = {'width': 1, 
                                'outline': 'darkgreen', 
                                'fill': 'green'}
-        self.rotMarkSettings = {'fill': 'black'}
-        self.scMarkCursors = {'r' : 'right_side', 
-                            'tr': 'top_right_corner', 
-                            't' : 'top_side', 
-                            'tl': 'top_left_corner', 
-                            'l' : 'left_side', 
-                            'bl': 'bottom_left_corner', 
-                            'b' : 'bottom_side',
-                            'br': 'bottom_right_corner'}
+        self.rotMarkSettings = {'width': 1, 
+                                'fill': 'black'}
+        self.markNames = ['r', 'tr', 't', 'tl', 'l', 'bl', 'b', 'br']
+        self.cursorShapes = ['right_side', 
+                             'top_right_corner', 
+                             'top_side', 
+                             'top_left_corner', 
+                             'left_side', 
+                             'bottom_left_corner', 
+                             'bottom_side',
+                             'bottom_right_corner']
+        self.numShapes = len(self.cursorShapes)
         
         self.markIds = {}       # mark items drawn on canvas  
         self.id = None          # id of the ellipse draw on canvas
@@ -90,17 +93,22 @@ class DrawingCanvas(Canvas):
     def switchToRotateMode(self):
         self.scaleMode = False               
         self.rotateMode = True
+        self.delete('marks')
         self.drawMarks(mode='rotate')
 
     def switchToScaleMode(self):
         self.rotateMode = False               
         self.scaleMode = True
+        self.delete('marks')
         self.drawMarks(mode='scale')
     
     def drawMarks(self, mode):
         if mode == 'scale':
             createFcn = self.create_rectangle
             settings = self.scMarkSettings
+            # update the dict with cursor shapes according to current angle
+            self.calcShapesDict()
+            
         elif mode == 'rotate':
             createFcn = self.create_oval
             settings = self.rotMarkSettings
@@ -116,6 +124,7 @@ class DrawingCanvas(Canvas):
             self.markIds[mark] = markId
             
             if mode == 'scale':
+            
                 def onEnter(mark):
                     return lambda ev: self.config(cursor = 
                                                   self.scMarkCursors[mark])
@@ -131,6 +140,22 @@ class DrawingCanvas(Canvas):
             self.tag_bind('marks', '<ButtonPress-1>', self.startRotate)
             
         self.tag_bind('marks', '<Leave>', lambda ev: self.config(cursor = ''))
+    
+    def calcShapesDict(self):
+        """Calculate the dictionary with cursor shapes according to 
+        current angle of the ellipse.
+        """
+    
+        segmentSize = 2*math.pi / self.numShapes   # pi/4
+        angleSegment = (self.ellipse.angle + segmentSize/2)//segmentSize
+                        # (angle + pi/8) // (pi/4)
+                        
+        rotatedShapes = []
+        for i in range(self.numShapes):
+            shape = self.cursorShapes[int((i - angleSegment) % self.numShapes)]
+            rotatedShapes.append(shape)
+            
+        self.scMarkCursors = dict(zip(self.markNames, rotatedShapes))
     
     def startMove(self, event):
         self.startPoint = Point(event)
@@ -251,7 +276,7 @@ class DrawingCanvas(Canvas):
         self.delete('marks')
         self.drawMarks(mode=mode)
     
-    def getPolygonPoints(self, steps=80):
+    def getPolygonPoints(self, steps=100):
         """
         
         better keep the number of steps a multiple of four
@@ -321,7 +346,7 @@ class Ellipse():
         self.topLeft = topLeft
         self.bottomRight = bottomRight
         
-        self.angle = 0       
+        self.angle = 0  # angle between a-axis and horizontal axis, in (0, 2 pi]
         
         # calculate initial positions of scale marks (ellipse not rotated)
         self.markCoords = {}
@@ -346,7 +371,7 @@ class Ellipse():
     
     def changeAngle(self, diffAngle):
         
-        self.angle = self.angle + diffAngle
+        self.angle = (self.angle + diffAngle) % (2 * math.pi)
         self.a = self.a.rotate(diffAngle)
         self.b = self.b.rotate(diffAngle)
         
@@ -463,7 +488,7 @@ class Point():
     
     def getAngle(self, center):
         """Return the point's angel coord with respect to a given center."""
-        return cmath.phase(complex(self) - complex(center))
+        return cmath.phase(complex(self) - complex(center)) % (2 * math.pi)
 
 
 
