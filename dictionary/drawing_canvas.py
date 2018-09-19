@@ -284,25 +284,25 @@ class DrawingCanvas(Canvas):
         
         mouseMove = self.endPoint - self.startPoint
         
-        # only horizontal movement:                
+        # movement parallel to a-axis:                
         if self.movingMark == 'r':
-            self.ellipse.bottomRight += mouseMove.projectOn((1, 0))
+            self.ellipse.bottomRight += mouseMove.projectOn(self.ellipse.unitA)
         elif self.movingMark == 'l':
-            self.ellipse.topLeft += mouseMove.projectOn((1, 0))
+            self.ellipse.topLeft += mouseMove.projectOn(self.ellipse.unitA)
         
         # only vertical movement:                      
         elif self.movingMark == 't':
-            self.ellipse.topLeft += mouseMove.projectOn((0, 1))
+            self.ellipse.topLeft += mouseMove.projectOn(self.ellipse.unitB)
         elif self.movingMark == 'b':
-            self.ellipse.bottomRight += mouseMove.projectOn((0, 1))
+            self.ellipse.bottomRight += mouseMove.projectOn(self.ellipse.unitB)
         
         # a corner mark is moving            
         elif self.movingMark == 'tr':
-            self.ellipse.topLeft += mouseMove.projectOn((0, 1))
-            self.ellipse.bottomRight += mouseMove.projectOn((1, 0))
+            self.ellipse.topLeft += mouseMove.projectOn(self.ellipse.unitB)
+            self.ellipse.bottomRight += mouseMove.projectOn(self.ellipse.unitA)
         elif self.movingMark == 'bl':
-            self.ellipse.bottomRight += mouseMove.projectOn((0, 1))
-            self.ellipse.topLeft += mouseMove.projectOn((1, 0))    
+            self.ellipse.bottomRight += mouseMove.projectOn(self.ellipse.unitB)
+            self.ellipse.topLeft += mouseMove.projectOn(self.ellipse.unitA)    
         elif self.movingMark == 'tl':
             self.ellipse.topLeft += mouseMove
         elif self.movingMark == 'br':
@@ -338,11 +338,11 @@ class Ellipse():
         self.ab = self.bottomRight - self.center
         
         # unit vector in the direction of a-semiaxis -- tuple: (float, float)
-        unitA = (math.cos(self.angle), math.sin(self.angle))
+        self.unitA = (math.cos(self.angle), math.sin(self.angle))
         # unit vector in the direction of b-semiaxis -- tuple
-        unitB = (- math.sin(self.angle), math.cos(self.angle))
-        self.a = self.ab.projectOn(unitA)
-        self.b = self.ab.projectOn(unitB)        
+        self.unitB = (- math.sin(self.angle), math.cos(self.angle))
+        self.a = self.ab.projectOn(self.unitA)
+        self.b = self.ab.projectOn(self.unitB)        
     
     def changeAngle(self, diffAngle):
         
