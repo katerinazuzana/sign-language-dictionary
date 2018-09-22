@@ -34,11 +34,16 @@ class SignInputFrm(Frame):
 
     def onSearchPress(self):
     
-        signComponents = ((self.actshapes.sel1, self.actshapes.sel1), 
-                          (self.radiofrm.var.get(), 
-                           self.radiofrm.passhapes.sel1), 
-                          (None,))
-        # TODO fetch the ellipse
+        signComponents = ((self.actshapes.var1.get(), 
+                           self.actshapes.var2.get()), 
+                           self.radiofrm.var.get(), 
+                           self.radiofrm.passhapes.var1.get(), 
+                          (self.placementfrm.canvas.ellipse.center.x, 
+                           self.placementfrm.canvas.ellipse.center.y, 
+                       abs(self.placementfrm.canvas.ellipse.a), 
+                       abs(self.placementfrm.canvas.ellipse.b), 
+                           self.placementfrm.canvas.ellipse.angle))
+
         self.signSearchFcn(*signComponents)
         
 
