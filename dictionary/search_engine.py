@@ -37,7 +37,6 @@ class SearchEngine():
                        
         self.width = 240    # canvas width
         self.height = 250   # canvas height
-        self.showSignsFcn = None
 
     def search(self, lookupword):
         """Search for the given word in the database.        
@@ -274,8 +273,10 @@ class SearchEngine():
         # add suffixes
         result = addSuffixes(result)
         
+        # add success flag
+        res = (True, result)
         # show the result
-        self.showSignsFcn(result)
+        self.showResultFcn(res)
 
 
     def calcActDist(self, uShape, uGroups, dbShape, dbGroups):

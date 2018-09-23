@@ -2,6 +2,7 @@ from tkinter import *
 from searchentry_frame import EntFrm
 from video_frame import VideoFrm
 from altoptions_frame import AltsFrm
+from scrolled_frame import ScrolledFrame
 
 
 class MainFrm(Frame):
@@ -92,20 +93,25 @@ class MainFrm(Frame):
         self.video.grid(column=0, row=3)
         
         # create a frame for displaying thumbnail videos
-        self.thumbfrm = Frame(self, bg=self.bgcolor)
+        self.thumbfrm = ScrolledFrame(self, bg=self.bgcolor)
         self.thumbfrm.grid(column=0, row=4, 
                            sticky=N+E+S+W,
                            pady=(self.THUMB_PADY, self.BORDER))
 
     def showResult(self, result):
+        """
+        """
+        
         successFlag, alist = result        
         self.deleteThumbnails()
         if successFlag == True:
             # the word was found
+            # or it was a sign search (that always returns successFlag = True)
             word, videofile = alist[0]
             self.showVideoAndWord(word, videofile)
             if len(alist) > 1:                
                 # there's more than one match
+                # (this is always the case for the sign search)
                 self.createThumbnails(alist)
         else:
             # the word was not found
@@ -139,7 +145,7 @@ class MainFrm(Frame):
         Arguments:
         find -- [list] a list of 2-tuples (word, videofile) where
                 word -- [string] the word that is being translated
-                videofile -- [string] name of video file without suffix
+                videofile -- [string] name of video file
         """
         self.thumbfrm.rowconfigure(0, minsize = self.THUMB_HEIGHT + 
                                                 2 * self.HIGHLIGHT_BORDER)
@@ -218,14 +224,7 @@ class MainFrm(Frame):
             self.alts.destroy()
         self.labvar.set('Zadejte výraz, který chcete vyhledat')
 
-    def showResult(self, result):
-        """
-        """
         
-        # find the word corresponding to the zero item of the result list
-        
-        # display the zero item on the main screen
-        self.showVideoAndWord(word, result[0])
 
 
 

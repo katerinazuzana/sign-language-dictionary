@@ -79,9 +79,8 @@ class Dictionary():
         self.mainfrm.grid(column=0, row=0, sticky=N+E+S+W)
         
         # when the searchEng is done searching, it calls a function to show
-        # the result - these functions are defined in the mainfrm object
+        # the result - this function is defined in the mainfrm object
         self.searchEng.showResultFcn = self.mainfrm.showResult
-        self.searchEng.showSignsFcn = self.mainfrm.showSigns
         
         # create notebook
         self.notebook = ttk.Notebook(self.root)
