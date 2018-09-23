@@ -113,8 +113,8 @@ class MainFrm(Frame):
             self.showNotFound(alist)
         
     def showVideoAndWord(self, word, videofile):
-        """Show the word that is being translated and play
-        the corresponding video.
+        """Show the word on the label and play the corresponding video.
+        
         Arguments:
         word -- [string] the word to be displayed
         videofile -- [string] name of the video file
@@ -222,7 +222,10 @@ class MainFrm(Frame):
         """
         """
         
+        # find the word corresponding to the zero item of the result list
         
+        # display the zero item on the main screen
+        self.showVideoAndWord(word, result[0])
 
 
 

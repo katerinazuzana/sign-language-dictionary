@@ -55,12 +55,7 @@ class SearchEngine():
         
         if find != []:
             # the word was found
-            # find the full name (including suffix) of the video files
-            # and rewrite the videofile names in the find list so that
-            # the videofile now contains a suffix
-            for i in range(len(find)):
-                withsuffix = self.findVideoFile(find[i][1])
-                find[i] = (find[i][0], withsuffix)
+            find = self.addSuffixes(find)
             # call fct to show the result            
             self.showResultFcn((True, find))
                           
@@ -81,6 +76,20 @@ class SearchEngine():
             if vf.startswith(videofile + '.'):
                 videosource = os.path.join(self.vfdir, vf)
                 return videosource
+
+    def addSuffixes(self, alist):
+        """Find the full names (including suffix) of the video files
+        in a given list and rewrite the videofile names so that they 
+        contain a suffix.
+        
+        Arguments:
+        alist [list] -- items take form (word [str], videofile [str])
+        """
+            
+        for i, (word, filename) in enumerate(alist):
+            withsuffix = self.findVideoFile(filename)
+            alist[i] = (word, withsuffix)
+        return alist
 
     def findAltOpts(self, lookupword):
         """Find words that have the longest common substrings with lookupword. 
@@ -243,8 +252,6 @@ class SearchEngine():
         result = result[:self.signsmax]
         # remove the distance values
         result = self.listOfTuplesToList(result)
-        # add suffixes
-        result = [self.findVideoFile(filename) for filename in result]
         # demo result:
         result = ['bezecke_lyzovani.mp4', 
                   'biatlon.mp4', 
@@ -254,6 +261,19 @@ class SearchEngine():
                   'cerna_hora.mp4', 
                   'cesko.mp4', 
                   'brazilie_2.mp4']
+                  
+        # find the words corresponding to individual videofiles
+        for i, videofile in enumerate(result):
+            with sqlite3.connect(self.dbpath) as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT word FROM translation WHERE \
+                               videofile=?', (videofile,))
+                words = cursor.fetchall()
+            text = ', '.join(self.listOfTuplesToList(words))
+            result[i] = (text, videofile)
+        # add suffixes
+        result = addSuffixes(result)
+        
         # show the result
         self.showSignsFcn(result)
 
