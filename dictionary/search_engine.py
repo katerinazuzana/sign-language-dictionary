@@ -21,6 +21,20 @@ class SearchEngine():
         
         self.allsigns = []
         self.signsmax = 10
+        self.groups = {1: 'I', 2: 'I', 3: 'I', 4: 'I', 5: 'I', 
+                       6: 'II', 7: 'II', 8: 'II', 9: 'III', 10: 'III', 
+                       11: 'III', 12: 'IV', 13: 'IV', 14: 'IV', 15: 'III', 
+                       16: 'III', 17: 'IV', 18: 'III', 19: 'III', 20: 'IV', 
+                       21: 'II', 22: 'V', 23: 'V', 24: 'V', 25: 'V', 
+                       26: 'VI', 27: 'VI', 28: 'VII', 29: 'VII', 30: 'VII', 
+                       31: 'VII', 32: 'VII', 33: 'VII', 34: 'VII', 35: 'VII',
+                       36: 'VIII', 37: 'VIII', 38: 'VIII', 39: 'VIII', 
+                       40: 'VIII', 41: 'IX', 42: 'IX', 43: 'IX', 44: 'IX', 
+                       45: 'IX', 46: 'IX', 47: 'IX', 48: 'X', 49: 'XI', 
+                       50: 'XI', 51: 'XII'}
+                       # all the possible 51 hand shapes are divided into 
+                       # 12 groups of visually similar shapes (roman nums I-XII)
+                       
         self.width = 240    # canvas width
         self.height = 250   # canvas height
         self.showSignsFcn = None
@@ -107,39 +121,80 @@ class SearchEngine():
         return altopts
 
     def listOfTuplesToList(self, listOfTuples):    
-        """Convert a list of 1-tuples into a simple list."""
+        """Convert a list of tuples into a simple list of tuple[0] items."""
         res = []
         for item in listOfTuples:
             res.append(item[0])
         return res
   
     def signSearch(self, *userSign):
-        """
+        """Search the database for signs similar to the sign from the user 
+        input.
         
+        Take a list of all the signs in the database, where each item of the
+        list contains also information about the sign type and the sign
+        components - hand shapes and placement.
+        
+        Go through all the database signs and for each of them calculate 
+        an abstract distance between the sign provided by the user
+        and the sign from the database. The distance is measured in a 3D 
+        space, where the axes correspond to:
+        - active hand's shape
+        - sign type
+        - sign placement
+         
+        Along each of the three axes, the distance can take a value from 
+        interval [0, 1]. (0 - the components match perfectly, 1 - the 
+        components are completely different)
         
         Active Hand Shape dimension:
-        The algorithm doesn't take into account the order of the shapes.
-        Explain shape groups
-        We distinguish the cases where the hand shapes are the same, 
-        and the cases where the shapes are similar, i.e. belong to 
-        the same group
+        There is a set of shapes from the user and a set of shapes from the 
+        database. The more these two sets are similar, the shorter the distance
+        is. We distinguish the cases where the hand shapes are exactly the same 
+        (leading to a shorter distance), and the cases where the shapes are
+        similar, i.e. belong to the same group (leads to a longer distance).
         
-        When the search is done, call 'self.showSignsFcn' to display the result.
+        Sign Type dimension:
+        There are three possible types: 'single hand', 'both the same' and 
+        'passive hand'. If the type of the user's sign is the same as the type 
+        of the sign from the database, the distance is zero, otherwise it's 1.
+        There's one exception: when both the user's and the database signs'
+        type is 'passive hand', but the user and the db provide different 
+        passive hand shape number (uPassiveShape and dbPassiveShape values), 
+        the distance is 0.5.
         
-        uActiveShape [tuple] - (int, int)
-        uSignType [str]
-        uPassiveShape [int]
+        Sign Placement dimension:
+        The placement of a sign is given by an elliptic area on a canvas
+        (see drawing_canvas.py). The distance between two signs is calculated
+        as a ratio of an area where the two ellipses overlap (counted twice -
+        once for each ellipse) to the total area of the ellipses.
+        
+        After calculating the distance for all the database signs, choose the
+        'self.signsmax' number of the closest signs as a result of the search.
+        When the search is done, call 'self.showSignsFcn' to display it in 
+        the application's 'mainfrm' frame.
+        
+        Arguments:
+        *userSign -- a tuple that unpacks into:
+        uActiveShape [tuple of ints] -- describes the shape of the active hand
+        uSignType [str] -- a string describing the type of the sign, takes one
+                           of the values: 'single hand', 
+                                          'both the same', 
+                                          'passive hand'
+        uPassiveShape [int] -- a number describing the shape of the passive hand
+        uPlacement [tuple] -- a tuple of floats of the form 
+                              [centerx, centery, a , b, angle]
+                              describing the sign's placement
         """
         
         # unpack the user's sign input
         uActiveShape, uSignType, uPassiveShape, uPlacemet = *userSign
         
-        uActiveShapes = set(uActiveShapes)
+        uActiveShapes = set(uActiveShapes) # a set of ints
         uShapeGroups = set(self.groups[shape] for shape in uActiveShapes 
-                           if shape != 0)
+                           if shape != 0) # a set of strings
         
-        uCenterX, uCenterY, uA, uB, uAngle = *uPlacement
-        # area of the ellipse from user input
+        # used for comparing the signs placement
         uRelief = self.getReliefFcn(*uPlacement)
         uArea = self.integrateOverCanvas(uRelief)
         
@@ -150,7 +205,7 @@ class SearchEngine():
             with sqlite3.connect(self.dbpath) as conn:
                 cursor = conn.cursor()
                 cursor.execute('SELECT * FROM signs')
-                allsigns = cursor.fetchall() # returns a list of tuples
+                allsigns = cursor.fetchall()
 
         result = []        
         
@@ -160,11 +215,11 @@ class SearchEngine():
             = *dbSign
             
             # dbActiveShape is a str of comma separated numbers -> change to set
-            dbActiveShape = set(dbActiveShape.split(','))
+            dbActiveShape = set(int(item) for item in dbActiveShape.split(','))
             dbShapeGroups = set(self.groups[shape] for shape in dbActiveShapes)
             
-            # change dbPlacement from string "centerx,centery,a,b,angle" to list
-            dbPlacement = dbPlacement.split(',')
+            # change dbPlacement from str "centerx,centery,a,b,angle" to tuple
+            dbPlacement = tuple(float(item) for item in dbPlacement.split(','))
             
             
             # distance in the Active Hand Shape dimension
@@ -186,11 +241,40 @@ class SearchEngine():
         # choose the first 'self.signmax' closest signs
         result = sorted(result, key = lambda x: x[1])
         result = result[:self.signsmax]
+        # remove the distance values
         result = self.listOfTuplesToList(result)
+        # add suffixes
+        result = [self.findVideoFile(filename) for filename in result]
+        # demo result:
+        result = ['bezecke_lyzovani.mp4', 
+                  'biatlon.mp4', 
+                  'bowling.mp4', 
+                  'bolivie.mp4', 
+                  'box.mp4', 
+                  'cerna_hora.mp4', 
+                  'cesko.mp4', 
+                  'brazilie_2.mp4']
+        # show the result
         self.showSignsFcn(result)
 
 
     def calcActDist(self, uShape, uGroups, dbShape, dbGroups):
+        """Calculate the distance between the uSign and the dbSign in the
+        Active Hand Shape dimension.
+        
+        Arguments:
+        uShape [set] -- a set of ints describing the shape of the active hand 
+                        of the user's sign
+        uGroups [set] -- a set of strings describing the hand shape groups 
+                         of the user's sign
+        dbShape [set] -- a set of ints describing the shape of the active hand 
+                        of the dbSign
+        dbGroups [set] -- a set of strings describing the hand shape groups 
+                         of the dbSign
+        
+        Returns:
+        a distance [float]
+        """
     
         if dbActiveShape == uActiveShape:
             # all the same shapes
@@ -212,6 +296,18 @@ class SearchEngine():
 
     def calcTypeDist(self, uSignType, uPassiveShape, 
                            dbSignType, dbPassiveShape):
+        """Calculate the distance between the uSign and the dbSign in the
+        Sign Type dimension.
+        
+        Arguments:
+        uSignType [str] -- one of 'single hand', 'both the same', 'passive hand'
+        uPassiveShape [int] -- a number describing the shape of the passive hand
+        dbSignType [str]-- one of 'single hand', 'both the same', 'passive hand'
+        dbPassiveShape [int]-- a number describing the shape of the passive hand
+        
+        Returns:
+        a distance [float] 
+        """
         
         if dbSignType != uSignType:
             # different type
@@ -231,6 +327,22 @@ class SearchEngine():
         return typeDist
 
     def calcPlaceDist(self, uRelief, uArea, dbPlacement):
+        """Calculate the distance between the uSign and the dbSign in the
+        Placement dimension.
+        
+        The distance is calculated as a ratio of the overlapping area (counted
+        twice - once for each ellipse) to the total area of the ellipses.
+        
+        Arguments:
+        uRelief [function] -- fcn of canvas coords describing the user's ellipse
+        uArea [int] -- the area af the user's ellipse
+        dbPlacement [list] -- a list of floats of the form 
+                              [centerx, centery, a , b, angle]
+                              describing the dbSign's placement
+                              
+        Returns:
+        a distance [float] 
+        """
         
         # area of the db ellipse
         dbRelief = self.getReliefFcn(*dbPlacement)
@@ -253,20 +365,30 @@ class SearchEngine():
         return integral
 
     def getReliefFcn(self, centerx, centery, a, b, angle):
-        """return a function of canvas coords that describes the elliptic area
+        """Return a function of canvas coords that describes an elliptic area.
+        
+        Arguments:
+        centerx [float] -- x coord of the elipse center
+        centery [float] -- y coord of the elipse center
+        a [float] -- major semi-axis length
+        b [float] -- minor semi-axis lenght
+        angle [float] -- angle of rotation of the ellipse
+        
+        Returns:
+        a function of two float args that returns 1 for points inside 
+        the elliptic area, and 0 for points outside of it:
         f(x, y) = 1     for (x, y) inside the ellipse
         f(x, y) = 0     for (x, y) outside the ellipse
         """       
         
         def f(x, y):
-            
             center = Point(centerx, centery)
             point = Point(x, y)
-            # angle coord of the point with respect to the ellipse center
+            # angle coord of the point with respect to the ellipse center:
             phi = point.getAngle(center)
-            # radial coord of the point with respect to the ellipse center
+            # radial coord of the point with respect to the ellipse center:
             r = abs(point - center)
-            # radial coord of the ellipse border at angle phi
+            # radial coord of the ellipse border at angle phi:
             elRadius = math.sqrt(a**2 * math.cos(phi - angle)**2 + 
                                  b**2 * math.sin(phi - angle)**2)
             

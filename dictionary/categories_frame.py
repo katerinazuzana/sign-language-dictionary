@@ -143,7 +143,7 @@ class CatFrm(Frame):
         return sorted(alist, key = lambda x: (x[0].isdigit(), x.lower()))
     
     def listOfTuplesToList(self, listOfTuples):    
-        """Convert a list of 1-tuples into a simple list."""
+        """Convert a list of tuples into a simple list of tuple[0] items."""
         res = []
         for item in listOfTuples:
             res.append(item[0])

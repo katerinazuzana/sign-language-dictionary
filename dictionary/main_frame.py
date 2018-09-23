@@ -218,5 +218,14 @@ class MainFrm(Frame):
             self.alts.destroy()
         self.labvar.set('Zadejte výraz, který chcete vyhledat')
 
+    def showResult(self, result):
+        """
+        """
+        
+        
+
+
+
+
 
 
