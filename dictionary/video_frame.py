@@ -85,6 +85,7 @@ class VideoFrm(Frame):
             self.after(self.video.delay, lambda: self.update(video_source))
         else:
             # there are no more frames in the video source
+            self.showFirstPic(video_source)
             if self.thumb == False:
                 # the object is the large video, not a thumbnail     
                 # draw a replay arrow and replay the video on a mouse click
