@@ -16,6 +16,10 @@ class ShapeSelectFrm(Frame):
         self.delay = 1000 # how long to wait before button description shows up
         self.captFont = ('Helvetica', 10)
         
+        self.submitIconPath = os.path.join(imgdir, 'submit_icon.png')
+        self.closeIconPath = os.path.join(imgdir, 'close_icon.png')
+        self.selectWinIconSize = 20
+        
         self.labwidth = 65
         self.labheight = 80
         self.labborder = 3
@@ -176,20 +180,7 @@ class ShapeSelectFrm(Frame):
         self.selectWin.rowconfigure(1, weight=1)
         
         self.makeLabels()
-        
-        # make Submit and Quit buttons in their own frame
-        buttonsfrm = Frame(self.selectWin, bg=self.popupBgColor)
-        buttonsfrm.grid(column=0, row=2, sticky=E)
-        ttk.Button(buttonsfrm, 
-               text='Použít', 
-               command=self.onSubmit).grid(column=0, row=0, 
-                                      sticky=E+W, 
-                                      padx=(0, 15), pady=10)
-        ttk.Button(buttonsfrm, 
-               text='Zavřít', 
-               command=self.onPopupClose).grid(column=1, row=0, 
-                                          sticky=E+W, 
-                                          padx=(0, 15), pady=10)
+        self.makeSelectWinButtons() 
         
         # position the popup next to a shape selection frame
         self.selectWin.update_idletasks()
@@ -202,6 +193,41 @@ class ShapeSelectFrm(Frame):
         
         # disable enlarging the popup window
         self.selectWin.maxsize(width = width, height = height)
+    
+    def makeSelectWinButtons(self):
+        # make Submit and Quit buttons in their own frame
+        buttonsfrm = Frame(self.selectWin, bg=self.popupBgColor)
+        buttonsfrm.grid(column=0, row=2, sticky=E)
+        
+        # submit button
+        with Image.open(self.submitIconPath) as img:
+            img = img.resize((self.selectWinIconSize, 
+                              self.selectWinIconSize), 
+                             Image.LANCZOS)
+            self.submitImg = ImageTk.PhotoImage(img)
+        submitButton = ttk.Button(buttonsfrm, 
+                                  text='Použít', 
+                                  image=self.submitImg, 
+                                  command=self.onSubmit)
+        submitButton.grid(column=0, row=0, 
+                          sticky=E+W, 
+                          padx=(0, 15), pady=10)
+        submitButton['compound'] = LEFT # display image to left of button text
+        
+        # close button
+        with Image.open(self.closeIconPath) as img:
+            img = img.resize((self.selectWinIconSize, 
+                              self.selectWinIconSize), 
+                             Image.LANCZOS)
+            self.closeImg = ImageTk.PhotoImage(img)
+        closeButton = ttk.Button(buttonsfrm, 
+                                 text='Zavřít', 
+                                 image=self.closeImg, 
+                                 command=self.onPopupClose)
+        closeButton.grid(column=1, row=0, 
+                         sticky=E+W, 
+                         padx=(0, 15), pady=10)
+        closeButton['compound'] = LEFT
     
     def onSubmit(self):
         if self.var.get() != 0:
