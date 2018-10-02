@@ -29,6 +29,8 @@ class MainFrm(Frame):
                         video frame
     THUMB_PADX -- horizontal spacing of the thumbnail videos
     THUMB_PADY -- space between the main video and the thumbnails
+    SCROLLBAR_WIDTH -- the width of the scrollbar used in the frame with
+                       thumbnail videos 
     """
     
     VIDEO_WIDTH = 540
@@ -38,6 +40,7 @@ class MainFrm(Frame):
     HIGHLIGHT_BORDER = 4
     THUMB_PADX = 10
     THUMB_PADY = 10
+    SCROLLBAR_WIDTH = 15
     
     def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, 
                  altsmax, border, **options):
@@ -92,16 +95,32 @@ class MainFrm(Frame):
                               parent=self)
         self.video.grid(column=0, row=3)
         
-        # create a frame for displaying thumbnail videos
-        self.thumbfrm = ScrolledFrame(self, bg=self.bgcolor)
+        # frame for displaying thumbnail videos
+        self.thumbfrm = None
+        
+    def createThumbFrm(self):
+        self.thumbfrm = ScrolledFrame(self, 
+                                      # canvas size:
+                                      width = self.VIDEO_WIDTH, 
+                                      height = self.THUMB_HEIGHT + 
+                                               2 * self.HIGHLIGHT_BORDER, 
+                                      orient='horizontal', 
+                                      bg=self.bgcolor)
+        # frame size:
+        self.thumbfrm.config(width = self.VIDEO_WIDTH, 
+                             height = self.THUMB_HEIGHT + 
+                                      2 * self.HIGHLIGHT_BORDER + 
+                                      self.SCROLLBAR_WIDTH)
+        self.thumbfrm.grid_propagate(0)
+        
         self.thumbfrm.grid(column=0, row=4, 
-                           sticky=N+E+S+W,
+                           sticky=N+E+S+W, 
                            pady=(self.THUMB_PADY, self.BORDER))
 
     def showResult(self, result):
         """
         """
-        
+
         successFlag, alist = result        
         self.deleteThumbnails()
         if successFlag == True:
@@ -147,6 +166,8 @@ class MainFrm(Frame):
                 word -- [string] the word that is being translated
                 videofile -- [string] name of video file
         """
+        
+        self.createThumbFrm()
         self.thumbfrm.rowconfigure(0, minsize = self.THUMB_HEIGHT + 
                                                 2 * self.HIGHLIGHT_BORDER)
         
@@ -158,7 +179,7 @@ class MainFrm(Frame):
             # create the thumbnails and collect them in self.thumbs variable
             thumb = VideoFrm(width=self.THUMB_WIDTH,
                              height=self.THUMB_HEIGHT,
-                             parent=self.thumbfrm,
+                             parent=self.thumbfrm.interior, 
                              thumb=True,
                              border=self.HIGHLIGHT_BORDER)
             thumb.grid(column=i, row=0, padx=(0, self.THUMB_PADX))
@@ -197,6 +218,7 @@ class MainFrm(Frame):
         for thumb in self.thumbs:
             thumb.destroy()
         self.thumbs = []
+        if self.thumbfrm: self.thumbfrm.destroy()
 
     def showNotFound(self, altoptions):
         if altoptions == []:

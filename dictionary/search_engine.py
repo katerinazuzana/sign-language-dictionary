@@ -2,7 +2,7 @@ import sqlite3
 import os
 import math
 from difflib import SequenceMatcher
-from drawing_canvas import Point
+from drawing_canvas import Vect
 
 
 class SearchEngine():
@@ -196,17 +196,17 @@ class SearchEngine():
         """
         
         # unpack the user's sign input
-        uActiveShape, uSignType, uPassiveShape, uPlacemet = *userSign
+        uActiveShape, uSignType, uPassiveShape, uPlacement = userSign
         
-        uActiveShapes = set(uActiveShapes) # a set of ints
-        uShapeGroups = set(self.groups[shape] for shape in uActiveShapes 
+        uActiveShape = set(uActiveShape) # a set of ints
+        uShapeGroups = set(self.groups[shape] for shape in uActiveShape 
                            if shape != 0) # a set of strings
         
-        # used for comparing the signs placement
-        uRelief = self.getReliefFcn(*uPlacement)
-        uArea = self.integrateOverCanvas(uRelief)
-        
-        
+        if uPlacement:
+            # used for comparing the signs placement:
+            uRelief = self.getReliefFcn(*uPlacement)
+            uArea = self.integrateOverCanvas(uRelief)
+        """
         if self.allsigns == []:
             # create a list of all the signs in the database - a list of tuples:
             # (videofile, activeShape, signType, passiveShape, placement)
@@ -215,12 +215,13 @@ class SearchEngine():
                 cursor.execute('SELECT * FROM signs')
                 allsigns = cursor.fetchall()
 
-        result = []        
+        result = []
+        placeDist = 1        
         
         for dbSign in allsigns: 
             # unpack the dbSign's components
             videofile, dbActiveShape, dbSignType, dbPassiveShape, dbPlacemet \
-            = *dbSign
+            = dbSign
             
             # dbActiveShape is a str of comma separated numbers -> change to set
             dbActiveShape = set(int(item) for item in dbActiveShape.split(','))
@@ -239,7 +240,8 @@ class SearchEngine():
                                          dbSignType, dbPassiveShape)
             
             # distance in the Sign Placement dimension
-            placeDist = self.calcPlaceDist(uRelief, uArea, dbPlacement)
+            if uPlacement:
+                placeDist = self.calcPlaceDist(uRelief, uArea, dbPlacement)
             
             # the total distance
             dist  = math.sqrt(actDist**2 + typeDist**2 + placeDist**2)
@@ -250,16 +252,16 @@ class SearchEngine():
         result = sorted(result, key = lambda x: x[1])
         result = result[:self.signsmax]
         # remove the distance values
-        result = self.listOfTuplesToList(result)
+        result = self.listOfTuplesToList(result)"""
         # demo result:
-        result = ['bezecke_lyzovani.mp4', 
-                  'biatlon.mp4', 
-                  'bowling.mp4', 
-                  'bolivie.mp4', 
-                  'box.mp4', 
-                  'cerna_hora.mp4', 
-                  'cesko.mp4', 
-                  'brazilie_2.mp4']
+        result = ['bezecke_lyzovani', 
+                  'biatlon', 
+                  'bowling', 
+#                  'bolivie', 
+#                  'box', 
+#                  'cerna_hora', 
+#                  'cesko', 
+                  'brazilie_2']
                   
         # find the words corresponding to individual videofiles
         for i, videofile in enumerate(result):
@@ -271,7 +273,7 @@ class SearchEngine():
             text = ', '.join(self.listOfTuplesToList(words))
             result[i] = (text, videofile)
         # add suffixes
-        result = addSuffixes(result)
+        result = self.addSuffixes(result)
         
         # add success flag
         res = (True, result)

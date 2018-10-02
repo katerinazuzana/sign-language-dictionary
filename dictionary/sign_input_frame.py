@@ -27,22 +27,29 @@ class SignInputFrm(Frame):
                            sticky=N+S+W, pady=(0, 20))
 
         # create canvas for sign-placement input
-        placementfrm = PlacementFrm(self,
+        self.placementfrm = PlacementFrm(self,
                                     self.imgdir, 
                                     bg=self.bgcolor)
-        placementfrm.grid(column=0, row=2, sticky=W)
+        self.placementfrm.grid(column=0, row=2, sticky=W)
 
     def onSearchPress(self):
     
+        if self.placementfrm.canvas.ellipse:
+            # an ellipse object exists
+            ellipseParams = (self.placementfrm.canvas.ellipse.center.x, 
+                             self.placementfrm.canvas.ellipse.center.y, 
+                         abs(self.placementfrm.canvas.ellipse.a), 
+                         abs(self.placementfrm.canvas.ellipse.b), 
+                             self.placementfrm.canvas.ellipse.angle)
+        else:
+            # no ellipse was drawn
+            ellipseParams = None
+        
         signComponents = ((self.actshapes.var1.get(), 
                            self.actshapes.var2.get()), 
                            self.radiofrm.var.get(), 
                            self.radiofrm.passhapes.var1.get(), 
-                          (self.placementfrm.canvas.ellipse.center.x, 
-                           self.placementfrm.canvas.ellipse.center.y, 
-                       abs(self.placementfrm.canvas.ellipse.a), 
-                       abs(self.placementfrm.canvas.ellipse.b), 
-                           self.placementfrm.canvas.ellipse.angle))
+                           ellipseParams)
 
         self.signSearchFcn(*signComponents)
         

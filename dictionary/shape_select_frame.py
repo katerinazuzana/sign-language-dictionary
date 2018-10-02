@@ -130,9 +130,11 @@ class ShapeSelectFrm(Frame):
         self.scrollfrm = ScrolledFrame(self.selectWin, 
                              self.numcols*(self.labwidth + 2*self.labborder) + 
                              (self.numcols-1)*self.sepwidth,
-                              
                              self.numrows*(self.labheight + 2*self.labborder) + 
-                             (self.numrows-1)*self.sepwidth)
+                             (self.numrows-1)*self.sepwidth, 
+                             orient='vertical', 
+                             border=True, 
+                             bg=self.bgcolor)
         self.scrollfrm.grid(column=0, row=1, padx=10)
         self.selectWin.rowconfigure(1, weight=1)
         

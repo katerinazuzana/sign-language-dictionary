@@ -1,27 +1,38 @@
 from tkinter import *
+from tkinter import ttk
 from autoscrollbar import AutoScrollbar
 
 
 class ScrolledFrame(Frame):
-    def __init__(self, parent, width, height, **options):
-        super().__init__(parent)
-        self.configure(borderwidth=2, relief='groove')
+    """A frame inside which is a canvas with scrollbars, inside which is an
+    inner frame.
+    """
+
+    def __init__(self, parent, width, height, orient, border=False, **options):
+        super().__init__(parent, **options)
+        if border: self.configure(borderwidth=2, relief='groove')
+        self.bgcolor = options.get('bg', self['bg'])
         
         # make a canvas with vertical and horizontal scrollbars
         vsbar = AutoScrollbar(self, orient=VERTICAL)
-        hsbar = AutoScrollbar(self, orient=HORIZONTAL)
-        canvas = Canvas(self, width=width, height=height, 
-                              yscrollcommand=vsbar.set,
-                              xscrollcommand=hsbar.set)
+        hsbar = ttk.Scrollbar(self, orient=HORIZONTAL) # AutoScrollbar doesn't
+                                                   # work here - wouldn't appear
+        canvas = Canvas(self, width=width, height=height, # visible area size 
+                              bg=self.bgcolor)
         vsbar.config(command=canvas.yview)
         hsbar.config(command=canvas.xview)
+        self.hsbar = hsbar
         
-        vsbar.grid(column=1, row=0, sticky=N+S)
-        hsbar.grid(column=0, row=1, sticky=E+W)
-        canvas.grid(column=0, row=0, sticky=N+E+S+W)
-        self.columnconfigure(0, weight=1)
+        if orient == 'horizontal':
+            self.rowconfigure(0, minsize=height)
+            self.rowconfigure(1, minsize=40)
+            canvas.config(xscrollcommand=hsbar.set)
+            canvas.grid(column=0, row=0, sticky=N+E+S+W, columnspan=3)
+        else:   # vertical:
+            canvas.config(yscrollcommand=vsbar.set)
+            canvas.grid(column=0, row=0, sticky=N+E+S+W)
+
         self.rowconfigure(0, weight=1)
-        
         canvas.config(highlightthickness=0)
         self.canvas = canvas
         
@@ -31,17 +42,23 @@ class ScrolledFrame(Frame):
         
         # make the inner frame
         interior = Frame(canvas, 
-                         bg = 'white', 
-                         cursor='hand2') # set a cursor
+                         bg = self.bgcolor, 
+                         cursor='hand2')
         self.interior = interior
         interior_id = canvas.create_window((0, 0), window=interior, anchor=NW)
         
         def configureInterior(event):
             size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
+            # set the total canvas size
             canvas.config(scrollregion=(0, 0, size[0], size[1]))
-            if interior.winfo_reqwidth() != canvas.winfo_width():
-                # update the canvas's height to fit the inner frame
-                canvas.config(width=interior.winfo_reqwidth())
+
+            if orient == 'horizontal':
+                # hide scrollbar when not needed
+                if interior.winfo_reqwidth() <= canvas.winfo_width():
+                    self.hsbar.grid_forget()
+                else:
+                    self.hsbar.grid(column=0, row=1, sticky=N+E+W, columnspan=3)
+            
         interior.bind('<Configure>', configureInterior)
 
     def onMouseWheelDown(self, event):
