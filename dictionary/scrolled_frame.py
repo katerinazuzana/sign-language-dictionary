@@ -27,18 +27,17 @@ class ScrolledFrame(Frame):
             self.rowconfigure(0, minsize=height)
             self.rowconfigure(1, minsize=40)
             canvas.config(xscrollcommand=hsbar.set)
-            canvas.grid(column=0, row=0, sticky=N+E+S+W, columnspan=3)
+            canvas.grid(column=0, row=0, sticky=N+S+W, columnspan=3) #
         else:   # vertical:
             canvas.config(yscrollcommand=vsbar.set)
             canvas.grid(column=0, row=0, sticky=N+E+S+W)
+            # enable scrolling the canvas with the mouse wheel
+            canvas.bind_all('<Button-5>', self.onMouseWheelDown)
+            canvas.bind_all('<Button-4>', self.onMouseWheelUp)
 
         self.rowconfigure(0, weight=1)
         canvas.config(highlightthickness=0)
         self.canvas = canvas
-        
-        # enable scrolling the canvas with the mouse wheel
-        self.canvas.bind_all('<Button-5>', self.onMouseWheelDown)
-        self.canvas.bind_all('<Button-4>', self.onMouseWheelUp)
         
         # make the inner frame
         interior = Frame(canvas, 
@@ -56,8 +55,14 @@ class ScrolledFrame(Frame):
                 # hide scrollbar when not needed
                 if interior.winfo_reqwidth() <= canvas.winfo_width():
                     self.hsbar.grid_forget()
+                    # disable scrolling the canvas with the mouse wheel
+                    self.canvas.unbind_all('<Button-5>')
+                    self.canvas.unbind_all('<Button-4>')
                 else:
                     self.hsbar.grid(column=0, row=1, sticky=N+E+W, columnspan=3)
+                    # enable scrolling the canvas with the mouse wheel
+                    self.canvas.bind_all('<Button-5>', self.scrollRight)
+                    self.canvas.bind_all('<Button-4>', self.scrollLeft)
                     
         interior.bind('<Configure>', configureInterior)
 
@@ -65,11 +70,21 @@ class ScrolledFrame(Frame):
         """Roll the canvas down if the mouse pointer is over it."""
         if self.isMouseOverCanvas():
             self.canvas.yview_scroll(1, 'units')
-        
+
     def onMouseWheelUp(self, event):
         """Roll the canvas up if the mouse pointer is over it."""
         if self.isMouseOverCanvas():
             self.canvas.yview_scroll(-1, 'units')
+        
+    def scrollRight(self, event):
+        """Scroll the canvas to the right if the mouse pointer is over it."""
+        if self.isMouseOverCanvas():        
+            self.canvas.xview_scroll(1, 'units')
+        
+    def scrollLeft(self, event):
+        """Scroll the canvas to the left if the mouse pointer is over it."""
+        if self.isMouseOverCanvas():        
+            self.canvas.xview_scroll(-1, 'units')
     
     def isMouseOverCanvas(self):
         x0, x1, y0, y1 = self.getCanvasCoords()
