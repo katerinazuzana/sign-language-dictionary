@@ -204,14 +204,8 @@ class ShapeSelectFrm(Frame):
 
     def redrawSeparator(self):
         if self.var1.get() != 0:
-#            self.sep = ttk.Separator(self.selectionfrm, 
-#                          orient='vertical')
-#            self.sep = Frame(self.selectionfrm, bg=self.sepcolor)
-#            self.sep.grid(column=1, row=0, sticky=N+S)
             self.sep.configure(bg=self.sepcolor) # make the separator visible
         elif self.sel1 != None:
-#            self.sep.destroy()
-#            self.sep = None
             self.sep.configure(bg=self.bgcolor)  # make the separator invisible
 
     def redrawPlace2(self):                
@@ -278,10 +272,11 @@ class ShapeSelectFrm(Frame):
                         
         self.createSeparators()
         
-    def createSeparators(self):        
+    def createSeparators(self):
+        """Create 'separators' (implemented as thin frames) between labels.""" 
+        
         # create vertical separators between the labels
         for i in range(self.numcols - 1):
-#            sep = ttk.Separator(self.scrollfrm.interior, orient='vertical')
             sep = Frame(self.scrollfrm.interior, bg=self.sepcolor)
             sep.grid(column=2*i + 1, 
                    row=0, 
@@ -289,7 +284,6 @@ class ShapeSelectFrm(Frame):
                      sticky=N+S)
         # create horizontal separators between the labels
         for i in range(len(self.shapes) // self.numcols): # number of full rows
-#            sep = ttk.Separator(self.scrollfrm.interior, orient='horizontal')
             sep = Frame(self.scrollfrm.interior, bg=self.sepcolor)
             sep.grid(column=0, 
                      row=2*i + 1, 
@@ -363,7 +357,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
                             bg=self.bgcolor, 
                             borderwidth=2, 
                             relief='groove')
-        self.selectionfrm.grid(column=0, row=1, rowspan=2) # 0. row is empty
+        self.selectionfrm.grid(column=0, row=1, rowspan=2) # 0th row is empty
         self.selectionfrm.columnconfigure(0, 
                           minsize = self.labwidth + 2 * self.labborder)
         self.selectionfrm.rowconfigure(0, 
