@@ -13,6 +13,8 @@ class ShapeSelectFrm(Frame):
         self.selectIconPath = os.path.join(imgdir, 'select_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
         self.iconSize = 30
+        self.delay = 1000 # how long to wait before button description shows up
+        self.captFont = ('Helvetica', 10)
         
         self.labwidth = 65
         self.labheight = 80
@@ -77,6 +79,8 @@ class ShapeSelectFrm(Frame):
         self.sep.grid(column=1, row=0, sticky=N+S)
         
     def makeButtons(self):
+        self.caption = None
+        
         # create select button
         with Image.open(self.selectIconPath) as img:
             img = img.resize((self.iconSize, self.iconSize), Image.LANCZOS)
@@ -86,6 +90,10 @@ class ShapeSelectFrm(Frame):
                                 command=self.openPopup)
         self.selectBut.grid(column=1, row=1, sticky=W, padx=20)
         
+        # when mouse is over the button for a while, show a caption
+        self.selectBut.bind('<Enter>', lambda ev: self.onButEnter('Vybrat'))
+        self.selectBut.bind('<Leave>', self.onButLeave)
+        
         # create delete button
         with Image.open(self.delIconPath) as img:
             img = img.resize((self.iconSize, self.iconSize), Image.LANCZOS)
@@ -94,6 +102,35 @@ class ShapeSelectFrm(Frame):
                              image=self.delImg, 
                              command=self.onDelete)      
         self.delBut.grid(column=1, row=2, sticky=W, padx=20)
+        
+        # when mouse is over the button for a while, show a caption
+        self.delBut.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
+        self.delBut.bind('<Leave>', self.onButLeave)
+    
+    def onButEnter(self, text):
+        self.job = self.after(self.delay, lambda: self.showCaption(text))
+    
+    def onButLeave(self, event):
+        self.after_cancel(self.job)
+        if self.caption: self.hideCaption()
+    
+    def showCaption(self, text):
+        self.caption = Toplevel()
+        Message(self.caption, 
+                text=text, 
+                width=100, 
+                font=self.captFont,
+                bg=self.bgcolor).grid()
+        
+        x, y = self.winfo_pointerxy()
+        xoffset = x + 10 # x + approx cursor size
+        yoffset = y + 11 # y + approx cursor size
+        self.caption.geometry('+{}+{}'.format(xoffset, yoffset))
+        self.caption.overrideredirect(True)
+    
+    def hideCaption(self):
+        self.caption.destroy()
+        self.caption = None  
     
     def onDelete(self):
         if self.var2.get() != 0:
