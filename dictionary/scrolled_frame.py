@@ -58,7 +58,7 @@ class ScrolledFrame(Frame):
                     self.hsbar.grid_forget()
                 else:
                     self.hsbar.grid(column=0, row=1, sticky=N+E+W, columnspan=3)
-            
+                    
         interior.bind('<Configure>', configureInterior)
 
     def onMouseWheelDown(self, event):

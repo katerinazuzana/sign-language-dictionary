@@ -38,7 +38,7 @@ class MainFrm(Frame):
     THUMB_WIDTH = 160
     THUMB_HEIGHT = 94
     HIGHLIGHT_BORDER = 4
-    THUMB_PADX = 10
+    THUMB_PADX = 5
     THUMB_PADY = 10
     SCROLLBAR_WIDTH = 15
     
@@ -181,7 +181,8 @@ class MainFrm(Frame):
                              height=self.THUMB_HEIGHT,
                              parent=self.thumbfrm.interior, 
                              thumb=True,
-                             border=self.HIGHLIGHT_BORDER)
+                             border=self.HIGHLIGHT_BORDER, 
+                             bg=self.bgcolor)
             thumb.grid(column=i, row=0, padx=(0, self.THUMB_PADX))
             self.thumbs.append(thumb)
             thumb.showFirstPic(find[i][1])

@@ -17,7 +17,7 @@ class VideoFrm(Frame):
     """
    
     def __init__(self, width, height, parent, thumb=False, 
-                 border=None, **options):
+                 border=0, **options):
         """Create the self.canvas widget.
         
         Arguments:
@@ -30,16 +30,14 @@ class VideoFrm(Frame):
                  as the large video screen (thumb=False) 
                  or as a thumbnail video (thumb=True)
                  (default False)
-        border -- [int] a highlight thickness of the thumbnail video,
-                  use only when 'thumb=True'
-                  (default None)
+        border -- [int] a highlight thickness of the thumbnail video
+                  (default 0)
         """
         super().__init__(parent, **options)
         self.thumb = thumb
-        if self.thumb:
-            self.light = False  # a boolean flag showing whether
-                                # the thumbnail is currently highlighted
-            self.border = border
+        if self.thumb: self.light = False  # a boolean flag showing whether
+                                   # the thumbnail is currently highlighted
+        self.border = border
         
         # create a canvas for displaying the video
         self.width = width
@@ -47,11 +45,11 @@ class VideoFrm(Frame):
         self.canvas = Canvas(self, width = self.width, 
                                    height = self.height, 
                                    highlightthickness=0)
-        self.canvas.grid(column=0, row=0)
+        self.canvas.grid(column=0, row=0, padx=self.border, pady=self.border) #
         self.canvas.config(bg='black')
         # canvas center coords
-        self.centerX =  int(self.width / 2)
-        self.centerY =  int(self.height / 2)
+        self.centerX =  int(self.width / 2) + self.border
+        self.centerY =  int(self.height / 2) + self.border
 
     def play(self, video_source):
         """Start playing video from the video source.
@@ -96,37 +94,29 @@ class VideoFrm(Frame):
     
     def onVideoClick(self, video_source):
         """Replay the video."""
+        
         self.play(video_source)
         # unbind Button-1 event so that the video is replayed only 
         # on the first click
         self.canvas.unbind('<Button-1>')
     
     def lightOn(self):
-        """Draw a highlighting border around the canvas.
-        Redraw the image currently being displayed 
-        so that it is centered correctly.
-        """
-        self.canvas.config(highlightthickness=4, 
-                           highlightbackground='Red')
+        """Draw a highlighting border around the canvas."""
+        
         if not self.light:
             self.light = True
-            self.centerX = self.centerX + self.border
-            self.centerY = self.centerY + self.border
-            self.canvas.create_image(self.centerX, self.centerY,             
-                                     image=self.image, anchor=CENTER)
+            self.canvas.config(highlightthickness=self.border, 
+                               highlightbackground='red')
+            self.canvas.grid(column=0, row=0, padx=0, pady=0)
     
     def lightOff(self):
-        """Remove the highlighting border from around the canvas.
-        Redraw the image currently being displayed 
-        so that it is centered correctly.
-        """
-        self.canvas.config(highlightthickness=0)
+        """Remove the highlighting border from around the canvas."""
+        
         if self.light:
             self.light = False
-            self.centerX = self.centerX - self.border
-            self.centerY = self.centerY - self.border
-            self.canvas.create_image(self.centerX, self.centerY,             
-                                     image=self.image, anchor=CENTER)
+            self.canvas.config(highlightthickness=0)
+            self.canvas.grid(column=0, row=0, 
+                             padx=self.border, pady=self.border)
     
     def showFirstPic(self, video_source):
         """Display the first frame from the video source on self.canvas.
