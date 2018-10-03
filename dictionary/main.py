@@ -97,9 +97,22 @@ class Dictionary():
                                      background=self.BGCOLOR)
         
         style.configure('Treeview', background=self.BGCOLOR, 
-                                    padding=(0, 2, 0, 4))
+                                    rowheight=25, 
+                                    padding=(0, 0, 0, 0))
         style.map('Treeview', background=[('selected', 'lightgrey')])
-        style.configure('Treeview.Item', padding=(-15, -5, 0, 0))
+        style.configure('Treeview.Item', padding=(-15, 0, 0, 0))
+        
+        # ged rid of dashed rectangle around the highlighted item in treeview
+        style.layout('Treeview.Item',
+          [('Treeitem.padding', {'sticky': 'nswe', 'children': 
+            [('Treeitem.indicator', {'side': 'left', 'sticky': ''}),
+             ('Treeitem.image', {'side': 'left', 'sticky': ''}),
+            #('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [
+               ('Treeitem.text', {'side': 'left', 'sticky': ''}),
+            #]})
+            ],
+          })]
+        )
         
         style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0, 
                                                   self.TAB_PAD, 0))

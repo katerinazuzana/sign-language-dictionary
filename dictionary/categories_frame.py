@@ -75,7 +75,7 @@ class CatFrm(Frame):
         self.scrolledlist = ScrolledList(self, 
                                          self.height, 
                                          self.searchfcn)
-        self.scrolledlist.grid(column=0, row=2, sticky=N+E+S+W, 
+        self.scrolledlist.grid(column=0, row=2, sticky=N+E+W, 
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
 
@@ -97,6 +97,7 @@ class CatFrm(Frame):
         Update the options in the scrolledlist to all words
         of the selectected category.
         """
+        self.catcb.selection_clear() # remove highlighting from the combobox
         subcats = self.findSubcats()       
         self.subcatcb['values'] = subcats
         self.subcatcb.config(state='readonly')
@@ -136,6 +137,7 @@ class CatFrm(Frame):
     def subcatHandler(self, event):
         """Update the options in the scrolledlist to the words
         of the selectected subcategory."""
+        self.subcatcb.selection_clear() # remove highlighting from the combobox
         wordlist = self.findWords(self.subcatvar)
         self.scrolledlist.setOptions(wordlist)
         
