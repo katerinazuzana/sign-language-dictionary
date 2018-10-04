@@ -7,6 +7,7 @@
 
 from tkinter import *
 from tkinter import ttk
+import tkinter.font as tkFont
 import sqlite3
 import os
 from search_engine import SearchEngine
@@ -27,10 +28,10 @@ class Dictionary():
     BGCOLOR -- background color
     """
 
-    BORDER = 40
-    WIN_MIN_WIDTH = 985
-    WIN_MIN_HEIGHT = 700
-    TAB_PAD = 23
+    BORDER = 38
+    WIN_MIN_WIDTH = 1012
+    WIN_MIN_HEIGHT = 670
+    TAB_PAD = 22
     BGCOLOR = 'white'
 
     def __init__(self, dbpath, vfdir, imgdir):
@@ -47,23 +48,29 @@ class Dictionary():
         self.imgdir = imgdir
         
         self.altsmax = 10  # maximum number of alternative options
-        self.font = ('Helvetica', 12)
+        self.canvasSize = (250, 250)
         
         # the SearchEngine object provides the logic behind the dictionary app
         self.searchEng = SearchEngine(self.dbpath, 
                                       self.vfdir, 
-                                      self.altsmax)
+                                      self.altsmax, 
+                                      self.canvasSize)
         self.makeWidgets()
         
     def makeWidgets(self):
         # build the application window
         self.root = Tk()
         self.root.title('Slovník českého znakového jazyka')
-        self.root.option_add('*Font', self.font)
+        self.root.config(bg=self.BGCOLOR)
         self.root.minsize(width = self.WIN_MIN_WIDTH, 
                           height = self.WIN_MIN_HEIGHT)
-             
-        self.root.columnconfigure(1, weight=1)
+        
+        self.font = tkFont.Font(family='Nimbus Sans L', size=12)
+        self.root.option_add('*Font', self.font)
+        
+        self.root.columnconfigure(0, weight=2)  # empty column
+        self.root.columnconfigure(2, weight=1)  # empty column
+        self.root.columnconfigure(3, weight=3)  # notebook column
         self.root.rowconfigure(0, weight=1)
 
         # create the main frame
@@ -76,7 +83,7 @@ class Dictionary():
                              self.BORDER, 
                              bg=self.BGCOLOR, 
                              padx=self.BORDER)
-        self.mainfrm.grid(column=0, row=0, sticky=N+E+S+W)
+        self.mainfrm.grid(column=1, row=0, sticky=N+E+S+W)
         
         # when the searchEng is done searching, it calls a function to show
         # the result - this function is defined in the mainfrm object
@@ -84,7 +91,7 @@ class Dictionary():
         
         # create notebook
         self.notebook = ttk.Notebook(self.root)
-        self.notebook.grid(column=1, row=0, sticky=N+E+S+W)
+        self.notebook.grid(column=3, row=0, sticky=N+E+S+W)
         
         # style
         self.style = style = ttk.Style()
@@ -93,12 +100,12 @@ class Dictionary():
         style.configure('Gray.TEntry', foreground='gray')
         style.configure('Black.TEntry', foreground='black')
         
-        style.configure('TCombobox', padding=(0, -4, 0, -4), 
+        style.configure('TCombobox', padding=(0, -1, 0, -2),
                                      background=self.BGCOLOR)
         
         style.configure('Treeview', background=self.BGCOLOR, 
                                     rowheight=25, 
-                                    padding=(0, 0, 0, 0))
+                                    padding=(0, 0, 0, 25))
         style.map('Treeview', background=[('selected', 'lightgrey')])
         style.configure('Treeview.Item', padding=(-15, 0, 0, 0))
         
@@ -142,33 +149,30 @@ class Dictionary():
         self.signfrm = SignInputFrm(self.notebook,  
                                     self.imgdir, 
                                     self.searchEng.signSearch, 
+                                    self.canvasSize, 
                                     bg=self.BGCOLOR, 
-                                    padx=self.BORDER)
+                                    padx=self.BORDER, 
+                                    pady=20)
         self.signfrm.grid(column=0, row=0, sticky=N+E+S+W)
         self.notebook.add(self.signfrm, text='Překlad z ČZJ do ČJ')
         
-        # bind tab padding recalculation to notebook resizing
-        self.notebook.update_idletasks()
-        self.notebook.initialWidth = self.notebook.winfo_width()
-        self.notebook.bind('<Configure>', self.onResize)
+    def positionWindow(self):
+        """Position the application window in the center of the screen."""
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        xOffset = self.root.winfo_screenwidth()//2 - width//2
+        yOffset = self.root.winfo_screenheight()//2 - height//2
+        self.root.geometry('+{}+{}'.format(xOffset, yOffset))
         
-    def onResize(self, event):
-        """Dynamically set tab padding to streach tabs over whole notebook."""
-        width = self.notebook.winfo_width()
-        extraPadding = math.ceil((width - self.notebook.initialWidth) / 4)
-        self.style.configure('TNotebook.Tab', 
-                             padding=(self.TAB_PAD + extraPadding, 0, 
-                                      self.TAB_PAD + extraPadding, 0))
-        self.style.map('TNotebook.Tab', padding=[('selected', 
-                                     (self.TAB_PAD + extraPadding, 0, 
-                                      self.TAB_PAD + extraPadding, 0))])
         
-
 if __name__ == '__main__':
     dbpath = os.path.abspath('dict.db')
     vfdir = os.path.abspath('demo_videofiles')
     imgdir = os.path.abspath('demo_images')
     
-    Dictionary(dbpath, vfdir, imgdir).root.mainloop()
+    dictionary = Dictionary(dbpath, vfdir, imgdir)
+    dictionary.positionWindow()
+    dictionary.root.mainloop()
     
         

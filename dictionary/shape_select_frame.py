@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import tkinter.font as tkFont
 import os
 from PIL import Image, ImageTk
 from scrolled_frame import ScrolledFrame
@@ -14,7 +15,7 @@ class ShapeSelectFrm(Frame):
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
         self.iconSize = 30
         self.delay = 1000 # how long to wait before button description shows up
-        self.captFont = ('Helvetica', 10)
+        self.captFont = None
         
         self.submitIconPath = os.path.join(imgdir, 'submit_icon.png')
         self.closeIconPath = os.path.join(imgdir, 'close_icon.png')
@@ -47,6 +48,10 @@ class ShapeSelectFrm(Frame):
         self.sel1 = None
         self.sep = None
         self.sel2 = None
+        
+        self.columnconfigure(0, weight=1)  # empty column
+        self.columnconfigure(2, weight=1)
+        self.columnconfigure(3, weight=1)  # empty column
               
         self.makeLabel()
         self.makeSelectionFrm()
@@ -56,19 +61,19 @@ class ShapeSelectFrm(Frame):
         Label(self, 
               text=self.title, 
               bg=self.bgcolor
-              ).grid(column=0, row=0, columnspan=2, sticky=W, pady=(20, 3))
-        
+              ).grid(column=1, row=0, sticky=E+W, pady=(0, 3))
+              
     def makeSelectionFrm(self):
         selfrmwidth = 2*self.labwidth + 4*self.labborder + self.sepwidth + 2*2
         selfrmheight = self.labheight + 2*self.labborder + 2*2 # 2*borderwidth
             
         self.selectionfrm = Frame(self, 
-                            width=selfrmwidth, 
-                            height=selfrmheight, 
-                            bg=self.bgcolor, 
-                            borderwidth=2, 
-                            relief='groove')
-        self.selectionfrm.grid(column=0, row=1, rowspan=2)
+                                  width=selfrmwidth, 
+                                  height=selfrmheight, 
+                                  bg=self.bgcolor, 
+                                  borderwidth=2, 
+                                  relief='groove')
+        self.selectionfrm.grid(column=1, row=1, rowspan=2, sticky=W)
         self.selectionfrm.columnconfigure(0, 
                           minsize = self.labwidth + 2 * self.labborder)
         self.selectionfrm.rowconfigure(0, 
@@ -92,7 +97,7 @@ class ShapeSelectFrm(Frame):
         self.selectBut = Button(self, 
                                 image=self.selectImg, 
                                 command=self.openPopup)
-        self.selectBut.grid(column=1, row=1, sticky=W, padx=20)
+        self.selectBut.grid(column=2, row=1, sticky=W, padx=20)
         
         # when mouse is over the button for a while, show a caption
         self.selectBut.bind('<Enter>', lambda ev: self.onButEnter('Vybrat'))
@@ -105,7 +110,7 @@ class ShapeSelectFrm(Frame):
         self.delBut = Button(self, 
                              image=self.delImg, 
                              command=self.onDelete)      
-        self.delBut.grid(column=1, row=2, sticky=W, padx=20)
+        self.delBut.grid(column=2, row=2, sticky=W, padx=20)
         
         # when mouse is over the button for a while, show a caption
         self.delBut.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
@@ -120,11 +125,18 @@ class ShapeSelectFrm(Frame):
     
     def showCaption(self, text):
         self.caption = Toplevel()
-        Message(self.caption, 
+        msg = Message(self.caption, 
                 text=text, 
                 width=100, 
-                font=self.captFont,
-                bg=self.bgcolor).grid()
+                bg=self.bgcolor)
+        msg.grid()
+        
+        # set hint font if not defined yet
+        if not self.captFont:
+            font = tkFont.Font(font=msg['font'])    # the application's font
+            font.configure(size=10)
+            self.captFont = font                    # caption font
+        msg.config(font=self.captFont)
         
         x, y = self.winfo_pointerxy()
         xoffset = x + 10 # x + approx cursor size
@@ -415,12 +427,14 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         selfrmheight = self.labheight + 2*self.labborder + 2*2 
            
         self.selectionfrm = Frame(self, 
-                            width=selfrmwidth, 
-                            height=selfrmheight, 
-                            bg=self.bgcolor, 
-                            borderwidth=2, 
-                            relief='groove')
-        self.selectionfrm.grid(column=0, row=1, rowspan=2) # 0th row is empty
+                                  width=selfrmwidth, 
+                                  height=selfrmheight, 
+                                  bg=self.bgcolor, 
+                                  borderwidth=2, 
+                                  relief='groove')
+        self.selectionfrm.grid(column=1, row=1,    # 0th row is empty
+                               rowspan=2, 
+                               sticky=W)
         self.selectionfrm.columnconfigure(0, 
                           minsize = self.labwidth + 2 * self.labborder)
         self.selectionfrm.rowconfigure(0, 

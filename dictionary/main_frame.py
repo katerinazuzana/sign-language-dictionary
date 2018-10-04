@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.font as tkFont
 from searchentry_frame import EntFrm
 from video_frame import VideoFrm
 from altoptions_frame import AltsFrm
@@ -39,7 +40,7 @@ class MainFrm(Frame):
     THUMB_HEIGHT = 94
     HIGHLIGHT_BORDER = 4
     THUMB_PADX = 5
-    THUMB_PADY = 10
+    THUMB_PADY = 35
     SCROLLBAR_WIDTH = 15
     
     def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, 
@@ -61,9 +62,10 @@ class MainFrm(Frame):
 
     def makeWidgets(self):
         self.columnconfigure(0, minsize=self.VIDEO_WIDTH)
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)  # empty row
+        self.rowconfigure(1, weight=4)
         self.rowconfigure(3, minsize=self.VIDEO_HEIGHT)
-        self.rowconfigure(4, minsize= self.THUMB_HEIGHT +
+        self.rowconfigure(4, minsize= self.THUMB_HEIGHT + 
                                       2 * self.HIGHLIGHT_BORDER +
                                       self.THUMB_PADY +
                                       self.BORDER)
@@ -74,20 +76,22 @@ class MainFrm(Frame):
                              self, 
                              self.imgdir, 
                              bg=self.bgcolor)
-        self.entfrm.grid(column=0, row=0,
-                         rowspan=2, 
-                         sticky=N+E+W, 
-                         pady=(self.BORDER, 0))
+        self.entfrm.grid(column=0, row=1, 
+                         sticky=N+E+S+W, 
+                         pady=(self.BORDER + 5, 0))
 
         # create a label to display the word
         self.labvar = StringVar()
         self.lab = Label(self, 
                          textvariable=self.labvar, 
                          height=1, 
-                         font=('Helvetica', 20, 'bold'),
-                         bg=self.bgcolor,
+                         bg=self.bgcolor, 
                          fg='red2')
-        self.lab.grid(column=0, row=2, sticky=N+W+S, pady=0)
+        self.lab.grid(column=0, row=2, sticky=N+S+W, pady=(0, 20))
+        
+        font = tkFont.Font(font=self.lab['font']) # get current application font
+        font.configure(size=20, weight='bold')    # change its params
+        self.lab.config(font=font)           # use the changed font in the label
         
         # create the main video frame
         self.video = VideoFrm(width=self.VIDEO_WIDTH,
@@ -96,7 +100,7 @@ class MainFrm(Frame):
         self.video.grid(column=0, row=3)
         
         # frame for displaying thumbnail videos
-        self.thumbfrm = None
+        self.createThumbFrm()
         
     def createThumbFrm(self):
         self.thumbfrm = ScrolledFrame(self, 
@@ -167,7 +171,6 @@ class MainFrm(Frame):
                 videofile -- [string] name of video file
         """
         
-        self.createThumbFrm()
         self.thumbfrm.rowconfigure(0, minsize = self.THUMB_HEIGHT + 
                                                 2 * self.HIGHLIGHT_BORDER)
         
@@ -219,7 +222,9 @@ class MainFrm(Frame):
         for thumb in self.thumbs:
             thumb.destroy()
         self.thumbs = []
-        if self.thumbfrm: self.thumbfrm.destroy()
+        # create a new, empty thumbfrm
+        self.thumbfrm.destroy()
+        self.createThumbFrm()
 
     def showNotFound(self, altoptions):
         if altoptions == []:

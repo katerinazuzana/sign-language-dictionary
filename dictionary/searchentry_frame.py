@@ -31,8 +31,8 @@ class EntFrm(Frame):
         self.makeWidgets()
 
     def makeWidgets(self):
-        self.columnconfigure(0, weight=1)        
-        self.rowconfigure(0, minsize=140)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
         
         # create the search button
         bfrm = Frame(self, height=30, width=60)
@@ -63,7 +63,7 @@ class EntFrm(Frame):
         self.ent = AutocompleteEntry(self, 
                                      entries, 
                                      self.startSearch, 
-                                     maxEntries=6, 
+                                     maxEntries=10, 
                                      textvariable=self.var)
         self.ent.grid(column=0, row=0, sticky=N+E+W)
         self.ent.config(style="Gray.TEntry")

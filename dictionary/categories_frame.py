@@ -35,13 +35,21 @@ class CatFrm(Frame):
         self.dbpath = dbpath
         self.searchfcn = searchfcn
         self.width = 33
-        self.height = 15   # scrolled list height in lines
-        self.verticalSpace = 40  # space between widgets
-        self.topSpace = 33       # additional padding at the top of the frame
+        self.height = 14   # scrolled list height in lines
+        self.verticalSpace = 40   # space between widgets
+        self.topSpace = 10   # additional padding at the top of the frame
         self.makeWidgets()
        
     def makeWidgets(self):    
-        self.columnconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)  # empty column
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=2)  # empty column
+        
+        # empty rows:
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(2, weight=1)
+        self.rowconfigure(4, weight=1)
+        self.rowconfigure(6, weight=3)
         
         # create category combobox
         self.catvar = StringVar()
@@ -54,8 +62,8 @@ class CatFrm(Frame):
         self.catcb['values'] = self.findCats()
         
         self.catcb.bind('<<ComboboxSelected>>', self.catHandler)
-        self.catcb.grid(column=0, row=0, 
-                        sticky=N+E+S+W,
+        self.catcb.grid(column=1, row=1, 
+                        sticky=N+E+S+W, 
                         pady=(self.topSpace, self.verticalSpace))
 
         # create subcategory combobox, initially disabled
@@ -67,7 +75,7 @@ class CatFrm(Frame):
                              width=self.width)
         
         self.subcatcb.bind('<<ComboboxSelected>>', self.subcatHandler)
-        self.subcatcb.grid(column=0, row=1, 
+        self.subcatcb.grid(column=1, row=3, 
                            sticky=N+E+S+W, 
                            pady=(0, self.verticalSpace))
         
@@ -75,7 +83,7 @@ class CatFrm(Frame):
         self.scrolledlist = ScrolledList(self, 
                                          self.height, 
                                          self.searchfcn)
-        self.scrolledlist.grid(column=0, row=2, sticky=N+E+W, 
+        self.scrolledlist.grid(column=1, row=5, sticky=N+E+W, 
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
 

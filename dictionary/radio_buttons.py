@@ -12,6 +12,10 @@ class RadioFrm(Frame):
                   ('obě ruce stejný tvar', 'both the same'), 
                   ('tvar pasivní ruky', 'passive hand')]
         
+        self.columnconfigure(0, weight=1)   # empty column
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=3)   # empty column
+        
         for i in range(len(values)):
             Radiobutton(self, text=values[i][0], 
                               variable=self.var, 
@@ -20,14 +24,14 @@ class RadioFrm(Frame):
                               bg=self.bgcolor, 
                               activebackground=self.bgcolor, 
                               highlightthickness=0
-                              ).grid(column=0, row=i, sticky=W)
+                              ).grid(column=1, row=i, sticky=W)
         
         self.var.set('single hand')
         
         self.passhapes = PassiveShapeSelectFrm(self, 
                                                self.imgdir, 
                                                bg=self.bgcolor)
-        self.passhapes.grid(column=0, row=3, pady=(6, 0))
+        self.passhapes.grid(column=1, row=3, sticky=E+W, pady=(6, 0))
         self.passhapes.deactivate()
         
     def onPress(self):

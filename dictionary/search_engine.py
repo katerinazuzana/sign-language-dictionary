@@ -7,7 +7,7 @@ from drawing_canvas import Vect
 
 class SearchEngine():
 
-    def __init__(self, dbpath, vfdir, altsmax):
+    def __init__(self, dbpath, vfdir, altsmax, canvasSize):
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.altsmax = altsmax
@@ -35,8 +35,7 @@ class SearchEngine():
                        # all the possible 51 hand shapes are divided into 
                        # 12 groups of visually similar shapes (roman nums I-XII)
                        
-        self.width = 240    # canvas width
-        self.height = 250   # canvas height
+        self.canvasWidth, self.canvasHeight = canvasSize
 
     def search(self, lookupword):
         """Search for the given word in the database.        
@@ -382,8 +381,8 @@ class SearchEngine():
         """Integrate the function over the canvas area."""
         
         integral = 0
-        for x in range(self.width):
-            for y in range(self.height):
+        for x in range(self.canvasWidth):
+            for y in range(self.canvasHeight):
                 integral += fcn(x, y)
         return integral
 

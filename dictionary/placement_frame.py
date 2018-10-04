@@ -1,11 +1,12 @@
 from tkinter import *
+import tkinter.font as tkFont
 from PIL import Image, ImageTk
 import os
 from drawing_canvas import DrawingCanvas
 
 
 class PlacementFrm(Frame):
-    def __init__(self, parent, imgdir, **options):
+    def __init__(self, parent, imgdir, canvasSize, **options):
         super().__init__(parent, **options)
         self.bgcolor = options.get('bg', self['bg'])
         
@@ -16,7 +17,7 @@ class PlacementFrm(Frame):
         self.searchIconSize = 40
         self.delay = 1000 # how long to wait before button description shows up
         self.caption = None
-        self.captFont = ('Helvetica', 10)
+        self.captFont = None
         
         self.hintSize = 14
         self.hintText = 'Klepnutím a tažením nakreslete elipsu,'+\
@@ -24,17 +25,20 @@ class PlacementFrm(Frame):
                        ' Elipsu lze myší přesouvat.'+\
                        ' Po dvojkliku na elipsu je možné měnit její velikost.'+\
                        ' Po dalším dvojkliku lze elipsou otáčet.'
+        
+        self.canvasWidth, self.canvasHeight = canvasSize
         self.makeWidgets()
         
     def makeWidgets(self):
         self.rowconfigure(1, weight=1)
         self.columnconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(2, weight=1)
         
         Label(self, 
               text='Místo artikulace znaku', 
-              bg=self.bgcolor
-              ).grid(column=0, row=0, sticky=W, pady=(0, 3))
-        
+              bg=self.bgcolor).grid(column=0, row=0, sticky=E, pady=(0, 3))
+
         # create hint icon
         with Image.open(self.hintIconPath) as img:
             img = img.resize((self.hintSize, self.hintSize), Image.LANCZOS)
@@ -49,8 +53,8 @@ class PlacementFrm(Frame):
         
         # create a canvas
         self.canvas = DrawingCanvas(self, 
-                                    width=240, 
-                                    height=250, 
+                                    width=self.canvasWidth, 
+                                    height=self.canvasHeight, 
                                     borderwidth=2, 
                                     relief='groove')
         self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)        
@@ -86,14 +90,28 @@ class PlacementFrm(Frame):
     
     def showHint(self, event):
         self.hint = Toplevel()
-        Message(self.hint, 
+        msg = Message(self.hint, 
                 text=self.hintText, 
-                width=150, 
-                font=self.captFont,
-                bg=self.bgcolor).grid()
+                width=140, 
+                bg=self.bgcolor)
+        msg.grid()
+        
+        # set hint font if not defined yet
+        if not self.captFont:
+            font = tkFont.Font(font=msg['font'])    # the application's font
+            font.configure(size=10)
+            self.captFont = font                    # caption/hint font
+        msg.config(font=self.captFont)
         
         xoffset = self.hintIcon.winfo_rootx() + self.hintSize
         yoffset = self.hintIcon.winfo_rooty() + self.hintSize
+        
+        width = 150 # approx msg window actual width in pixels
+        # ensure that the message window is fully visible -
+        # that it doesn't streach beyond the right screen border: 
+        if xoffset + width > self.winfo_screenwidth():
+            xoffset = self.winfo_screenwidth() - width
+        
         self.hint.geometry('+{}+{}'.format(xoffset, yoffset))
         self.hint.overrideredirect(True)
     
@@ -117,11 +135,18 @@ class PlacementFrm(Frame):
     
     def showCaption(self, text):
         self.caption = Toplevel()
-        Message(self.caption, 
+        msg = Message(self.caption, 
                 text=text, 
                 width=100, 
-                font=self.captFont,
-                bg=self.bgcolor).grid()
+                bg=self.bgcolor)
+        msg.grid()
+                
+        # set hint font if not defined yet
+        if not self.captFont:
+            font = tkFont.Font(font=msg['font'])    # the application's font
+            font.configure(size=10)
+            self.captFont = font                    # caption/hint font
+        msg.config(font=self.captFont)
         
         x, y = self.winfo_pointerxy()
         xoffset = x + 10 # x + approx cursor size
