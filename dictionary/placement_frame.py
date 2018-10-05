@@ -95,10 +95,7 @@ class PlacementFrm(Frame):
         msg.grid()
         
         # set hint font if not defined yet
-        if not self.captFont:
-            font = tkFont.Font(font=msg['font'])    # the application's font
-            font.configure(size=10)
-            self.captFont = font                    # caption/hint font
+        if not self.captFont: self.setCaptFont(msg)
         msg.config(font=self.captFont)
         
         xoffset = self.hintIcon.winfo_rootx() + self.hintSize
@@ -139,11 +136,8 @@ class PlacementFrm(Frame):
                 bg=self.bgcolor)
         msg.grid()
                 
-        # set hint font if not defined yet
-        if not self.captFont:
-            font = tkFont.Font(font=msg['font'])    # the application's font
-            font.configure(size=10)
-            self.captFont = font                    # caption/hint font
+        # set caption font if not defined yet
+        if not self.captFont: self.setCaptFont(msg)
         msg.config(font=self.captFont)
         
         x, y = self.winfo_pointerxy()
@@ -156,4 +150,8 @@ class PlacementFrm(Frame):
         self.caption.destroy()
         self.caption = None 
 
+    def setCaptFont(self, msg):
+        font = tkFont.Font(font=msg['font'])  # the application's font
+        font.configure(size=10)
+        self.captFont = font                  # caption/hint font
     
