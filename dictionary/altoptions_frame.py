@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.font as tkFont
 
 
 class AltsFrm(Frame):
@@ -22,17 +23,22 @@ class AltsFrm(Frame):
         self.altoptions = altoptions
         self.searchfcn = searchfcn
         self.labbgcolor = labbgcolor
+        self.labFont = None
         self.makeWidgets()
 
     def makeWidgets(self):
         for i in range(len(self.altoptions)):
             lab = Label(self, text=self.altoptions[i],
                               height=1, 
-                              font=('Helvetica', 13, 'normal'),
                               bg=self.labbgcolor,
                               fg='red2',
                               cursor='hand2')
             lab.grid(column=0, row=i, sticky=W, pady=0)
+            
+            if not self.labFont:
+                font = tkFont.Font(font=lab['font']) # current application font
+                self.labFont = font.configure(size=13)
+            lab.config(font=self.labFont)
             
             # when a label is clicked on, the corresponding video is played
             def onLabelClick(i):
