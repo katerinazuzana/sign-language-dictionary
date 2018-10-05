@@ -6,8 +6,8 @@ class AutocompleteEntry(ttk.Entry):
     """
     """
 
-    def __init__(self, parent, entries, startSearchFcn, maxEntries=5, 
-                 caseSensitive=False, **kwargs):
+    def __init__(self, parent, entries, defaultText, startSearchFcn, 
+                 maxEntries=5, caseSensitive=False, **kwargs):
         """
         """
         ttk.Entry.__init__(self, parent, **kwargs)
@@ -17,6 +17,7 @@ class AutocompleteEntry(ttk.Entry):
         self.maxEntries = maxEntries
         self.caseSensitive = caseSensitive
         self.var = kwargs['textvariable']
+        self.defaultText = defaultText
         
         self.startSearch = startSearchFcn
         
@@ -25,6 +26,14 @@ class AutocompleteEntry(ttk.Entry):
 
         self.bind('<KeyRelease>', self.update)
         self.bind('<Down>', self.focusOnListbox)
+        self.bind('<Return>', self.startSearch)
+        
+        # on mouse click in the entry, or when the user starts typing, 
+        # delete the default text in the entry
+        self.bind('<Button-1>', self.deleteDefaultText)
+        self.bind('<KeyPress>', self.deleteDefaultText)
+        # on focus out of the entry, insert the default text back
+        self.bind('<FocusOut>', self.insertDefaultText)
         
 
     def update(self, event):
@@ -64,7 +73,7 @@ class AutocompleteEntry(ttk.Entry):
         self.listbox.bind('<Return>', self.startSearch)
         self.listbox.bind('<Double-Button>', self.startSearch)
         
-        # get the main app window
+        # get the main app window:
         # autocomplete entry -> search entry frm -> main frm -> root win
         root = self.master.master.master
         
@@ -96,9 +105,10 @@ class AutocompleteEntry(ttk.Entry):
         
     def focusOnListbox(self, event):
         """Set focus on the listbox and select the first item."""
-        self.listbox.selection_set(0)
-        self.listbox.focus_set()
-        self.listbox.event_generate("<<ListboxSelect>>")
+        if self.listbox:
+            self.listbox.selection_set(0)
+            self.listbox.focus_set()
+            self.listbox.event_generate("<<ListboxSelect>>")
     
     def focusOnEntry(self, event):
         """If the current selection of the listbox is the top one,
@@ -121,5 +131,15 @@ class AutocompleteEntry(ttk.Entry):
             entryValue = entryValue.lower()
         return option.lstrip().startswith(entryValue)
 
-
+    def deleteDefaultText(self, event):
+        """Delete the default text in the entry, if present."""
+        if self.var.get() == self.defaultText:
+            self.var.set('')
+            self.config(style="Black.TEntry")
+    
+    def insertDefaultText(self, event):
+        """Insert the default text back into the entry, if it's empty."""
+        if self.var.get() == '':
+            self.var.set(self.defaultText)
+            self.config(style="Gray.TEntry")
 

@@ -61,58 +61,22 @@ class EntFrm(Frame):
         self.var.set(self.defaultText)
         self.ent = AutocompleteEntry(self, 
                                      entries, 
+                                     self.defaultText, 
                                      self.startSearch, 
                                      maxEntries=10, 
                                      textvariable=self.var)
         self.ent.grid(column=0, row=0, sticky=N+E+W)
         self.ent.config(style="Gray.TEntry")
-        
-        self.ent.bind('<Return>', self.onEntryReturn)
-                
-        # on mouse click, delete the default text in the entry
-        self.ent.bind('<Button-1>', self.onEntryClick)
-        # when the user starts typing in the entry, delete the default text
-        self.ent.bind('<Key>', self.onTyping)
-        # on focus out of the entry, insert the default text back
-        self.ent.bind('<FocusOut>', self.onFocusOut)
-
-    def onEntryReturn(self, event):
-        """Start the search only if there is some text in the entry."""
-        if self.var.get() not in ('', self.defaultText):
-            self.startSearch()
 
     def startSearch(self, event=None):
         """Hide the listbox, set focus on the entry and do the search."""
         if self.var.get() in ('', self.defaultText):
-            # the user didn't enter any text
+            # the user didn't enter any text, prompt them to enter an expression
             self.master.showEnterText()
         else:
             self.ent.hideListboxWin()
             self.ent.focus_set()
             self.ent.icursor(END)
             self.searchfcn(self.var.get())
-        
-    def onEntryClick(self, event):
-        """Delete the default text in the entry, if present."""
-        if self.var.get() == self.defaultText:
-            self.var.set('')
-            self.ent.config(style="Black.TEntry")
-    
-    def onTyping(self, event):
-        """Delete the default text in the entry, if present."""
-        if self.var.get() == self.defaultText:
-            self.ent.var.set('')
-            self.ent.config(style="Black.TEntry")
-        else:
-            self.ent.update(event)
-    
-    def onFocusOut(self, event):
-        """Insert the default text back into the entry, if it's empty.
-        Hide the listbox.
-        """
-        if self.var.get() == '':
-            self.var.set(self.defaultText)
-            self.ent.config(style="Gray.TEntry")
-            self.ent.hideListboxWin()
 
 
