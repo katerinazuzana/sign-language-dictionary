@@ -86,13 +86,29 @@ class CatFrm(Frame):
         self.scrolledlist.grid(column=1, row=5, sticky=N+E+W, 
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
-
+    
     def findCats(self):
         """Look up available categories in the database and return
         a list of options for the category combobox."""
+        
+        SQLquery = 'SELECT DISTINCT upperlevel FROM cathierarchy'
+        return self.findCboxItems(SQLquery)
+    
+    def findSubcats(self):
+        """Find subcategories corresponding to the selected category 
+        and return a list of options for the subcategory combobox."""
+        
+        cat = self.catvar.get().lstrip()
+        SQLquery = 'SELECT lowerlevel FROM cathierarchy WHERE \
+                        upperlevel="{}"'.format(cat)
+        return self.findCboxItems(SQLquery)
+    
+    def findCboxItems(self, SQLquery):
+        """Return a list of options for a combobox."""
+        
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT DISTINCT upperlevel FROM cathierarchy')
+            cursor.execute(SQLquery)
             find = cursor.fetchall()
         find = self.listOfTuplesToList(find)
         return self.leftPadItems(find)
@@ -112,17 +128,6 @@ class CatFrm(Frame):
         self.subcatvar.set(' -- Zvolte podkategorii --')
         wordlist = self.findWords(self.catvar)
         self.scrolledlist.setOptions(wordlist)
-    
-    def findSubcats(self):
-        """Find subcategories corresponding to the selected category."""
-        cat = self.catvar.get().lstrip()
-        with sqlite3.connect(self.dbpath) as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT lowerlevel FROM cathierarchy WHERE \
-                            upperlevel=?', (cat,))
-            find = cursor.fetchall()
-        find = self.listOfTuplesToList(find)
-        return self.leftPadItems(find)
 
     def findWords(self, var):
         """Return a list of the words contained in a given (sub)category."""
