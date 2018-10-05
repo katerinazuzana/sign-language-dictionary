@@ -194,17 +194,38 @@ class ShapeSelectFrm(Frame):
         self.makeLabels()
         self.makeSelectWinButtons() 
         
-        # position the popup next to a shape selection frame
+        self.positionWindow()
+        self.selectWin.resizable(False, False)
+        
+    def positionWindow(self):
+        """Position the popup window slightly to the left from the center 
+        of the main app window, so that the selected shapes in the main 
+        window are visible."""
+        
         self.selectWin.update_idletasks()
         width = self.selectWin.winfo_reqwidth()
         height = self.selectWin.winfo_reqheight()
-        xoffset = self.winfo_rootx() - width
-        yoffset = self.winfo_rooty() # winfo_root[x|y] returns a coord relative
-                                     # to the screen's upper left corner
-        self.selectWin.geometry('+{}+{}'.format(xoffset, yoffset))
         
-        # disable enlarging the popup window
-        self.selectWin.maxsize(width = width, height = height)
+        # get the main application window object
+        root = self.getRoot()
+        
+        rootWidth = root.winfo_width()
+        rootHeight = root.winfo_height()
+        rootX = root.winfo_rootx()
+        rootY = root.winfo_rooty()
+        rootCenterX = rootX + rootWidth // 2
+        rootCenterY = rootY + rootHeight // 2
+        
+        xoffset = rootCenterX - width * 2 // 3
+        yoffset = rootCenterY - height // 2
+        self.selectWin.geometry('+{}+{}'.format(xoffset, yoffset))
+    
+    def getRoot(self):
+        """Return the root application window object."""
+        
+        # actshapes -> signfrm -> notebook -> root
+        root = self.master.master.master
+        return root
     
     def makeSelectWinButtons(self):
         # make Submit and Quit buttons in their own frame
@@ -447,6 +468,13 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
     
     def redrawSelectionFrm(self):        
         self.redrawPlace1()
+    
+    def getRoot(self):
+        """Return the root application window object."""
+        
+        # passhapes -> radiofrm -> signfrm -> notebook -> root
+        root = self.master.master.master.master
+        return root
         
     def deactivate(self):
         self.selectBut.config(state='disabled')
