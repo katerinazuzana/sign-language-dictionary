@@ -12,6 +12,7 @@ class SignInputFrm(Frame):
         self.signSearchFcn = signSearchFcn
         self.canvasSize = canvasSize
         self.bgcolor = options.get('bg', self['bg'])
+        self.verticalSpace = 20   # vertical space between the widgets
         self.makeWidgets()
         self.focus_set()
        
@@ -30,12 +31,14 @@ class SignInputFrm(Frame):
         # create an active hand shapes offer
         self.actshapes = ShapeSelectFrm(self, self.imgdir, bg=self.bgcolor)
         self.actshapes.grid(column=1, row=1, 
-                            sticky=N+E+S+W, pady=(0, 20))
+                            sticky=N+E+S+W, 
+                            pady=(0, self.verticalSpace))
         
         # create radio-buttons
         self.radiofrm = RadioFrm(self, self.imgdir, bg=self.bgcolor)
         self.radiofrm.grid(column=1, row=2, 
-                           sticky=N+E+S+W, pady=(0, 20))
+                           sticky=N+E+S+W, 
+                           pady=(0, self.verticalSpace))
 
         # create canvas for sign-placement input
         self.placementfrm = PlacementFrm(self,

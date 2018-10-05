@@ -93,19 +93,21 @@ class Dictionary():
         self.notebook = ttk.Notebook(self.root)
         self.notebook.grid(column=3, row=0, sticky=N+E+S+W)
         
-        # style
+        # style settings
         self.style = style = ttk.Style()
         style.theme_use('clearlooks')
         
-        style.configure('Gray.TEntry', foreground='gray')
-        style.configure('Black.TEntry', foreground='black')
+        style.configure('Gray.TEntry', foreground='gray')   # for default text
+        style.configure('Black.TEntry', foreground='black') # for user input
         
-        style.configure('TCombobox', padding=(0, -1, 0, -2),
-                                     background=self.BGCOLOR)
+        style.configure('TCombobox', background=self.BGCOLOR)
+        style.map('TCombobox', background=[('disabled', self.BGCOLOR)])
         
         style.configure('Treeview', background=self.BGCOLOR, 
                                     rowheight=25, 
                                     padding=(0, 0, 0, 25))
+                                    # the bottom padding is necessary for the
+                                    # treeview bottom border to be visible
         style.map('Treeview', background=[('selected', 'lightgrey')])
         style.configure('Treeview.Item', padding=(-15, 0, 0, 0))
         
@@ -124,7 +126,7 @@ class Dictionary():
         style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0, 
                                                   self.TAB_PAD, 0))
         style.map('TNotebook.Tab', padding=[('selected', (self.TAB_PAD, 0, 
-                                             self.TAB_PAD, 0))])
+                                                          self.TAB_PAD, 0))])
             
         # tabs' font:
         style.configure('.', font=self.font)

@@ -5,17 +5,24 @@ import os
 from scrolled_frame import ScrolledFrame
 import tools
 
+
 class ShapeSelectFrm(Frame):
+
     def __init__(self, parent, imgdir, **options):
+    
         super().__init__(parent, **options)
         self.imgdir = imgdir
         self.bgcolor = options.get('bg', self['bg'])
+        self.labPady = 3   # title label y-padding
         
         self.selectIconPath = os.path.join(imgdir, 'select_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
         self.iconSize = 30
+        self.butPadx = 20    # Select and Delete buttons x-padding
         self.delay = 1000 # how long to wait before button description shows up
         self.captFont = None
+        self.captFontSize = 10   # font size of the captions messages
+        self.msgWidth = 100      # width of the caption message widget
         
         self.submitIconPath = os.path.join(imgdir, 'submit_icon.png')
         self.closeIconPath = os.path.join(imgdir, 'close_icon.png')
@@ -61,7 +68,7 @@ class ShapeSelectFrm(Frame):
         Label(self, 
               text=self.title, 
               bg=self.bgcolor
-              ).grid(column=1, row=0, sticky=E+W, pady=(0, 3))
+              ).grid(column=1, row=0, sticky=E+W, pady=(0, self.labPady))
               
     def makeSelectionFrm(self):
         selfrmwidth = 2*self.labwidth + 4*self.labborder + self.sepwidth + 2*2
@@ -97,7 +104,7 @@ class ShapeSelectFrm(Frame):
         self.selectBut = Button(self, 
                                 image=self.selectImg, 
                                 command=self.openPopup)
-        self.selectBut.grid(column=2, row=1, sticky=W, padx=20)
+        self.selectBut.grid(column=2, row=1, sticky=W, padx=self.butPadx)
         
         # when mouse is over the button for a while, show a caption
         self.selectBut.bind('<Enter>', lambda ev: self.onButEnter('Vybrat'))
@@ -110,7 +117,7 @@ class ShapeSelectFrm(Frame):
         self.delBut = Button(self, 
                              image=self.delImg, 
                              command=self.onDelete)      
-        self.delBut.grid(column=2, row=2, sticky=W, padx=20)
+        self.delBut.grid(column=2, row=2, sticky=W, padx=self.butPadx)
         
         # when mouse is over the button for a while, show a caption
         self.delBut.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
@@ -127,14 +134,14 @@ class ShapeSelectFrm(Frame):
         self.caption = Toplevel()
         msg = Message(self.caption, 
                 text=text, 
-                width=100, 
+                width=self.msgWidth, 
                 bg=self.bgcolor)
         msg.grid()
         
         # set hint font if not defined yet
         if not self.captFont:
             font = tkFont.Font(font=msg['font'])    # the application's font
-            font.configure(size=10)
+            font.configure(size=self.captFontSize)
             self.captFont = font                    # caption font
         msg.config(font=self.captFont)
         
@@ -434,7 +441,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         pass
     
     def makeSelectionFrm(self):
-        selfrmwidth = self.labwidth + 2*self.labborder + 2*2
+        selfrmwidth = self.labwidth + 2*self.labborder + 2*2 # 2*borderwidth
         selfrmheight = self.labheight + 2*self.labborder + 2*2 
            
         self.selectionfrm = Frame(self, 

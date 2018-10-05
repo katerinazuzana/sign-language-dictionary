@@ -27,7 +27,7 @@ class ScrolledFrame(Frame):
             self.rowconfigure(0, minsize=height)
             self.rowconfigure(1, minsize=40)
             canvas.config(xscrollcommand=hsbar.set)
-            canvas.grid(column=0, row=0, sticky=N+S+W, columnspan=3) #
+            canvas.grid(column=0, row=0, sticky=N+S+W, columnspan=3)
         else:   # vertical:
             canvas.config(yscrollcommand=vsbar.set)
             canvas.grid(column=0, row=0, sticky=N+E+S+W)
@@ -92,7 +92,6 @@ class ScrolledFrame(Frame):
         return x0 < x < x1 and y0 < y < y1
     
     def getCanvasCoords(self):
-#        self.canvas.update_idletasks() # update to get correct coords
         x0 = self.canvas.winfo_rootx()
         x1 = x0 + self.canvas.winfo_width() 
         y0 = self.canvas.winfo_rooty()

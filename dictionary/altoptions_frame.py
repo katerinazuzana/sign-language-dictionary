@@ -23,7 +23,9 @@ class AltsFrm(Frame):
         self.altoptions = altoptions
         self.searchfcn = searchfcn
         self.labbgcolor = labbgcolor
+        
         self.labFont = None
+        self.labFontSize = 13
         self.makeWidgets()
 
     def makeWidgets(self):
@@ -37,7 +39,7 @@ class AltsFrm(Frame):
             
             if not self.labFont:
                 font = tkFont.Font(font=lab['font']) # current application font
-                self.labFont = font.configure(size=13)
+                self.labFont = font.configure(size=self.labFontSize)
             lab.config(font=self.labFont)
             
             # when a label is clicked on, the corresponding video is played

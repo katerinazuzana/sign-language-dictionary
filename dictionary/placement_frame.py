@@ -26,6 +26,14 @@ class PlacementFrm(Frame):
                        ' Po dvojkliku na elipsu je možné měnit její velikost.'+\
                        ' Po dalším dvojkliku lze elipsou otáčet.'
         
+        self.labPady = 3
+        self.hintPadx = 8
+        self.butPadx = 15
+        self.butVertSpace = 8 # vertical space between Delete and Search buttons
+        self.captFontSize = 10   # font size of the captions/hint message
+        self.msgWidth = 100      # width of the caption message widget
+        
+        self.canvasBorder = 2
         self.canvasWidth, self.canvasHeight = canvasSize
         self.makeWidgets()
         
@@ -37,7 +45,9 @@ class PlacementFrm(Frame):
         
         Label(self, 
               text='Místo artikulace znaku', 
-              bg=self.bgcolor).grid(column=0, row=0, sticky=E, pady=(0, 3))
+              bg=self.bgcolor).grid(column=0, row=0, 
+                                    sticky=E, 
+                                    pady=(0, self.labPady))
 
         # create hint icon
         self.icon = tools.getImage(self.hintIconPath, 
@@ -46,7 +56,7 @@ class PlacementFrm(Frame):
         self.hintIcon = Label(self, image=self.icon)
         self.hintIcon.grid(column=1, row=0, 
                            sticky=W, 
-                           padx=(8, 0))
+                           padx=(self.hintPadx, 0))
         # when mouse is over the icon, show the hintText
         self.hintIcon.bind('<Enter>', self.showHint)
         self.hintIcon.bind('<Leave>', self.hideHint)
@@ -55,7 +65,7 @@ class PlacementFrm(Frame):
         self.canvas = DrawingCanvas(self, 
                                     width=self.canvasWidth, 
                                     height=self.canvasHeight, 
-                                    borderwidth=2, 
+                                    borderwidth=self.canvasBorder, 
                                     relief='groove')
         self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)        
         
@@ -66,7 +76,9 @@ class PlacementFrm(Frame):
         delButton = Button(self, 
                            image=self.delImg, 
                            command=self.onDelete)
-        delButton.grid(column=2, row=1, sticky=S+W, padx=(15, 0))       
+        delButton.grid(column=2, row=1, 
+                       sticky=S+W, 
+                       padx=(self.butPadx, 0))       
         # when mouse is over the button for a while, show a caption
         delButton.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
         delButton.bind('<Leave>', self.onButLeave)
@@ -80,7 +92,8 @@ class PlacementFrm(Frame):
                               command=self.master.onSearchPress)
         searchButton.grid(column=2, row=2, 
                           sticky=S+W, 
-                          padx=(15, 0), pady=(8, 0))
+                          padx=(self.butPadx, 0), 
+                          pady=(self.butVertSpace, 0))
         
         # when mouse is over the button for a while, show a caption
         searchButton.bind('<Enter>', lambda ev: self.onButEnter('Vyhledat'))
@@ -90,7 +103,8 @@ class PlacementFrm(Frame):
         self.hint = Toplevel()
         msg = Message(self.hint, 
                 text=self.hintText, 
-                width=140, 
+                width=140,  # the actual width will be different because 
+                            # the words are not split at the end of line
                 bg=self.bgcolor)
         msg.grid()
         
@@ -132,7 +146,7 @@ class PlacementFrm(Frame):
         self.caption = Toplevel()
         msg = Message(self.caption, 
                 text=text, 
-                width=100, 
+                width=self.msgWidth, 
                 bg=self.bgcolor)
         msg.grid()
                 
@@ -152,6 +166,6 @@ class PlacementFrm(Frame):
 
     def setCaptFont(self, msg):
         font = tkFont.Font(font=msg['font'])  # the application's font
-        font.configure(size=10)
+        font.configure(size=self.captFontSize)
         self.captFont = font                  # caption/hint font
     

@@ -31,7 +31,10 @@ class MainFrm(Frame):
     THUMB_PADX -- horizontal spacing of the thumbnail videos
     THUMB_PADY -- space between the main video and the thumbnails
     SCROLLBAR_WIDTH -- the width of the scrollbar used in the frame with
-                       thumbnail videos 
+                       thumbnail videos
+    TOP_SPACE -- additional padding at the top of the frame
+    LAB_PADY -- space between the label and the main video frame widgets
+    LAB_FONT_SIZE -- font size of the label
     """
     
     VIDEO_WIDTH = 540
@@ -42,6 +45,9 @@ class MainFrm(Frame):
     THUMB_PADX = 5
     THUMB_PADY = 35
     SCROLLBAR_WIDTH = 15
+    TOP_SPACE = 5
+    LAB_PADY = 20
+    LAB_FONT_SIZE = 20
     
     def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, 
                  altsmax, border, **options):
@@ -78,7 +84,7 @@ class MainFrm(Frame):
                              bg=self.bgcolor)
         self.entfrm.grid(column=0, row=1, 
                          sticky=N+E+S+W, 
-                         pady=(self.BORDER + 5, 0))
+                         pady=(self.BORDER + self.TOP_SPACE, 0))
 
         # create a label to display the word
         self.labvar = StringVar()
@@ -87,10 +93,10 @@ class MainFrm(Frame):
                          height=1, 
                          bg=self.bgcolor, 
                          fg='red2')
-        self.lab.grid(column=0, row=2, sticky=N+S+W, pady=(0, 20))
+        self.lab.grid(column=0, row=2, sticky=N+S+W, pady=(0, self.LAB_PADY))
         
         font = tkFont.Font(font=self.lab['font']) # get current application font
-        font.configure(size=20, weight='bold')    # change its params
+        font.configure(size=self.LAB_FONT_SIZE, weight='bold')       # adjust it
         self.lab.config(font=font)           # use the changed font in the label
         
         # create the main video frame

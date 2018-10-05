@@ -45,7 +45,7 @@ class VideoFrm(Frame):
         self.canvas = Canvas(self, width = self.width, 
                                    height = self.height, 
                                    highlightthickness=0)
-        self.canvas.grid(column=0, row=0, padx=self.border, pady=self.border) #
+        self.canvas.grid(column=0, row=0, padx=self.border, pady=self.border)
         self.canvas.config(bg='black')
         # canvas center coords
         self.centerX =  int(self.width / 2) + self.border
