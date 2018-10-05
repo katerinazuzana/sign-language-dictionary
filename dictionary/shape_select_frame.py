@@ -2,8 +2,8 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.font as tkFont
 import os
-from PIL import Image, ImageTk
 from scrolled_frame import ScrolledFrame
+import tools
 
 class ShapeSelectFrm(Frame):
     def __init__(self, parent, imgdir, **options):
@@ -91,9 +91,9 @@ class ShapeSelectFrm(Frame):
         self.caption = None
         
         # create select button
-        with Image.open(self.selectIconPath) as img:
-            img = img.resize((self.iconSize, self.iconSize), Image.LANCZOS)
-            self.selectImg = ImageTk.PhotoImage(img)
+        self.selectImg = tools.getImage(self.selectIconPath, 
+                                        width=self.iconSize, 
+                                        height=self.iconSize)
         self.selectBut = Button(self, 
                                 image=self.selectImg, 
                                 command=self.openPopup)
@@ -104,9 +104,9 @@ class ShapeSelectFrm(Frame):
         self.selectBut.bind('<Leave>', self.onButLeave)
         
         # create delete button
-        with Image.open(self.delIconPath) as img:
-            img = img.resize((self.iconSize, self.iconSize), Image.LANCZOS)
-            self.delImg = ImageTk.PhotoImage(img)
+        self.delImg = tools.getImage(self.delIconPath, 
+                                     width=self.iconSize, 
+                                     height=self.iconSize)
         self.delBut = Button(self, 
                              image=self.delImg, 
                              command=self.onDelete)      
@@ -233,11 +233,9 @@ class ShapeSelectFrm(Frame):
         buttonsfrm.grid(column=0, row=2, sticky=E)
         
         # submit button
-        with Image.open(self.submitIconPath) as img:
-            img = img.resize((self.selectWinIconSize, 
-                              self.selectWinIconSize), 
-                             Image.LANCZOS)
-            self.submitImg = ImageTk.PhotoImage(img)
+        self.submitImg = tools.getImage(self.submitIconPath, 
+                                        width=self.selectWinIconSize, 
+                                        height=self.selectWinIconSize)
         submitButton = ttk.Button(buttonsfrm, 
                                   text='Použít', 
                                   image=self.submitImg, 
@@ -248,11 +246,9 @@ class ShapeSelectFrm(Frame):
         submitButton['compound'] = LEFT # display image to left of button text
         
         # close button
-        with Image.open(self.closeIconPath) as img:
-            img = img.resize((self.selectWinIconSize, 
-                              self.selectWinIconSize), 
-                             Image.LANCZOS)
-            self.closeImg = ImageTk.PhotoImage(img)
+        self.closeImg = tools.getImage(self.closeIconPath, 
+                                       width=self.selectWinIconSize, 
+                                       height=self.selectWinIconSize)
         closeButton = ttk.Button(buttonsfrm, 
                                  text='Zavřít', 
                                  image=self.closeImg, 
@@ -327,14 +323,8 @@ class ShapeSelectFrm(Frame):
             # create the images
             for i in self.shapes:
                 imgpath = os.path.join(self.imgdir, self.num(i) + '.png')
-                with Image.open(imgpath) as img:
-            
-                    # resize the image
-                    #width, height = img.size
-                    #self.labheight = int(height * self.labwidth / width)
-                    img = img.resize((self.labwidth, self.labheight), 
-                                     Image.LANCZOS)
-                    self.images.append(ImageTk.PhotoImage(img))
+                image = tools.getImage(imgpath, self.labwidth, self.labheight)
+                self.images.append(image)
         for i in range(len(self.shapes)):                
             # display the image on a label            
             lab = Label(self.scrollfrm.interior, 

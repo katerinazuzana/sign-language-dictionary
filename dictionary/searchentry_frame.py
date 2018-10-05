@@ -1,8 +1,8 @@
 from tkinter import *
 import os
 import sqlite3
-from PIL import Image, ImageTk
 from autocomplete_entry import AutocompleteEntry
+import tools
 
 
 class EntFrm(Frame):
@@ -40,14 +40,13 @@ class EntFrm(Frame):
         bfrm.grid(column=1, row=0, sticky=N)
         bfrm.rowconfigure(0, weight=1)
         
-        with Image.open(self.iconPath) as img:
-            img = img.resize((self.iconSize, self.iconSize), 
-                             Image.LANCZOS)
-            self.iconImg = ImageTk.PhotoImage(img)
-        
-        Button(bfrm, image=self.iconImg,
-                     command=self.startSearch
-              ).grid(column=0, row=0, sticky=N+E+S+W)
+        self.iconImg = tools.getImage(self.iconPath, 
+                                       width=self.iconSize, 
+                                       height=self.iconSize)
+        Button(bfrm, 
+               image=self.iconImg,
+               command=self.startSearch
+               ).grid(column=0, row=0, sticky=N+E+S+W)
         
         # create a list of all the words contained in the database
         with sqlite3.connect(self.dbpath) as conn:

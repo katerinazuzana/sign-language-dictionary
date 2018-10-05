@@ -1,8 +1,8 @@
 from tkinter import *
 import tkinter.font as tkFont
-from PIL import Image, ImageTk
 import os
 from drawing_canvas import DrawingCanvas
+import tools
 
 
 class PlacementFrm(Frame):
@@ -40,9 +40,9 @@ class PlacementFrm(Frame):
               bg=self.bgcolor).grid(column=0, row=0, sticky=E, pady=(0, 3))
 
         # create hint icon
-        with Image.open(self.hintIconPath) as img:
-            img = img.resize((self.hintSize, self.hintSize), Image.LANCZOS)
-            self.icon = ImageTk.PhotoImage(img)
+        self.icon = tools.getImage(self.hintIconPath, 
+                                   width=self.hintSize, 
+                                   height=self.hintSize)
         self.hintIcon = Label(self, image=self.icon)
         self.hintIcon.grid(column=1, row=0, 
                            sticky=W, 
@@ -60,10 +60,9 @@ class PlacementFrm(Frame):
         self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)        
         
         # create delete button
-        with Image.open(self.delIconPath) as img:
-            img = img.resize((self.delIconSize, self.delIconSize), 
-                             Image.LANCZOS)
-            self.delImg = ImageTk.PhotoImage(img)
+        self.delImg = tools.getImage(self.delIconPath, 
+                                       width=self.delIconSize, 
+                                       height=self.delIconSize)
         delButton = Button(self, 
                            image=self.delImg, 
                            command=self.onDelete)
@@ -73,13 +72,12 @@ class PlacementFrm(Frame):
         delButton.bind('<Leave>', self.onButLeave)
         
         # create search sign button
-        with Image.open(self.searchIconPath) as img:
-            img = img.resize((self.searchIconSize, self.searchIconSize), 
-                             Image.LANCZOS)
-            self.searchImg = ImageTk.PhotoImage(img)
+        self.searchImg = tools.getImage(self.searchIconPath, 
+                                        width=self.searchIconSize, 
+                                        height=self.searchIconSize)
         searchButton = Button(self, 
-               image=self.searchImg, 
-               command=self.master.onSearchPress)
+                              image=self.searchImg, 
+                              command=self.master.onSearchPress)
         searchButton.grid(column=2, row=2, 
                           sticky=S+W, 
                           padx=(15, 0), pady=(8, 0))
