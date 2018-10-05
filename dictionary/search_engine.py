@@ -3,6 +3,7 @@ import os
 import math
 from difflib import SequenceMatcher
 from drawing_canvas import Vect
+import tools
 
 
 class SearchEngine():
@@ -99,7 +100,7 @@ class SearchEngine():
                 cursor = conn.cursor()
                 cursor.execute('SELECT word FROM words')
                 allwords = cursor.fetchall()
-            self.allwords = self.listOfTuplesToList(allwords)
+            self.allwords = tools.listOfTuplesToList(allwords)
         
         altopts = []    # to collect words that have the longest common
                         # substrings with the lookupword
@@ -126,13 +127,6 @@ class SearchEngine():
                 del altopts[-1]
                 del lengths[-1]
         return altopts
-
-    def listOfTuplesToList(self, listOfTuples):    
-        """Convert a list of tuples into a simple list of tuple[0] items."""
-        res = []
-        for item in listOfTuples:
-            res.append(item[0])
-        return res
   
     def signSearch(self, *userSign):
         """Search the database for signs similar to the sign from the user 

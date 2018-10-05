@@ -4,6 +4,7 @@ import sqlite3
 import os
 import re
 from scrolledlist_frame import ScrolledList
+import tools
 
 
 class CatFrm(Frame):
@@ -110,8 +111,8 @@ class CatFrm(Frame):
             cursor = conn.cursor()
             cursor.execute(SQLquery)
             find = cursor.fetchall()
-        find = self.listOfTuplesToList(find)
-        return self.leftPadItems(find)
+        find = tools.listOfTuplesToList(find)
+        return tools.leftPadItems(find)
     
     def catHandler(self, event):
         """Update the subcategory combobox and the scrolled list. 
@@ -144,7 +145,7 @@ class CatFrm(Frame):
             cursor = conn.cursor()
             cursor.execute(SQLquery, (vartext,))
             find = cursor.fetchall()
-        find = self.listOfTuplesToList(find)
+        find = tools.listOfTuplesToList(find)
         return self.mySort(find)
 
     def subcatHandler(self, event):
@@ -156,22 +157,5 @@ class CatFrm(Frame):
         
     def mySort(self, alist):
         return sorted(alist, key = lambda x: (x[0].isdigit(), x.lower()))
-    
-    def listOfTuplesToList(self, listOfTuples):    
-        """Convert a list of tuples into a simple list of tuple[0] items."""
-        res = []
-        for item in listOfTuples:
-            res.append(item[0])
-        return res
-        
-    def leftPadItems(self, alist):
-        """Add a space to the begining of each string in a given list."""
-        return [self.leftPad(item) for item in alist]
-    
-    def leftPad(self, word):
-        """Add a space to the begining of a given string.""" 
-        return " " + word   
-
-        
-        
+                
 

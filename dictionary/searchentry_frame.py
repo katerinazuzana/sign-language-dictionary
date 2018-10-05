@@ -53,8 +53,8 @@ class EntFrm(Frame):
             cursor = conn.cursor()
             cursor.execute('SELECT word FROM words')
             allwords = cursor.fetchall()
-        entries = self.listOfTuplesToList(allwords)
-        entries = self.leftPadItems(entries)
+        entries = tools.listOfTuplesToList(allwords)
+        entries = tools.leftPadItems(entries)
         
         # create the autocomplete entry
         self.var = StringVar()
@@ -114,22 +114,5 @@ class EntFrm(Frame):
             self.var.set(self.defaultText)
             self.ent.config(style="Gray.TEntry")
             self.ent.hideListboxWin()
-    
-    def listOfTuplesToList(self, listOfTuples):    
-        """Convert a list of 1-tuples into a simple list."""
-        res = []
-        for item in listOfTuples:
-            res.append(item[0])
-        return res
-
-    def leftPadItems(self, alist):
-        """Add a space to the begining of each string in a given list."""
-        return [self.leftPad(item) for item in alist]
-    
-    def leftPad(self, word):
-        """Add a space to the begining of a given string.""" 
-        return " " + word
-
-
 
 
