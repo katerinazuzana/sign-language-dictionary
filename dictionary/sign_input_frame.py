@@ -1,5 +1,5 @@
 from tkinter import *
-from shape_select_frame import ShapeSelectFrm, PassiveShapeSelectFrm
+from shape_select_frame import ShapeSelectFrm
 from radio_buttons import RadioFrm
 from placement_frame import PlacementFrm
 
@@ -7,6 +7,7 @@ from placement_frame import PlacementFrm
 class SignInputFrm(Frame):
 
     def __init__(self, parent, imgdir, signSearchFcn, canvasSize, **options):
+        
         super().__init__(parent, **options)
         self.imgdir = imgdir
         self.signSearchFcn = signSearchFcn

@@ -13,14 +13,14 @@ class EntFrm(Frame):
     can be called on Return/Search button press.
     """
     
-    def __init__(self, dbpath, searchfcn, parent, imgdir, **options):
+    def __init__(self, parent, dbpath, imgdir, searchfcn, **options):
         """Create the AutocompleteEntry and the Search button.
         
         Arguments:
+        parent -- the parent tkinter widget
         dbpath -- [str] the database file path
         searchfcn -- a function that does the search,
                      takes one [str] argument
-        parent -- the parent tkinter widget
         """
         super().__init__(parent, **options)
         self.dbpath = dbpath
@@ -41,8 +41,8 @@ class EntFrm(Frame):
         bfrm.rowconfigure(0, weight=1)
         
         self.iconImg = tools.getImage(self.iconPath, 
-                                       width=self.iconSize, 
-                                       height=self.iconSize)
+                                      width=self.iconSize, 
+                                      height=self.iconSize)
         Button(bfrm, 
                image=self.iconImg,
                command=self.startSearch

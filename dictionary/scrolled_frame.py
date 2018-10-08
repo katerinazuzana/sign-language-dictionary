@@ -9,31 +9,35 @@ class ScrolledFrame(Frame):
     """
 
     def __init__(self, parent, width, height, orient, border=False, **options):
+        
         super().__init__(parent, **options)
         if border: self.configure(borderwidth=2, relief='groove')
-        self.bgcolor = options.get('bg', self['bg'])
+        bgcolor = options.get('bg', self['bg'])
         
         # make a canvas with vertical and horizontal scrollbars
         vsbar = AutoScrollbar(self, orient=VERTICAL)
         hsbar = ttk.Scrollbar(self, orient=HORIZONTAL) # AutoScrollbar doesn't
                                                    # work here - wouldn't appear
-        canvas = Canvas(self, width=width, height=height, # visible area size 
-                              bg=self.bgcolor)
+        canvas = Canvas(self, 
+                        # visible area size: 
+                        width=width, 
+                        height=height,  
+                        bg=bgcolor)
         vsbar.config(command=canvas.yview)
         hsbar.config(command=canvas.xview)
-        self.hsbar = hsbar
         
         if orient == 'horizontal':
             self.rowconfigure(0, minsize=height)
-            self.rowconfigure(1, minsize=40)
+            self.rowconfigure(1, minsize=40)  # to fit a scrollbar
             canvas.config(xscrollcommand=hsbar.set)
             canvas.grid(column=0, row=0, sticky=N+S+W, columnspan=3)
+        
         else:   # vertical:
             canvas.config(yscrollcommand=vsbar.set)
             canvas.grid(column=0, row=0, sticky=N+E+S+W)
             # enable scrolling the canvas with the mouse wheel
-            canvas.bind_all('<Button-5>', self.onMouseWheelDown)
-            canvas.bind_all('<Button-4>', self.onMouseWheelUp)
+            canvas.bind_all('<Button-5>', self.scrollDown) # wheel down
+            canvas.bind_all('<Button-4>', self.scrollUp)   # wheel up
 
         self.rowconfigure(0, weight=1)
         canvas.config(highlightthickness=0)
@@ -41,7 +45,7 @@ class ScrolledFrame(Frame):
         
         # make the inner frame
         interior = Frame(canvas, 
-                         bg = self.bgcolor, 
+                         bg = bgcolor, 
                          cursor='hand2')
         self.interior = interior
         interior_id = canvas.create_window((0, 0), window=interior, anchor=NW)
@@ -54,25 +58,25 @@ class ScrolledFrame(Frame):
             if orient == 'horizontal':
                 # hide scrollbar when not needed
                 if interior.winfo_reqwidth() <= canvas.winfo_width():
-                    self.hsbar.grid_forget()
+                    hsbar.grid_forget()
                     # disable scrolling the canvas with the mouse wheel
                     self.canvas.unbind_all('<Button-5>')
                     self.canvas.unbind_all('<Button-4>')
                 else:
-                    self.hsbar.grid(column=0, row=1, sticky=N+E+W, columnspan=3)
+                    hsbar.grid(column=0, row=1, sticky=N+E+W, columnspan=3)
                     # enable scrolling the canvas with the mouse wheel
                     self.canvas.bind_all('<Button-5>', self.scrollRight)
                     self.canvas.bind_all('<Button-4>', self.scrollLeft)
                     
         interior.bind('<Configure>', configureInterior)
 
-    def onMouseWheelDown(self, event):
-        """Roll the canvas down if the mouse pointer is over it."""
+    def scrollDown(self, event):
+        """Scroll the canvas down if the mouse pointer is over it."""
         if self.isMouseOverCanvas():
             self.canvas.yview_scroll(1, 'units')
 
-    def onMouseWheelUp(self, event):
-        """Roll the canvas up if the mouse pointer is over it."""
+    def scrollUp(self, event):
+        """Scroll the canvas up if the mouse pointer is over it."""
         if self.isMouseOverCanvas():
             self.canvas.yview_scroll(-1, 'units')
         

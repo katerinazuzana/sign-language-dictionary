@@ -11,14 +11,6 @@ class PlacementFrm(Frame):
         self.bgcolor = options.get('bg', self['bg'])
         
         self.hintIconPath = os.path.join(imgdir, 'hint_icon.png')
-        self.delIconPath = os.path.join(imgdir, 'del_icon.png')
-        self.delIconSize = 30
-        self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
-        self.searchIconSize = 40
-        self.delay = 1000 # how long to wait before button description shows up
-        self.caption = None
-        self.captFont = None
-        
         self.hintSize = 14
         self.hintText = 'Klepnutím a tažením nakreslete elipsu,'+\
                        ' která bude vyznačovat umístění znaku.'+\
@@ -26,12 +18,21 @@ class PlacementFrm(Frame):
                        ' Po dvojkliku na elipsu je možné měnit její velikost.'+\
                        ' Po dalším dvojkliku lze elipsou otáčet.'
         
+        self.delIconPath = os.path.join(imgdir, 'del_icon.png')
+        self.delIconSize = 30
+        self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
+        self.searchIconSize = 40
+        
+        self.delay = 1000 # how long to wait before button description shows up
+        self.caption = None
+        self.captFont = None
+        self.captFontSize = 10   # font size of the captions/hint message
+        self.msgWidth = 100      # width of the caption message widget
+        
         self.labPady = 3
         self.hintPadx = 8
         self.butPadx = 15
         self.butVertSpace = 8 # vertical space between Delete and Search buttons
-        self.captFontSize = 10   # font size of the captions/hint message
-        self.msgWidth = 100      # width of the caption message widget
         
         self.canvasBorder = 2
         self.canvasWidth, self.canvasHeight = canvasSize
@@ -94,7 +95,6 @@ class PlacementFrm(Frame):
                           sticky=S+W, 
                           padx=(self.butPadx, 0), 
                           pady=(self.butVertSpace, 0))
-        
         # when mouse is over the button for a while, show a caption
         searchButton.bind('<Enter>', lambda ev: self.onButEnter('Vyhledat'))
         searchButton.bind('<Leave>', self.onButLeave)
@@ -102,10 +102,10 @@ class PlacementFrm(Frame):
     def showHint(self, event):
         self.hint = Toplevel()
         msg = Message(self.hint, 
-                text=self.hintText, 
-                width=140,  # the actual width will be different because 
-                            # the words are not split at the end of line
-                bg=self.bgcolor)
+                      text=self.hintText, 
+                      width=140,  # the actual width will be different because 
+                                  # the words are not split at the end of line
+                      bg=self.bgcolor)
         msg.grid()
         
         # set hint font if not defined yet

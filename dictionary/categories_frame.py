@@ -1,8 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 import sqlite3
-import os
-import re
 from scrolledlist_frame import ScrolledList
 import tools
 
@@ -21,16 +19,16 @@ class CatFrm(Frame):
     so that it can be called when a word is selected.
     """
     
-    def __init__(self, dbpath, searchfcn, parent, **options):
+    def __init__(self, parent, dbpath, searchfcn, **options):
         """Create a category selection combobox 'self.catcb',
                   a subcategory selection combobox 'self.subcacb' and
                   a 'self.scrolledlist'.
         
-        Arguments: 
+        Arguments:
+        parent -- the parent tkinter widget 
         dbpath -- [str] the database file path
         searchfcn -- a function that does the search,
                      takes one [str] argument
-        parent -- the parent tkinter widget
         """
         super().__init__(parent, **options)
         self.dbpath = dbpath
@@ -55,9 +53,10 @@ class CatFrm(Frame):
         # create category combobox
         self.catvar = StringVar()
         self.catvar.set(' -- Zvolte kategorii --')
-        self.catcb = ttk.Combobox(self, textvariable=self.catvar, 
-                                        width=self.width,
-                                        state='readonly')
+        self.catcb = ttk.Combobox(self, 
+                                  textvariable=self.catvar, 
+                                  width=self.width,
+                                  state='readonly')
         
         # set up the options available in category combobox
         self.catcb['values'] = self.findCats()
@@ -82,9 +81,10 @@ class CatFrm(Frame):
         
         # create empty scrolledlist
         self.scrolledlist = ScrolledList(self, 
-                                         self.height, 
-                                         self.searchfcn)
-        self.scrolledlist.grid(column=1, row=5, sticky=N+E+W, 
+                                         self.searchfcn, 
+                                         self.height)
+        self.scrolledlist.grid(column=1, row=5, 
+                               sticky=N+E+W, 
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
     

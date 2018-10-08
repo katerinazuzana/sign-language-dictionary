@@ -8,13 +8,11 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter.font as tkFont
-import sqlite3
 import os
 from search_engine import SearchEngine
 from main_frame import MainFrm
 from categories_frame import CatFrm
 from sign_input_frame import SignInputFrm
-import math
 
 
 class Dictionary():
@@ -75,14 +73,14 @@ class Dictionary():
 
         # create the main frame
         self.mainfrm = MainFrm(self.root, 
-                             self.dbpath, 
-                             self.vfdir, 
-                             self.imgdir, 
-                             self.searchEng.search, 
-                             self.altsmax, 
-                             self.BORDER, 
-                             bg=self.BGCOLOR, 
-                             padx=self.BORDER)
+                               self.dbpath, 
+                               self.vfdir, 
+                               self.imgdir, 
+                               self.searchEng.search, 
+                               self.altsmax, 
+                               self.BORDER, 
+                               bg=self.BGCOLOR, 
+                               padx=self.BORDER)
         self.mainfrm.grid(column=1, row=0, sticky=N+E+S+W)
         
         # when the searchEng is done searching, it calls a function to show
@@ -138,9 +136,9 @@ class Dictionary():
         style.map('TNotebook.Tab', background=[('selected', self.BGCOLOR)])
         
         # create the category-selection frame
-        self.catfrm = CatFrm(self.dbpath, 
+        self.catfrm = CatFrm(self.notebook, 
+                             self.dbpath, 
                              self.searchEng.search, 
-                             self.notebook, 
                              bg=self.BGCOLOR, 
                              padx=self.BORDER, 
                              pady=self.BORDER)

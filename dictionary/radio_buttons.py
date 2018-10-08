@@ -10,13 +10,10 @@ class RadioFrm(Frame):
         self.imgdir = imgdir
         self.bgcolor = options.get('bg', self['bg'])
         self.var = StringVar()
-        
         self.values = [('jednoruční znak', 'single hand'), 
                        ('obě ruce stejný tvar', 'both the same'), 
                        ('tvar pasivní ruky', 'passive hand')]
-        
         self.pady = 6   # passhapes frame y-padding
-        
         self.makeWidgets()
         
     def makeWidgets(self):
@@ -25,7 +22,7 @@ class RadioFrm(Frame):
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=3)   # empty column
         
-        for i in range(len(values)):
+        for i in range(len(self.values)):
             Radiobutton(self, text = self.values[i][0], 
                               variable = self.var, 
                               value = self.values[i][1], 

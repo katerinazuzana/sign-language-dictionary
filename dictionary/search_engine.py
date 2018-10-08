@@ -14,6 +14,9 @@ class SearchEngine():
         self.altsmax = altsmax
         
         self.allwords = []
+        
+        # a function that shows the result in the main frame (mainfrm), 
+        # the function is assigned in main.py after mainfrm is created
         self.showResultFcn = None
 
         # create a list of video file names for searching with unknown suffix

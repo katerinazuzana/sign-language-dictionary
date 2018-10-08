@@ -9,7 +9,7 @@ class AltsFrm(Frame):
     Each option is displayed on its own Label.
     """
    
-    def __init__(self, altoptions, searchfcn, labbgcolor, parent, **options):
+    def __init__(self, parent, altoptions, searchfcn, **options):
         """Create the labels with the options.
         
         Arguments:
@@ -19,11 +19,11 @@ class AltsFrm(Frame):
         labbgcolor -- [str] background color of the labels
         parent -- the parent tkinter widget
         """
+        
         super().__init__(parent, **options)
         self.altoptions = altoptions
         self.searchfcn = searchfcn
-        self.labbgcolor = labbgcolor
-        
+        self.labbgcolor = options.get('bg', self['bg'])
         self.labFont = None
         self.labFontSize = 13
         self.makeWidgets()

@@ -8,13 +8,13 @@ class ScrolledList(Frame):
     double-clicked, the searchfcn is called on the choosen word.
     """
     
-    def __init__(self, parent, height, searchfcn):
+    def __init__(self, parent, searchfcn, height):
         """Create an empty scrolled list.
         
         Arguments:
+        parent -- the parent tkinter widget
         searchfcn -- a function that takes a string as an argument
         height -- [int] height of the scrolled list in lines
-        parent -- the parent tkinter widget
         """
         super().__init__(parent)
         self.searchfcn = searchfcn

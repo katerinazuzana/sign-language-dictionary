@@ -26,7 +26,7 @@ class ShapeSelectFrm(Frame):
         
         self.submitIconPath = os.path.join(imgdir, 'submit_icon.png')
         self.closeIconPath = os.path.join(imgdir, 'close_icon.png')
-        self.selectWinIconSize = 20
+        self.popupWinIconSize = 20
         
         self.labwidth = 65
         self.labheight = 80
@@ -35,9 +35,9 @@ class ShapeSelectFrm(Frame):
         self.numrows = 4
         self.sepcolor = 'gray'
         self.sepwidth = 1
+        
         self.images = []
         self.labels = []
-        
         self.shapes = [i+1 for i in range(51)]
                 
         self.title = 'Tvar aktivní ruky'
@@ -51,7 +51,7 @@ class ShapeSelectFrm(Frame):
         self.var2 = IntVar()
         self.var2.set(0)
         
-        self.selectWin = None
+        self.popupWin = None
         self.sel1 = None
         self.sep = None
         self.sel2 = None
@@ -163,31 +163,29 @@ class ShapeSelectFrm(Frame):
         self.redrawSelectionFrm()
     
     def openPopup(self):
-        if not self.selectWin:
+        if self.popupWin:
+            self.popupWin.deiconify()
+        else:
             self.createPopup()
-    
-    def onPopupClose(self):
-        self.selectWin.destroy() # deletes window from display
-        self.selectWin = None
     
     def createPopup(self):
         # create a popup window
-        self.selectWin = Toplevel(bg=self.popupBgColor)
-        self.selectWin.title(self.title)
-        self.selectWin.columnconfigure(0, weight=1)
+        self.popupWin = Toplevel(bg=self.popupBgColor)
+        self.popupWin.title(self.title)
+        self.popupWin.columnconfigure(0, weight=1)
         
-        self.selectWin.protocol('WM_DELETE_WINDOW', self.onPopupClose)
-        self.selectWin.attributes('-topmost', True)
+        self.popupWin.protocol('WM_DELETE_WINDOW', self.onPopupClose)
+        self.popupWin.attributes('-topmost', True)
         
         # set the instructions label
-        Label(self.selectWin, 
+        Label(self.popupWin, 
               text=self.popuptext, 
               bg=self.popupBgColor).grid(column=0, row=0, 
                                         padx=10, pady=10, 
                                         sticky=W)
         
         # make a scrolled frame for displaying labels with images
-        self.scrollfrm = ScrolledFrame(self.selectWin, 
+        self.scrollfrm = ScrolledFrame(self.popupWin, 
                              self.numcols*(self.labwidth + 2*self.labborder) + 
                              (self.numcols-1)*self.sepwidth,
                              self.numrows*(self.labheight + 2*self.labborder) + 
@@ -196,22 +194,22 @@ class ShapeSelectFrm(Frame):
                              border=True, 
                              bg=self.bgcolor)
         self.scrollfrm.grid(column=0, row=1, padx=10)
-        self.selectWin.rowconfigure(1, weight=1)
+        self.popupWin.rowconfigure(1, weight=1)
         
         self.makeLabels()
-        self.makeSelectWinButtons() 
+        self.makePopupWinButtons() 
         
         self.positionWindow()
-        self.selectWin.resizable(False, False)
+        self.popupWin.resizable(False, False)
         
     def positionWindow(self):
-        """Position the popup window slightly to the left from the center 
-        of the main app window, so that the selected shapes in the main 
-        window are visible."""
+        """Position 'self.popupWin' window slightly to the left 
+        from the center of the main app window, so that the selected shapes 
+        in the main window are visible."""
         
-        self.selectWin.update_idletasks()
-        width = self.selectWin.winfo_reqwidth()
-        height = self.selectWin.winfo_reqheight()
+        self.popupWin.update_idletasks()
+        width = self.popupWin.winfo_reqwidth()
+        height = self.popupWin.winfo_reqheight()
         
         # get the main application window object
         root = self.getRoot()
@@ -225,7 +223,7 @@ class ShapeSelectFrm(Frame):
         
         xoffset = rootCenterX - width * 2 // 3
         yoffset = rootCenterY - height // 2
-        self.selectWin.geometry('+{}+{}'.format(xoffset, yoffset))
+        self.popupWin.geometry('+{}+{}'.format(xoffset, yoffset))
     
     def getRoot(self):
         """Return the root application window object."""
@@ -234,15 +232,15 @@ class ShapeSelectFrm(Frame):
         root = self.master.master.master
         return root
     
-    def makeSelectWinButtons(self):
+    def makePopupWinButtons(self):
         # make Submit and Quit buttons in their own frame
-        buttonsfrm = Frame(self.selectWin, bg=self.popupBgColor)
+        buttonsfrm = Frame(self.popupWin, bg=self.popupBgColor)
         buttonsfrm.grid(column=0, row=2, sticky=E)
         
         # submit button
         self.submitImg = tools.getImage(self.submitIconPath, 
-                                        width=self.selectWinIconSize, 
-                                        height=self.selectWinIconSize)
+                                        width=self.popupWinIconSize, 
+                                        height=self.popupWinIconSize)
         submitButton = ttk.Button(buttonsfrm, 
                                   text='Použít', 
                                   image=self.submitImg, 
@@ -254,8 +252,8 @@ class ShapeSelectFrm(Frame):
         
         # close button
         self.closeImg = tools.getImage(self.closeIconPath, 
-                                       width=self.selectWinIconSize, 
-                                       height=self.selectWinIconSize)
+                                       width=self.popupWinIconSize, 
+                                       height=self.popupWinIconSize)
         closeButton = ttk.Button(buttonsfrm, 
                                  text='Zavřít', 
                                  image=self.closeImg, 
@@ -323,46 +321,48 @@ class ShapeSelectFrm(Frame):
                 self.sel2.destroy()
                 self.sel2 = None                
         
-    def makeLabels(self):        
-        if self.labels != []:
-            self.labels = []
+    def makeLabels(self):
+    
+        # create the images if they are not created yet
         if self.images == []:
-            # create the images
             for i in self.shapes:
                 imgpath = os.path.join(self.imgdir, self.num(i) + '.png')
                 image = tools.getImage(imgpath, self.labwidth, self.labheight)
                 self.images.append(image)
-        for i in range(len(self.shapes)):                
-            # display the image on a label            
-            lab = Label(self.scrollfrm.interior, 
-                        image=self.images[i], 
-                        borderwidth=0)
-            lab.grid(column=(i % self.numcols) * 2, 
-                     row=(i // self.numcols) * 2,
-                     padx=self.labborder, 
-                     pady=self.labborder)
-            self.labels.append(lab)    
+        
+        # create the labels if they are not created yet
+        if self.labels == []:
+            for i in range(len(self.shapes)):                
+                # display the image on a label            
+                lab = Label(self.scrollfrm.interior, 
+                            image=self.images[i], 
+                            borderwidth=0)
+                lab.grid(column=(i % self.numcols) * 2, 
+                         row=(i // self.numcols) * 2,
+                         padx=self.labborder, 
+                         pady=self.labborder)
+                self.labels.append(lab)    
             
-            # on label click, change the color of highlighting
-            def clickHandler(i):
-                return lambda event: self.onLabClick(i)            
-            lab.bind('<Button-1>', clickHandler(i))
-            
-            # on label double-click, the label is fetched
-            def doubleClickHandler(i):
-                return lambda event: self.onLabDoubleClick(i)            
-            lab.bind('<Double-Button-1>', doubleClickHandler(i))
-            
-            # when the cursor enters a label, the label is highlighted
-            def enterHandler(i):
-                return lambda event: self.onLabEnter(i)
-            lab.bind('<Enter>', enterHandler(i))
-            
-            # when the cursor leaves a label, highlighting is removed
-            def leaveHandler(i):
-                return lambda event: self.onLabLeave(i)
-            lab.bind('<Leave>', leaveHandler(i))
-                        
+                # on label click, change the color of highlighting
+                def clickHandler(i):
+                    return lambda event: self.onLabClick(i)            
+                lab.bind('<Button-1>', clickHandler(i))
+                
+                # on label double-click, the label is fetched
+                def doubleClickHandler(i):
+                    return lambda event: self.onLabDoubleClick(i)            
+                lab.bind('<Double-Button-1>', doubleClickHandler(i))
+                
+                # when the cursor enters a label, the label is highlighted
+                def enterHandler(i):
+                    return lambda event: self.onLabEnter(i)
+                lab.bind('<Enter>', enterHandler(i))
+                
+                # when the cursor leaves a label, highlighting is removed
+                def leaveHandler(i):
+                    return lambda event: self.onLabLeave(i)
+                lab.bind('<Leave>', leaveHandler(i))
+                            
         self.createSeparators()
         
     def createSeparators(self):
@@ -425,6 +425,10 @@ class ShapeSelectFrm(Frame):
     def num(self, i):
         if i < 10: return '0' + str(i)
         return str(i)
+    
+    def onPopupClose(self):
+        """Delete the window from display."""
+        self.popupWin.withdraw()
 
 
 class PassiveShapeSelectFrm(ShapeSelectFrm):

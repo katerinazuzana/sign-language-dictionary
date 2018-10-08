@@ -16,14 +16,14 @@ class VideoFrm(Frame):
     videos.   
     """
    
-    def __init__(self, width, height, parent, thumb=False, 
+    def __init__(self, parent, width, height, thumb=False, 
                  border=0, **options):
         """Create the self.canvas widget.
         
         Arguments:
+        parent -- the parent tkinter widget
         width -- [int] the width of the canvas
         height -- [int] the height of the canvas
-        parent -- the parent tkinter widget
         Keyword arguments:
         thumb -- [bool] a boolean flag indicating whether 
                  the VideoFrm object is used 
@@ -42,8 +42,8 @@ class VideoFrm(Frame):
         # create a canvas for displaying the video
         self.width = width
         self.height = height
-        self.canvas = Canvas(self, width = self.width, 
-                                   height = self.height, 
+        self.canvas = Canvas(self, width=self.width, 
+                                   height=self.height, 
                                    highlightthickness=0)
         self.canvas.grid(column=0, row=0, padx=self.border, pady=self.border)
         self.canvas.config(bg='black')
@@ -79,8 +79,10 @@ class VideoFrm(Frame):
             # display the image on the canvas
             self.image = PIL.ImageTk.PhotoImage(img)
             self.canvas.delete('all')
-            self.canvas.create_image(self.centerX, self.centerY,             
-                                     image=self.image, anchor=CENTER)
+            self.canvas.create_image(self.centerX, 
+                                     self.centerY,             
+                                     image=self.image, 
+                                     anchor=CENTER)
             # after delay, call self.update method again   
             self.after(self.video.delay, lambda: self.update(video_source))
         else:
@@ -134,8 +136,10 @@ class VideoFrm(Frame):
         img = img.resize((newwidth, newheight), PIL.Image.BILINEAR)
         # display the image on the canvas    
         self.image = PIL.ImageTk.PhotoImage(img)
-        self.canvas.create_image(self.centerX, self.centerY,             
-                                     image=self.image, anchor=CENTER)   
+        self.canvas.create_image(self.centerX, 
+                                 self.centerY,             
+                                 image=self.image, 
+                                 anchor=CENTER)   
        
     def drawReplayArrow(self):
         """Draw a replay arrow over the video on self.canvas

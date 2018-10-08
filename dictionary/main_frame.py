@@ -14,7 +14,7 @@ class MainFrm(Frame):
                      that will be translated to sign language
     'self.lab' -- a label where the word that has been looked up 
                   in the Dictionary is displayed
-    'self.video' -- a large video frame where the translation
+    'self.videofrm' -- a large video frame where the translation
                     to sign language is played
     'self.thumbfrm' -- a frame containing thumbnail video frames,
                        the thumbnails are displayed when there is more
@@ -58,8 +58,8 @@ class MainFrm(Frame):
         self.imgdir = imgdir
         self.searchfcn = searchfcn
         self.thumbs = []   # a list of frames where thumbnail videos live
-        self.alts = None   # the frame where alternative options are displayed
-                           # when the given word is not found in the database
+        self.altsfrm = None   # a frame where alternative options are displayed
+                             # when the given word is not found in the database
         self.altsmax = altsmax
         self.BORDER = border
         self.bgcolor = options.get('bg', self['bg'])
@@ -77,10 +77,10 @@ class MainFrm(Frame):
                                       self.BORDER)
 
         # create the search entry frame
-        self.entfrm = EntFrm(self.dbpath, 
-                             self.searchfcn,  
-                             self, 
+        self.entfrm = EntFrm(self, 
+                             self.dbpath, 
                              self.imgdir, 
+                             self.searchfcn,  
                              bg=self.bgcolor)
         self.entfrm.grid(column=0, row=1, 
                          sticky=N+E+S+W, 
@@ -100,10 +100,10 @@ class MainFrm(Frame):
         self.lab.config(font=font)           # use the changed font in the label
         
         # create the main video frame
-        self.video = VideoFrm(width=self.VIDEO_WIDTH,
-                              height=self.VIDEO_HEIGHT,
-                              parent=self)
-        self.video.grid(column=0, row=3)
+        self.videofrm = VideoFrm(self, 
+                              self.VIDEO_WIDTH,
+                              self.VIDEO_HEIGHT)
+        self.videofrm.grid(column=0, row=3)
         
         # frame for displaying thumbnail videos
         self.createThumbFrm()
@@ -158,15 +158,15 @@ class MainFrm(Frame):
                
         # if there is an alternative-options-frame currently being displayed,
         # destroy it, and create a video-frame
-        if self.alts != None:
-            self.alts.destroy()
-            self.alts = None
-            self.video = VideoFrm(width=self.VIDEO_WIDTH,
-                                  height=self.VIDEO_HEIGHT,
-                                  parent=self)
-            self.video.grid(column=0, row=3)        
+        if self.altsfrm is not None:
+            self.altsfrm.destroy()
+            self.altsfrm = None
+            self.videofrm = VideoFrm(self, 
+                                     self.VIDEO_WIDTH,
+                                     self.VIDEO_HEIGHT)
+            self.videofrm.grid(column=0, row=3)        
         # play the video file
-        self.video.play(video_source=videofile)
+        self.videofrm.play(video_source=videofile)
                                 
     def createThumbnails(self, find):
         """Create the thumbnail videos.
@@ -186,9 +186,9 @@ class MainFrm(Frame):
                                                   self.THUMB_PADX)
             
             # create the thumbnails and collect them in self.thumbs variable
-            thumb = VideoFrm(width=self.THUMB_WIDTH,
-                             height=self.THUMB_HEIGHT,
-                             parent=self.thumbfrm.interior, 
+            thumb = VideoFrm(self.thumbfrm.interior, 
+                             self.THUMB_WIDTH,
+                             self.THUMB_HEIGHT, 
                              thumb=True,
                              border=self.HIGHLIGHT_BORDER, 
                              bg=self.bgcolor)
@@ -222,7 +222,7 @@ class MainFrm(Frame):
         self.thumbs[i].lightOn()
         for thumb in self.thumbs[:i]+self.thumbs[i+1:]:
             thumb.lightOff()   
-        self.video.play(video_source=vf)
+        self.videofrm.play(video_source=vf)
      
     def deleteThumbnails(self):
         for thumb in self.thumbs:
@@ -238,24 +238,23 @@ class MainFrm(Frame):
         else:
             self.labvar.set('Výraz nebyl nalezen - nechtěli jste hledat:')
             # destroy the video frame
-            self.video.destroy()
+            self.videofrm.destroy()
             # if there is an alternative-options-frame currently 
             # being displayed, destroy it
-            if self.alts != None:
-                self.alts.destroy()
+            if self.altsfrm is not None:
+                self.altsfrm.destroy()
         # create a frame with an offer of alternative options
-        self.alts = AltsFrm(altoptions, 
-                            self.searchfcn, 
-                            self.bgcolor, 
-                            self, 
-                            bg=self.bgcolor)
-        self.alts.grid(column=0, row=3, sticky=N+E+S+W)
+        self.altsfrm = AltsFrm(self, 
+                               altoptions, 
+                               self.searchfcn, 
+                               bg=self.bgcolor)
+        self.altsfrm.grid(column=0, row=3, sticky=N+E+S+W)
     
     def showEnterText(self):
         self.deleteThumbnails()
-        self.video.destroy()
-        if self.alts != None:
-            self.alts.destroy()
+        self.videofrm.destroy()
+        if self.altsfrm is not None:
+            self.altsfrm.destroy()
         self.labvar.set('Zadejte výraz, který chcete vyhledat')
 
         
