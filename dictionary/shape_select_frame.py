@@ -7,9 +7,24 @@ import tools
 
 
 class ShapeSelectFrm(Frame):
-
-    def __init__(self, parent, imgdir, **options):
+    """A frame for selecting one or more handshapes of the active hand.
     
+    The frame contains:
+    - a label with a title
+    - 'self.selectionfrm' frame with two places where the selected handshapes
+                          are displayed
+    - 'self.selectBut' - Select button that opens a popup window with
+                         an offer of handshapes
+    - 'self.delBut' - Delete button for deleting a handshape from selection
+    """
+    
+    def __init__(self, parent, imgdir, **options):
+        """Initialize a ShapeSelectFrm. Create 'selectionfrm' and buttons.
+        
+        Arguments:
+            parent: a parent tkinter widget
+            imgdir (str): a path to the directory with images
+        """
         super().__init__(parent, **options)
         self.imgdir = imgdir
         self.bgcolor = options.get('bg', self['bg'])
@@ -36,25 +51,25 @@ class ShapeSelectFrm(Frame):
         self.sepcolor = 'gray'
         self.sepwidth = 1
         
-        self.images = []
-        self.labels = []
+        self.images = []     # images of the handshapes
+        self.labels = []     # labels with handshape pics in the popup window
         self.shapes = [i+1 for i in range(51)]
                 
         self.title = 'Tvar aktivní ruky'
         self.popuptext = 'Zvolte tvar aktivní ruky'
         self.popupBgColor = '#efebe7'
         
-        self.var = IntVar()
-        self.var.set(0)
-        self.var1 = IntVar()
+        self.var = IntVar()  # tracks a shape selected in the popup window
+        self.var.set(0)          # 0 means there's no shape selected
+        self.var1 = IntVar() # tracks a shape displayed on the 1st place
         self.var1.set(0)
-        self.var2 = IntVar()
+        self.var2 = IntVar() # tracks a shape displayed on the 2nd place
         self.var2.set(0)
         
         self.popupWin = None
-        self.sel1 = None
-        self.sep = None
-        self.sel2 = None
+        self.sel1 = None    # label with 1st selected shape
+        self.sep = None     # separator-like frame separating the labels
+        self.sel2 = None    # label with 2nd selected shape
         
         self.columnconfigure(0, weight=1)  # empty column
         self.columnconfigure(2, weight=1)
@@ -65,12 +80,14 @@ class ShapeSelectFrm(Frame):
         self.makeButtons()
     
     def makeLabel(self):
+        """Create a label with a title."""
         Label(self, 
               text=self.title, 
               bg=self.bgcolor
               ).grid(column=1, row=0, sticky=E+W, pady=(0, self.labPady))
               
     def makeSelectionFrm(self):
+        """Create a frame where the selected shapes are displayed."""
         selfrmwidth = 2*self.labwidth + 4*self.labborder + self.sepwidth + 2*2
         selfrmheight = self.labheight + 2*self.labborder + 2*2 # 2*borderwidth
             
@@ -81,20 +98,22 @@ class ShapeSelectFrm(Frame):
                                   borderwidth=2, 
                                   relief='groove')
         self.selectionfrm.grid(column=1, row=1, rowspan=2, sticky=W)
-        self.selectionfrm.columnconfigure(0, 
-                          minsize = self.labwidth + 2 * self.labborder)
-        self.selectionfrm.rowconfigure(0, 
-                          minsize = self.labheight + 2 * self.labborder)
         
-        self.selectionfrm.columnconfigure(1, minsize = self.sepwidth)
+        self.selectionfrm.columnconfigure(0, 
+                                   minsize=self.labwidth + 2*self.labborder)
+        self.selectionfrm.rowconfigure(0, 
+                                   minsize=self.labheight + 2*self.labborder)
+        self.selectionfrm.columnconfigure(1, minsize=self.sepwidth)
         self.selectionfrm.columnconfigure(2, 
-                                   minsize = self.labwidth + 2 * self.labborder)
+                                   minsize=self.labwidth + 2*self.labborder)
+        
         # Create a separator. On creation, it's not visible.
         # (It has the same color as selectionfrm background.)
         self.sep = Frame(self.selectionfrm, bg=self.bgcolor)
         self.sep.grid(column=1, row=0, sticky=N+S)
         
     def makeButtons(self):
+        """Create Select and Delete buttons."""
         self.caption = None
         
         # create select button
@@ -124,18 +143,21 @@ class ShapeSelectFrm(Frame):
         self.delBut.bind('<Leave>', self.onButLeave)
     
     def onButEnter(self, text):
+        """Call the after() method to show a button caption."""
         self.job = self.after(self.delay, lambda: self.showCaption(text))
     
     def onButLeave(self, event):
+        """Stop showing the button caption."""
         self.after_cancel(self.job)
         if self.caption: self.hideCaption()
     
     def showCaption(self, text):
+        """Create a toplevel window with a caption message."""
         self.caption = Toplevel()
         msg = Message(self.caption, 
-                text=text, 
-                width=self.msgWidth, 
-                bg=self.bgcolor)
+                      text=text, 
+                      width=self.msgWidth, 
+                      bg=self.bgcolor)
         msg.grid()
         
         # set hint font if not defined yet
@@ -145,6 +167,7 @@ class ShapeSelectFrm(Frame):
             self.captFont = font                    # caption font
         msg.config(font=self.captFont)
         
+        # position the window at the right bottom of mouse cursor
         x, y = self.winfo_pointerxy()
         xoffset = x + 10 # x + approx cursor size
         yoffset = y + 11 # y + approx cursor size
@@ -152,10 +175,12 @@ class ShapeSelectFrm(Frame):
         self.caption.overrideredirect(True)
     
     def hideCaption(self):
+        """Destroy the 'self.caption' window."""
         self.caption.destroy()
         self.caption = None  
     
     def onDelete(self):
+        """Delete the rightmost one of the selected shapes."""
         if self.var2.get() != 0:
             self.var2.set(0)
         elif self.var1.get() != 0:
@@ -163,12 +188,14 @@ class ShapeSelectFrm(Frame):
         self.redrawSelectionFrm()
     
     def openPopup(self):
+        """Open a popup window."""
         if self.popupWin:
             self.popupWin.deiconify()
         else:
             self.createPopup()
     
     def createPopup(self):
+        """Create a popup window for selecting a handshape."""
         # create a popup window
         self.popupWin = Toplevel(bg=self.popupBgColor)
         self.popupWin.title(self.title)
@@ -197,16 +224,18 @@ class ShapeSelectFrm(Frame):
         self.popupWin.rowconfigure(1, weight=1)
         
         self.makeLabels()
-        self.makePopupWinButtons() 
+        self.makePopupWinButtons()
         
         self.positionWindow()
         self.popupWin.resizable(False, False)
         
     def positionWindow(self):
-        """Position 'self.popupWin' window slightly to the left 
-        from the center of the main app window, so that the selected shapes 
-        in the main window are visible."""
+        """Position the 'self.popupWin' window.
         
+        Position 'self.popupWin' window slightly to the left 
+        from the center of the main app window, so that the selected shapes 
+        in the main window are visible.
+        """
         self.popupWin.update_idletasks()
         width = self.popupWin.winfo_reqwidth()
         height = self.popupWin.winfo_reqheight()
@@ -227,13 +256,12 @@ class ShapeSelectFrm(Frame):
     
     def getRoot(self):
         """Return the root application window object."""
-        
         # actshapes -> signfrm -> notebook -> root
         root = self.master.master.master
         return root
     
     def makePopupWinButtons(self):
-        # make Submit and Quit buttons in their own frame
+        """Create the Submit and Quit buttons in their own frame."""
         buttonsfrm = Frame(self.popupWin, bg=self.popupBgColor)
         buttonsfrm.grid(column=0, row=2, sticky=E)
         
@@ -264,6 +292,7 @@ class ShapeSelectFrm(Frame):
         closeButton['compound'] = LEFT
     
     def onSubmit(self):
+        """Update 'var1' and 'var2' variables and redraw 'selectionfrm'."""
         if self.var.get() != 0:
             selection = self.var.get()
             place1 = self.var1.get()
@@ -279,50 +308,54 @@ class ShapeSelectFrm(Frame):
                     self.var2.set(selection)     # set 2nd to current selection
             self.redrawSelectionFrm()
     
-    def redrawSelectionFrm(self):        
+    def redrawSelectionFrm(self):
+        """Update 'self.selectionfrm' frame."""     
         self.redrawSeparator()
         self.redrawPlace1()
         self.redrawPlace2()
         
-    def redrawPlace1(self):    
+    def redrawPlace1(self):
+        """Update 'self.sel1' label."""
         if self.var1.get() != 0:
             image = self.images[self.var1.get() - 1]    
             if self.sel1 != None: self.sel1.destroy()
             self.sel1 = Label(self.selectionfrm, 
-                        image=image, 
-                        borderwidth=0)
+                              image=image, 
+                              borderwidth=0)
             self.sel1.grid(column=0, 
-                     row=0,
-                     padx=self.labborder, 
-                     pady=self.labborder)            
+                           row=0,
+                           padx=self.labborder, 
+                           pady=self.labborder)            
         elif self.sel1 != None:
             self.sel1.destroy()
             self.sel1 = None
 
     def redrawSeparator(self):
+        """Update the color of the separator."""
         if self.var1.get() != 0:
             self.sep.configure(bg=self.sepcolor) # make the separator visible
         elif self.sel1 != None:
             self.sep.configure(bg=self.bgcolor)  # make the separator invisible
 
-    def redrawPlace2(self):                
+    def redrawPlace2(self):
+        """Update 'self.sel2' label."""
         if self.var2.get() != 0:
             image = self.images[self.var2.get() - 1]
             if self.sel2 != None: self.sel2.destroy()    
             self.sel2 = Label(self.selectionfrm, 
-                    image=image, 
-                    borderwidth=0)
+                              image=image, 
+                              borderwidth=0)
             self.sel2.grid(column=2, 
-                     row=0,
-                     padx=self.labborder, 
-                     pady=self.labborder)
+                           row=0,
+                           padx=self.labborder, 
+                           pady=self.labborder)
         else:
             if self.sel2 != None:
                 self.sel2.destroy()
                 self.sel2 = None                
         
     def makeLabels(self):
-    
+        """Fill the interior of 'self.scrollfrm' with labels."""
         # create the images if they are not created yet
         if self.images == []:
             for i in self.shapes:
@@ -366,8 +399,7 @@ class ShapeSelectFrm(Frame):
         self.createSeparators()
         
     def createSeparators(self):
-        """Create 'separators' (implemented as thin frames) between labels.""" 
-        
+        """Create 'separators' (implemented as thin frames) between labels."""  
         # create vertical separators between the labels
         for i in range(self.numcols - 1):
             sep = Frame(self.scrollfrm.interior, bg=self.sepcolor)
@@ -375,6 +407,7 @@ class ShapeSelectFrm(Frame):
                    row=0, 
                    rowspan=(len(self.shapes)//self.numcols)*2 + 1, # num of rows
                      sticky=N+S)
+        
         # create horizontal separators between the labels
         for i in range(len(self.shapes) // self.numcols): # number of full rows
             sep = Frame(self.scrollfrm.interior, bg=self.sepcolor)
@@ -384,6 +417,7 @@ class ShapeSelectFrm(Frame):
                      sticky=E+W)
         
     def onLabClick(self, i):
+        """Highlight the label in red."""
         # remove highlighting from the previously selected label
         if self.var.get() != 0:
             j = self.var.get() - 1
@@ -405,7 +439,7 @@ class ShapeSelectFrm(Frame):
         self.onSubmit()
                 
     def onLabEnter(self, i):
-        # highlight the label in blue
+        """Highlight the label in blue."""
         if self.var.get() != i+1:
             self.labels[i].config(highlightthickness=self.labborder, 
                               highlightbackground='LightBlue1')
@@ -414,7 +448,7 @@ class ShapeSelectFrm(Frame):
                                 padx=0, pady=0)
         
     def onLabLeave(self, i):
-        # remove the blue highlighting
+        """Remove the blue highlighting from the label."""
         if self.var.get() != i+1:
             self.labels[i].config(highlightthickness=0)
             self.labels[i].grid(column=(i % self.numcols) * 2, 
@@ -423,6 +457,7 @@ class ShapeSelectFrm(Frame):
                                 pady=self.labborder)
         
     def num(self, i):
+        """Convert (int) to (str) and if single digit, left-pad it with 0."""
         if i < 10: return '0' + str(i)
         return str(i)
     
@@ -432,7 +467,23 @@ class ShapeSelectFrm(Frame):
 
 
 class PassiveShapeSelectFrm(ShapeSelectFrm):
+    """A frame for selecting a handshape of the passive hand.
+    
+    The frame contains:
+    - 'self.selectionfrm' frame with one place where the selected handshape
+                          is displayed
+    - 'self.selectBut' - Select button that opens a popup window with
+                         an offer of handshapes
+    - 'self.delBut' - Delete button for deleting the handshape from selection
+    """
+    
     def __init__(self, parent, imgdir, **options):
+        """Initialize a PassiveShapeSelectFrm.
+        
+        Arguments:
+            parent: a parent tkinter widget
+            imgdir (str): a path to the directory with images
+        """
         super().__init__(parent, imgdir, **options)
          
         self.shapes = [1, 2, 4, 6, 9, 12, 13, 14, 16, 17, 23, 28, 41]
@@ -445,6 +496,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         pass
     
     def makeSelectionFrm(self):
+        """Create a frame where the selected shape is displayed."""
         selfrmwidth = self.labwidth + 2*self.labborder + 2*2 # 2*borderwidth
         selfrmheight = self.labheight + 2*self.labborder + 2*2 
            
@@ -457,27 +509,30 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         self.selectionfrm.grid(column=1, row=1,    # 0th row is empty
                                rowspan=2, 
                                sticky=W)
+                               
         self.selectionfrm.columnconfigure(0, 
-                          minsize = self.labwidth + 2 * self.labborder)
+                          minsize=self.labwidth + 2*self.labborder)
         self.selectionfrm.rowconfigure(0, 
-                          minsize = self.labheight + 2 * self.labborder)
+                          minsize=self.labheight + 2*self.labborder)
     
     def onSubmit(self):
+        """Update 'self.var1' variable and redraw 'self.selectionfrm'."""
         if self.var.get() != 0:
             self.var1.set(self.var.get())
             self.redrawSelectionFrm()
     
-    def redrawSelectionFrm(self):        
+    def redrawSelectionFrm(self):
+        """Update 'self.selectionfrm' frame."""
         self.redrawPlace1()
     
     def getRoot(self):
         """Return the root application window object."""
-        
         # passhapes -> radiofrm -> signfrm -> notebook -> root
         root = self.master.master.master.master
         return root
         
     def deactivate(self):
+        """Disable the buttons and darken the widgets."""
         self.selectBut.config(state='disabled')
         self.delBut.config(state='disabled')        
         
@@ -490,12 +545,8 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
                              sticky=N+E+S+W)
         
     def activate(self):
+        """Reset the buttons to normal state and remove the darkening layer."""
         self.selectBut.config(state='normal')
         self.delBut.config(state='normal')
         self.darkscreen.destroy()
-
-
-
-
-
 

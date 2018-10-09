@@ -17,36 +17,52 @@ from sign_input_frame import SignInputFrm
 
 class Dictionary():
     """A Czech Sign Language Dictionary application.
-            
-    Constants:
-    BORDER -- the main frame border
-    WIN_MIN_WIDTH -- minimal width of the main application window
-    WIN_MIN_HEIGHT -- minimal height of the main application window
-    TAB_PAD -- initial notebook's tab padding
-    BGCOLOR -- background color
+
+    A GUI application that serves as a bilingual dictionary for translating
+    expressions in both directions: to and from czech and czech sign language.
+    
+    A czech expression may be entered by typing into an entry or by 
+    selecting from a chosen category (or subcategory) of words.
+    If a sign language translation of the expression is found in the database,
+    a video with the sign is played. If there's more than one possible 
+    translation, all the possibilities are displayed in thumbnail videos.
+    
+    An expression in sign language is entered by specifying the sign's
+    components (handshapes, placement) and the sign type.
+    The application tries to find signs that correspond the best to the
+    components entered by the user. These signs are then displayed as thumbnail
+    videos. After clicking on them, the video with corresponding czech
+    translation is shown.
+    
+    The root application window (self.root) contains:
+    - the main frame (self.mainfrm) where the result of search is displayed,
+        and where there's also an entry for a czech expression input
+    - a notebook (self.notebook) that switches between:
+        - a frame (self.catfrm) for choosing a word from a category
+        - a frame (self.signfrm) where sign components may be entered
     """
 
-    BORDER = 38
-    WIN_MIN_WIDTH = 1012
-    WIN_MIN_HEIGHT = 670
-    TAB_PAD = 22
-    BGCOLOR = 'white'
+    BORDER = 38  # the main window border width
+    WIN_MIN_WIDTH = 1012  # minimal width of the main application window
+    WIN_MIN_HEIGHT = 670  # minimal height of the main application window
+    TAB_PAD = 22  # initial notebook's tab padding
+    BGCOLOR = 'white'  # background color
 
     def __init__(self, dbpath, vfdir, imgdir):
-        """Build the application window.
+        """Build the application.
         
         Arguments:
-        dbpath -- [str] the database file path
-        vfdir -- [str] path to the directory where video files 
-                 with translations to sign language are located
-        imgdir -- [str] path to the directory where images are located
+            dbpath (str): the database file path
+            vfdir (str): a path to the directory where video files with 
+                translations to sign language are located
+            imgdir (str): a path to the directory where images are located
         """
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.imgdir = imgdir
         
-        self.altsmax = 10  # maximum number of alternative options
-        self.canvasSize = (250, 250)
+        self.altsmax = 10  # number of alternatives showed when word not found
+        self.canvasSize = (250, 250)  # canvas for specifying sign placement
         
         # the SearchEngine object provides the logic behind the dictionary app
         self.searchEng = SearchEngine(self.dbpath, 
@@ -56,6 +72,8 @@ class Dictionary():
         self.makeWidgets()
         
     def makeWidgets(self):
+        """Build the app window with all its widgets and define a style."""
+        
         # build the application window
         self.root = Tk()
         self.root.title('Slovník českého znakového jazyka')

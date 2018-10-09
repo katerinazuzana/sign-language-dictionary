@@ -3,23 +3,21 @@ import tkinter.font as tkFont
 
 
 class AltsFrm(Frame):
-    """A frame where alternative options to the word given 
-    by the user are displayed. The AltsFrm object is to be displayed 
-    when the search for the word is not successfull.
-    Each option is displayed on its own Label.
+    """A frame displaying alternative options when the word was not found.
+    
+    When the czech expression from user input is not found in the database,
+    some alternative expressions are suggested to the user. The alternative
+    options are displayed in AltsFrm object, each option in its own label.
     """
    
     def __init__(self, parent, altoptions, searchfcn, **options):
-        """Create the labels with the options.
+        """Create a frame with an offer of options.
         
         Arguments:
-        altoptions -- a list of strings
-        searchfcn -- a function that does the search,
-                     takes one [str] argument
-        labbgcolor -- [str] background color of the labels
-        parent -- the parent tkinter widget
+            parent: the parent tkinter widget
+            altoptions: a list of (str) options
+            searchfcn: a function that does the search, takes a str argument
         """
-        
         super().__init__(parent, **options)
         self.altoptions = altoptions
         self.searchfcn = searchfcn
@@ -29,12 +27,15 @@ class AltsFrm(Frame):
         self.makeWidgets()
 
     def makeWidgets(self):
+        """Create the labels with alternative options."""
+        
         for i in range(len(self.altoptions)):
-            lab = Label(self, text=self.altoptions[i],
-                              height=1, 
-                              bg=self.labbgcolor,
-                              fg='red2',
-                              cursor='hand2')
+            lab = Label(self, 
+                        text=self.altoptions[i],
+                        height=1, 
+                        bg=self.labbgcolor,
+                        fg='red2',
+                        cursor='hand2')
             lab.grid(column=0, row=i, sticky=W, pady=0)
             
             if not self.labFont:

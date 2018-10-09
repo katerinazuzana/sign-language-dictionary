@@ -4,12 +4,21 @@ from autoscrollbar import AutoScrollbar
 
 
 class ScrolledFrame(Frame):
-    """A frame inside which is a canvas with scrollbars, inside which is an
-    inner frame.
-    """
+    """A frame that is either horizontally or vertically scrollable."""
 
     def __init__(self, parent, width, height, orient, border=False, **options):
+        """Create a frame with a scrolled canvas that has an inner frame.
         
+        The canvas can be scrolled using a scrollbar or by a mouse wheel.
+        
+        Arguments:
+            parent: a parent tkinter widget
+            width (int): a width of the visible canvas area
+            height (int): a height of the visible canvas area
+            orient (str): takes either 'horizontal' or 'vertical' value to
+                indicate the orientation of the scrollbar
+            border (bool): says whether there is a border around ScrolledFrame
+        """
         super().__init__(parent, **options)
         if border: self.configure(borderwidth=2, relief='groove')
         bgcolor = options.get('bg', self['bg'])
@@ -17,7 +26,7 @@ class ScrolledFrame(Frame):
         # make a canvas with vertical and horizontal scrollbars
         vsbar = AutoScrollbar(self, orient=VERTICAL)
         hsbar = ttk.Scrollbar(self, orient=HORIZONTAL) # AutoScrollbar doesn't
-                                                   # work here - wouldn't appear
+                                                 # work here - wouldn't appear
         canvas = Canvas(self, 
                         # visible area size: 
                         width=width, 
@@ -29,8 +38,7 @@ class ScrolledFrame(Frame):
         if orient == 'horizontal':
             self.rowconfigure(0, minsize=height)
             self.rowconfigure(1, minsize=40)  # to fit a scrollbar
-            canvas.config(xscrollcommand=hsbar.set)
-            canvas.grid(column=0, row=0, sticky=N+S+W, columnspan=3)
+            canvas.grid(column=0, row=0, sticky=N+S+W)
         
         else:   # vertical:
             canvas.config(yscrollcommand=vsbar.set)
@@ -87,19 +95,20 @@ class ScrolledFrame(Frame):
         
     def scrollLeft(self, event):
         """Scroll the canvas to the left if the mouse pointer is over it."""
-        if self.isMouseOverCanvas():        
+        if self.isMouseOverCanvas():
             self.canvas.xview_scroll(-1, 'units')
     
     def isMouseOverCanvas(self):
-        x0, x1, y0, y1 = self.getCanvasCoords()
+        """Return a bool saying whether the cursor is over the canvas."""
+        x0, y0, x1, y1 = self.getCanvasCoords()
         x, y = self.winfo_pointerxy()
         return x0 < x < x1 and y0 < y < y1
     
     def getCanvasCoords(self):
+        """Return a 4-tuple with canvas coords."""
         x0 = self.canvas.winfo_rootx()
-        x1 = x0 + self.canvas.winfo_width() 
         y0 = self.canvas.winfo_rooty()
+        x1 = x0 + self.canvas.winfo_width() 
         y1 = y0 + self.canvas.winfo_height()
-        return x0, x1, y0, y1
-        
+        return x0, y0, x1, y1
         

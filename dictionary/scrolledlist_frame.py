@@ -4,17 +4,15 @@ from autoscrollbar import AutoScrollbar
 
 
 class ScrolledList(Frame):
-    """A scrolled list displaying a list of words. When a word is 
-    double-clicked, the searchfcn is called on the choosen word.
-    """
+    """A scrolled list for displaying words."""
     
     def __init__(self, parent, searchfcn, height):
         """Create an empty scrolled list.
         
         Arguments:
-        parent -- the parent tkinter widget
-        searchfcn -- a function that takes a string as an argument
-        height -- [int] height of the scrolled list in lines
+            parent: a parent tkinter widget
+            searchfcn: a function that does the search, takes a (str) argument
+            height (int): height of the scrolled list in lines
         """
         super().__init__(parent)
         self.searchfcn = searchfcn
@@ -22,13 +20,12 @@ class ScrolledList(Frame):
         self.makeWidgets()
 
     def makeWidgets(self):
-        # create a scrollbar and a treeview
+        """Create a treeview with a scrollbar."""
         sbar = AutoScrollbar(self, orient=VERTICAL)
         treeview = ttk.Treeview(self,                                 
                                 height=self.height,  
                                 selectmode='browse', 
                                 show='tree')
-        # cross link them
         sbar.config(command=treeview.yview)    
         treeview.config(yscrollcommand=sbar.set)
         
@@ -42,16 +39,16 @@ class ScrolledList(Frame):
         self.treeview = treeview
 
     def handler(self, event):
-        """Fetch the selection text and call the search."""
+        """Fetch the selection text and start the search."""
         iid = self.treeview.selection()[0]
         selection = self.treeview.item(iid, option='text')
         self.searchfcn(selection)       
 
     def setOptions(self, options):
-        """Update the options of the scrolled list.
+        """Update the content of the scrolled list.
         
         Arguments:
-        options -- a list of strings
+            options: a list of strings
         """
         items = self.treeview.get_children()
         self.treeview.delete(*items)

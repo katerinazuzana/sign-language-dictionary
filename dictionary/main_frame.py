@@ -7,66 +7,66 @@ from scrolled_frame import ScrolledFrame
 
 
 class MainFrm(Frame):
-    """A frame where the results of searching are displayed.
+    """A frame where the search results are displayed.
     
-    The main frame consists of components:
-    'self.entfrm' -- a search entry frame for inserting the word 
-                     that will be translated to sign language
-    'self.lab' -- a label where the word that has been looked up 
-                  in the Dictionary is displayed
-    'self.videofrm' -- a large video frame where the translation
-                    to sign language is played
+    MainFrm consists of widgets:
+    'self.entfrm' -- a frame with an entry for inserting a word
+    'self.lab' -- a label where the word that has been looked up is displayed
+    'self.videofrm' -- a large video frame where a video with a sign is played
     'self.thumbfrm' -- a frame containing thumbnail video frames,
-                       the thumbnails are displayed when there is more
-                       than one possible translation to sign language
-    
-    Constants:
-    VIDEO_WIDTH -- width of the canvas where the main video is played
-    VIDEO_HEIGHT -- height of the canvas where the main video is played
-    THUMB_WIDTH -- width of the thumbnail videos
-    THUMB_HEIGHT -- height of the thumbnail videos
-    HIGHLIGHT_BORDER -- a highlight thickness of the thumbnail video
-                        that is currently being displayed in the large 
-                        video frame
-    THUMB_PADX -- horizontal spacing of the thumbnail videos
-    THUMB_PADY -- space between the main video and the thumbnails
-    SCROLLBAR_WIDTH -- the width of the scrollbar used in the frame with
-                       thumbnail videos
-    TOP_SPACE -- additional padding at the top of the frame
-    LAB_PADY -- space between the label and the main video frame widgets
-    LAB_FONT_SIZE -- font size of the label
+                       czech to czech sign language:
+                           the thumbnails are displayed when there is more
+                           than one possible translation to sign language
+                       czech sign language to czech:
+                           the signs that are closest to the user input sign
+                           are displayed as thumbnail videos 
     """
     
-    VIDEO_WIDTH = 540
-    VIDEO_HEIGHT = 310
-    THUMB_WIDTH = 160
-    THUMB_HEIGHT = 94
-    HIGHLIGHT_BORDER = 4
-    THUMB_PADX = 5
-    THUMB_PADY = 35
-    SCROLLBAR_WIDTH = 15
-    TOP_SPACE = 5
-    LAB_PADY = 20
-    LAB_FONT_SIZE = 20
+    VIDEO_WIDTH = 540  # width of the canvas where the main video is played
+    VIDEO_HEIGHT = 310  # height of the canvas where the main video is played
+    THUMB_WIDTH = 160  # width of the thumbnail videos
+    THUMB_HEIGHT = 94  # height of the thumbnail videos
+    HIGHLIGHT_BORDER = 4  # a highlight thickness of the thumbnail video
+                          # that is currently being displayed in the large 
+                          # video frame
+    THUMB_PADX = 5  # horizontal spacing of the thumbnail videos
+    THUMB_PADY = 35  # space between the main video and the thumbnails
+    SCROLLBAR_WIDTH = 15  # the width of the scrollbar used in the frame with
+                          # thumbnail videos
+    TOP_SPACE = 5  # additional padding at the top of the frame
+    LAB_PADY = 20  # space between the label and the main video frame widgets
+    LAB_FONT_SIZE = 20  # font size of the label
     
-    def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, 
-                 altsmax, border, **options):
+    def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, altsmax, 
+                 border, **options):
+        """Initialize a MainFrm object, create the widgets.
+        
+        Arguments:
+            parent: a parent tkinter widget
+            dbpath (str): the database file path
+            vfdir (str): a path to the directory with video files
+            imgdir (str): a path to the directory with images
+            searchfcn: function that looks up a word and its translation
+            altsmax (int): number of alternative words shown when the word
+                from the user is not found in the database
+            border (int): the main window border width
+        """
         super().__init__(parent, **options)
-
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.imgdir = imgdir
         self.searchfcn = searchfcn
+        
         self.thumbs = []   # a list of frames where thumbnail videos live
         self.altsfrm = None   # a frame where alternative options are displayed
                              # when the given word is not found in the database
         self.altsmax = altsmax
         self.BORDER = border
         self.bgcolor = options.get('bg', self['bg'])
-
         self.makeWidgets()
 
     def makeWidgets(self):
+        """Create the widgets."""
         self.columnconfigure(0, minsize=self.VIDEO_WIDTH)
         self.rowconfigure(0, weight=1)  # empty row
         self.rowconfigure(1, weight=4)
@@ -109,6 +109,7 @@ class MainFrm(Frame):
         self.createThumbFrm()
         
     def createThumbFrm(self):
+        """Create a frame for displaying thumbnail videos."""
         self.thumbfrm = ScrolledFrame(self, 
                                       # canvas size:
                                       width = self.VIDEO_WIDTH, 
@@ -128,11 +129,18 @@ class MainFrm(Frame):
                            pady=(self.THUMB_PADY, self.BORDER))
 
     def showResult(self, result):
+        """Show the first video in result in large, and possible other videos
+        in thumbnails.
+        
+        If there's no result found, show an offer of alternative words.
+        
+        Arguments:
+            result: a 2-tuple of form (boolean-flag, a-list) where a-list
+                contains items of form (word (str), video-file (str))
         """
-        """
-
-        successFlag, alist = result        
         self.deleteThumbnails()
+        
+        successFlag, alist = result
         if successFlag == True:
             # the word was found
             # or it was a sign search (that always returns successFlag = True)
@@ -148,16 +156,15 @@ class MainFrm(Frame):
             self.showNotFound(alist)
         
     def showVideoAndWord(self, word, videofile):
-        """Show the word on the label and play the corresponding video.
+        """Show 'word' on 'self.lab' label and play the corresponding video.
         
         Arguments:
-        word -- [string] the word to be displayed
-        videofile -- [string] name of the video file
+            word (str): the word to be displayed
+            videofile (str): name of the video file
         """
         self.labvar.set(word)
                
-        # if there is an alternative-options-frame currently being displayed,
-        # destroy it, and create a video-frame
+        # if there is an AltsFrm, create a VideoFrm instead of it
         if self.altsfrm is not None:
             self.altsfrm.destroy()
             self.altsfrm = None
@@ -169,12 +176,12 @@ class MainFrm(Frame):
         self.videofrm.play(video_source=videofile)
                                 
     def createThumbnails(self, find):
-        """Create the thumbnail videos.
+        """Create the thumbnail video frames.
         
         Arguments:
-        find -- [list] a list of 2-tuples (word, videofile) where
-                word -- [string] the word that is being translated
-                videofile -- [string] name of video file
+            find (list): a list of 2-tuples (word, videofile) where
+                word (str) is the word that is being translated
+                videofile (str) is name of video file
         """
         
         self.thumbfrm.rowconfigure(0, minsize = self.THUMB_HEIGHT + 
@@ -225,6 +232,7 @@ class MainFrm(Frame):
         self.videofrm.play(video_source=vf)
      
     def deleteThumbnails(self):
+        """Delete the thumbnail video frames."""
         for thumb in self.thumbs:
             thumb.destroy()
         self.thumbs = []
@@ -233,14 +241,12 @@ class MainFrm(Frame):
         self.createThumbFrm()
 
     def showNotFound(self, altoptions):
+        """Show a 'Not found' notification and possible alternatives."""
         if altoptions == []:
             self.labvar.set('Výraz nebyl nalezen')
         else:
             self.labvar.set('Výraz nebyl nalezen - nechtěli jste hledat:')
-            # destroy the video frame
             self.videofrm.destroy()
-            # if there is an alternative-options-frame currently 
-            # being displayed, destroy it
             if self.altsfrm is not None:
                 self.altsfrm.destroy()
         # create a frame with an offer of alternative options
@@ -251,16 +257,9 @@ class MainFrm(Frame):
         self.altsfrm.grid(column=0, row=3, sticky=N+E+S+W)
     
     def showEnterText(self):
+        """Prompt the user to enter an expression."""
         self.deleteThumbnails()
-        self.videofrm.destroy()
         if self.altsfrm is not None:
             self.altsfrm.destroy()
         self.labvar.set('Zadejte výraz, který chcete vyhledat')
-
-        
-
-
-
-
-
 

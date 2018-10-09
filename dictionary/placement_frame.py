@@ -6,7 +6,25 @@ import tools
 
 
 class PlacementFrm(Frame):
+    """A frame with a drawing canvas used to specify the sign placement.
+    
+    PlacementFrm contains widgets:
+    - a label with a title
+    - 'self.hintIcon' label that shows a window with instructions when 
+        pointed to by a mouse
+    - 'self.canvas' DrawingCanvas used to specify the sign placement
+    - 'delButton' button that deletes what was drawn on the canvas
+    - 'searchButton' button that starts a search for signs
+    """    
+    
     def __init__(self, parent, imgdir, canvasSize, **options):
+        """Set constants and create the widgets.
+        
+        Arguments:
+            parent: a parent tkinter widget
+            imgdir (str): a path to the directory with images
+            canvasSize (tuple): a 2-tuple with width and height of the canvas
+        """
         super().__init__(parent, **options)
         self.bgcolor = options.get('bg', self['bg'])
         
@@ -39,6 +57,7 @@ class PlacementFrm(Frame):
         self.makeWidgets()
         
     def makeWidgets(self):
+        """Create a title label, a hint icon, a drawing canvas, and buttons."""
         self.rowconfigure(1, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -84,7 +103,7 @@ class PlacementFrm(Frame):
         delButton.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
         delButton.bind('<Leave>', self.onButLeave)
         
-        # create search sign button
+        # create search button
         self.searchImg = tools.getImage(self.searchIconPath, 
                                         width=self.searchIconSize, 
                                         height=self.searchIconSize)
@@ -100,6 +119,7 @@ class PlacementFrm(Frame):
         searchButton.bind('<Leave>', self.onButLeave)
     
     def showHint(self, event):
+        """Create a toplevel window with a hint message."""
         self.hint = Toplevel()
         msg = Message(self.hint, 
                       text=self.hintText, 
@@ -120,14 +140,15 @@ class PlacementFrm(Frame):
         # that it doesn't streach beyond the right screen border: 
         if xoffset + width > self.winfo_screenwidth():
             xoffset = self.winfo_screenwidth() - width
-        
         self.hint.geometry('+{}+{}'.format(xoffset, yoffset))
         self.hint.overrideredirect(True)
     
     def hideHint(self, event):
+        """Destroy the 'self.hint' window."""
         self.hint.destroy()
         
     def onDelete(self):
+        """Delete the canvas items reset the canvas to its initial state."""
         self.canvas.delete(ALL)
         self.canvas.ellipse = None
         self.canvas.drawMode = True
@@ -136,24 +157,28 @@ class PlacementFrm(Frame):
         self.canvas.rotateMode = False
 
     def onButEnter(self, text):
+        """Call the after() method to show a button caption."""
         self.job = self.after(self.delay, lambda: self.showCaption(text))
     
     def onButLeave(self, event):
+        """Stop showing the button caption."""
         self.after_cancel(self.job)
         if self.caption: self.hideCaption()
     
     def showCaption(self, text):
+        """Create a toplevel window with a caption message."""
         self.caption = Toplevel()
         msg = Message(self.caption, 
-                text=text, 
-                width=self.msgWidth, 
-                bg=self.bgcolor)
+                      text=text, 
+                      width=self.msgWidth, 
+                      bg=self.bgcolor)
         msg.grid()
                 
         # set caption font if not defined yet
         if not self.captFont: self.setCaptFont(msg)
         msg.config(font=self.captFont)
         
+        # position the window at the right bottom of mouse cursor
         x, y = self.winfo_pointerxy()
         xoffset = x + 10 # x + approx cursor size
         yoffset = y + 11 # y + approx cursor size
@@ -161,10 +186,12 @@ class PlacementFrm(Frame):
         self.caption.overrideredirect(True)
     
     def hideCaption(self):
+        """Destroy the 'self.caption' window."""
         self.caption.destroy()
         self.caption = None 
 
     def setCaptFont(self, msg):
+        """Set the caption font to be the app font with a changed size."""
         font = tkFont.Font(font=msg['font'])  # the application's font
         font.configure(size=self.captFontSize)
         self.captFont = font                  # caption/hint font

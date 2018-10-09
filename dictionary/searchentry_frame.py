@@ -6,21 +6,15 @@ import tools
 
 
 class EntFrm(Frame):
-    """A frame with an entry and a search button.
-    
-    Used for entering the word to be searched in the Dictionary.
-    On creation, takes a search function as an argument so that it
-    can be called on Return/Search button press.
-    """
+    """A frame with an entry and a search button."""
     
     def __init__(self, parent, dbpath, imgdir, searchfcn, **options):
-        """Create the AutocompleteEntry and the Search button.
+        """Create an AutocompleteEntry and a Search button.
         
         Arguments:
-        parent -- the parent tkinter widget
-        dbpath -- [str] the database file path
-        searchfcn -- a function that does the search,
-                     takes one [str] argument
+            parent: a parent tkinter widget
+            dbpath (str): the database file path
+            searchfcn: function that does the search, takes one (str) argument
         """
         super().__init__(parent, **options)
         self.dbpath = dbpath
@@ -31,6 +25,7 @@ class EntFrm(Frame):
         self.makeWidgets()
 
     def makeWidgets(self):
+        """Create the widgets."""
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         
@@ -54,6 +49,10 @@ class EntFrm(Frame):
             cursor.execute('SELECT word FROM words')
             allwords = cursor.fetchall()
         entries = tools.listOfTuplesToList(allwords)
+        # The items of 'entries' will be used in AutocompleteEntry's listbox.
+        # In a listbox, there's no option of inner padding, hence
+        # to simmulate the padding on the left side, 
+        # add a space at the begining of each line.
         entries = tools.leftPadItems(entries)
         
         # create the autocomplete entry
@@ -69,7 +68,7 @@ class EntFrm(Frame):
         self.ent.config(style="Gray.TEntry")
 
     def startSearch(self, event=None):
-        """Hide the listbox, set focus on the entry and do the search."""
+        """Hide listbox and do the search if there's some text in the entry."""
         if self.var.get() in ('', self.defaultText):
             # the user didn't enter any text, prompt them to enter an expression
             self.master.showEnterText()
@@ -78,5 +77,4 @@ class EntFrm(Frame):
             self.ent.focus_set()
             self.ent.icursor(END)
             self.searchfcn(self.var.get())
-
 

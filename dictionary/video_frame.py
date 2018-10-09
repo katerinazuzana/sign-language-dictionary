@@ -1,9 +1,10 @@
 """video_frame module
 
 classes:
-VideoFrm -- a frame where a video is played
-MyVideoCapture -- capture a video source
+    VideoFrm: a frame where a video is played
+    MyVideoCapture: class capturing a video source
 """
+
 
 from tkinter import *
 import cv2
@@ -11,27 +12,24 @@ import PIL.Image, PIL.ImageTk
 
 
 class VideoFrm(Frame):
-    """A frame containing a Canvas tkinter widget for playing a video. 
-    A VideoFrm is used for both the large video frame and the thumbnail
-    videos.   
+    """A frame with a canvas widget for playing a video. 
+    
+    A VideoFrm is used for both the large video screen and the thumbnail
+    videos.
     """
    
-    def __init__(self, parent, width, height, thumb=False, 
-                 border=0, **options):
-        """Create the self.canvas widget.
+    def __init__(self, parent, width, height, thumb=False, border=0, **options):
+        """Initialize a VideoFrm object. Create a 'self.canvas' widget.
         
         Arguments:
-        parent -- the parent tkinter widget
-        width -- [int] the width of the canvas
-        height -- [int] the height of the canvas
-        Keyword arguments:
-        thumb -- [bool] a boolean flag indicating whether 
-                 the VideoFrm object is used 
-                 as the large video screen (thumb=False) 
-                 or as a thumbnail video (thumb=True)
-                 (default False)
-        border -- [int] a highlight thickness of the thumbnail video
-                  (default 0)
+            parent: the parent tkinter widget
+            width (int): the width of the canvas
+            height (int): the height of the canvas
+            thumb (bool): a boolean flag indicating whether the VideoFrm 
+                object is used as the large video screen (thumb=False), 
+                or as a thumbnail video (thumb=True), (default is False)
+            border (int): a highlight thickness of the thumbnail video
+                (default is 0)
         """
         super().__init__(parent, **options)
         self.thumb = thumb
@@ -55,16 +53,16 @@ class VideoFrm(Frame):
         """Start playing video from the video source.
         
         Arguments:
-        video_source -- [str] a path to the video file to be played
+            video_source (str): a path to the video file to be played
         """
         self.video = MyVideoCapture(video_source)
         self.update(video_source)
     
     def update(self, video_source):
-        """Get a frame from the video source and display it on self.canvas.
+        """Get a frame from the video source and display it on 'self.canvas'.
         
         After it is called once, the update method will be automatically
-        called every self.video.delay milliseconds until there are no frames
+        called every 'self.video.delay' milliseconds until there are no frames
         left in the video source.
         """
         ret, frame = self.video.getFrame()
@@ -97,7 +95,6 @@ class VideoFrm(Frame):
     
     def onVideoClick(self, video_source):
         """Replay the video."""
-        
         self.play(video_source)
         # unbind Button-1 event so that the video is replayed only 
         # on the first click
@@ -105,7 +102,6 @@ class VideoFrm(Frame):
     
     def lightOn(self):
         """Draw a highlighting border around the canvas."""
-        
         if not self.light:
             self.light = True
             self.canvas.config(highlightthickness=self.border, 
@@ -114,7 +110,6 @@ class VideoFrm(Frame):
     
     def lightOff(self):
         """Remove the highlighting border from around the canvas."""
-        
         if self.light:
             self.light = False
             self.canvas.config(highlightthickness=0)
@@ -125,7 +120,7 @@ class VideoFrm(Frame):
         """Display the first frame from the video source on self.canvas.
         
         Arguments:
-        video_source -- [str] a path to the video file
+            video_source (str): a path to the video file
         """
         vid = MyVideoCapture(video_source)
         ret, frame = vid.getFrame()                    
@@ -176,7 +171,7 @@ class VideoFrm(Frame):
     
 
 class MyVideoCapture:
-    """An object capturing a video source using an OpenCV VideoCapture."""
+    """A class capturing a video source using an OpenCV VideoCapture."""
     
     def __init__(self, video_source):
         # open the video source
@@ -202,5 +197,4 @@ class MyVideoCapture:
             else:
                 return (ret, None)
         return (False, None)
-
 

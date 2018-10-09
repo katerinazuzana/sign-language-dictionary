@@ -7,15 +7,30 @@ import tools
 
 
 class SearchEngine():
-
+    """A class that provides the logic behind the dictionary application.
+    
+    Methods:
+        search(lookupword):
+            Look up the word in the database. Call a fcn to display the result.
+        signSearch(userSign):
+            Search the database for signs similar to the sign from user input.
+    """
+    
     def __init__(self, dbpath, vfdir, altsmax, canvasSize):
+        """Initialize the attributes.
+        
+        Arguments:
+            dbpath (str): the database file path
+            vfdir (str): a path to the directory with video files
+            altsmax (int): maximum number of alternative words
+            canvasSize (tuple of ints) : size of DrawingCanvas, (width, height)
+        """
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.altsmax = altsmax
-        
         self.allwords = []
         
-        # a function that shows the result in the main frame (mainfrm), 
+        # a function that shows the result of the search in the main frame, 
         # the function is assigned in main.py after mainfrm is created
         self.showResultFcn = None
 
@@ -36,43 +51,41 @@ class SearchEngine():
                        40: 'VIII', 41: 'IX', 42: 'IX', 43: 'IX', 44: 'IX', 
                        45: 'IX', 46: 'IX', 47: 'IX', 48: 'X', 49: 'XI', 
                        50: 'XI', 51: 'XII'}
-                       # all the possible 51 hand shapes are divided into 
+                       # all the possible 51 handshapes are divided into 
                        # 12 groups of visually similar shapes (roman nums I-XII)
                        
         self.canvasWidth, self.canvasHeight = canvasSize
 
     def search(self, lookupword):
-        """Search for the given word in the database.        
-        Call a function to display the result.
+        """Look up the word in the database. Call a fcn to display the result.
+        
         Arguments:
-        lookupword -- [str] the word to be looked up
+            lookupword (str): the word to be looked up
         Returns:
-        None
+            None
         """
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT word, videofile FROM translation WHERE \
                             lower(word)=lower(?)', (lookupword,))
-            find = cursor.fetchall() # returns a list of tuples
+            find = cursor.fetchall()
         
         if find != []:
             # the word was found
-            find = self.addSuffixes(find)
-            # call fct to show the result            
+            find = self.addSuffixes(find)        
             self.showResultFcn((True, find))
                           
         else:
             # the word was not found
             # search the database for similar words
-            altoptions = self.findAltOpts(lookupword)       
-            # call fct to show the result            
+            altoptions = self.findAltOpts(lookupword)           
             self.showResultFcn((False, altoptions))
         
     def findVideoFile(self, videofile):
         """Return the full name of a video file, including suffix.
         
         Arguments:
-        videofile -- [str] name of a video file without suffix
+            videofile (str): name of a video file without suffix
         """
         for vf in self.vflist:
             if vf.startswith(videofile + '.'):
@@ -80,21 +93,31 @@ class SearchEngine():
                 return videosource
 
     def addSuffixes(self, alist):
-        """Find the full names (including suffix) of the video files
-        in a given list and rewrite the videofile names so that they 
+        """Add suffixes to the videofiles names in 'alist'.
+        
+        Find the full names (including suffix) of the video files
+        in 'alist' and rewrite the videofile names so that they 
         contain a suffix.
         
         Arguments:
-        alist [list] -- items take form (word [str], videofile [str])
-        """
-            
+            alist (list): items take form (word (str), videofile (str))
+        """     
         for i, (word, filename) in enumerate(alist):
             withsuffix = self.findVideoFile(filename)
             alist[i] = (word, withsuffix)
         return alist
 
     def findAltOpts(self, lookupword):
-        """Find words that have the longest common substrings with lookupword. 
+        """Search the database for words similar to 'lookupword'.
+        
+        Find words that have the longest common substrings with 'lookupword'. 
+        The maximum number of these words is given by 'self.altsmax'.
+        
+        Arguments:
+            lookupword (str)
+        
+        Returns:
+            list: a list of expressions (str) that are closest to 'lookupword'
         """
         if self.allwords == []:
             # on first call of findAltOpts()
@@ -109,6 +132,7 @@ class SearchEngine():
                         # substrings with the lookupword
         lengths = []    # lengths[i] is the length of the longest common
                         # substring of altopts[i] and the lookupword
+                        
         for word in self.allwords:
             match = SequenceMatcher(None, 
                                     lookupword, 
@@ -131,13 +155,12 @@ class SearchEngine():
                 del lengths[-1]
         return altopts
   
-    def signSearch(self, *userSign):
-        """Search the database for signs similar to the sign from the user 
-        input.
+    def signSearch(self, userSign):
+        """Search the database for signs similar to the sign from user input.
         
         Take a list of all the signs in the database, where each item of the
         list contains also information about the sign type and the sign
-        components - hand shapes and placement.
+        components - handhapes and placement.
         
         Go through all the database signs and for each of them calculate 
         an abstract distance between the sign provided by the user
@@ -154,7 +177,7 @@ class SearchEngine():
         Active Hand Shape dimension:
         There is a set of shapes from the user and a set of shapes from the 
         database. The more these two sets are similar, the shorter the distance
-        is. We distinguish the cases where the hand shapes are exactly the same 
+        is. We distinguish the cases where the handshapes are exactly the same 
         (leading to a shorter distance), and the cases where the shapes are
         similar, i.e. belong to the same group (leads to a longer distance).
         
@@ -179,16 +202,14 @@ class SearchEngine():
         the application's 'mainfrm' frame.
         
         Arguments:
-        *userSign -- a tuple that unpacks into:
-        uActiveShape [tuple of ints] -- describes the shape of the active hand
-        uSignType [str] -- a string describing the type of the sign, takes one
-                           of the values: 'single hand', 
-                                          'both the same', 
-                                          'passive hand'
-        uPassiveShape [int] -- a number describing the shape of the passive hand
-        uPlacement [tuple] -- a tuple of floats of the form 
-                              [centerx, centery, a , b, angle]
-                              describing the sign's placement
+            userSign: a tuple of:
+                uActiveShape (tuple of ints): describes the shape of the 
+                    active hand
+                uSignType (str): describes the type of the sign, takes one of
+                    the values: 'single hand', 'both the same', 'passive hand'
+                uPassiveShape (int): describes the shape of the passive hand
+                uPlacement (tuple of floats): describes the sign placement,
+                    takes the form of (centerx, centery, a , b, angle)
         """
         
         # unpack the user's sign input
@@ -266,7 +287,7 @@ class SearchEngine():
                 cursor.execute('SELECT word FROM translation WHERE \
                                videofile=?', (videofile,))
                 words = cursor.fetchall()
-            text = ', '.join(self.listOfTuplesToList(words))
+            text = ', '.join(tools.listOfTuplesToList(words))
             result[i] = (text, videofile)
         # add suffixes
         result = self.addSuffixes(result)
@@ -276,23 +297,18 @@ class SearchEngine():
         # show the result
         self.showResultFcn(res)
 
-
     def calcActDist(self, uShape, uGroups, dbShape, dbGroups):
-        """Calculate the distance between the uSign and the dbSign in the
+        """Calculate the distance between the user sign and the db sign in the
         Active Hand Shape dimension.
         
         Arguments:
-        uShape [set] -- a set of ints describing the shape of the active hand 
-                        of the user's sign
-        uGroups [set] -- a set of strings describing the hand shape groups 
-                         of the user's sign
-        dbShape [set] -- a set of ints describing the shape of the active hand 
-                        of the dbSign
-        dbGroups [set] -- a set of strings describing the hand shape groups 
-                         of the dbSign
+            uShape (set of ints): describes active hand shapes of user sign
+            uGroups (set of strs): describes the handshape groups of user sign
+            dbShape (set of ints): describes the active hand shape of db sign
+            dbGroups (set of strs): describes the handshape groups of db sign
         
         Returns:
-        a distance [float]
+            float: a distance
         """
     
         if dbActiveShape == uActiveShape:
@@ -315,19 +331,20 @@ class SearchEngine():
 
     def calcTypeDist(self, uSignType, uPassiveShape, 
                            dbSignType, dbPassiveShape):
-        """Calculate the distance between the uSign and the dbSign in the
+        """Calculate the distance between the user sign and the db sign in the
         Sign Type dimension.
         
         Arguments:
-        uSignType [str] -- one of 'single hand', 'both the same', 'passive hand'
-        uPassiveShape [int] -- a number describing the shape of the passive hand
-        dbSignType [str]-- one of 'single hand', 'both the same', 'passive hand'
-        dbPassiveShape [int]-- a number describing the shape of the passive hand
+            uSignType (str): the user's sign type, one of:
+                'single hand', 'both the same', 'passive hand'
+            uPassiveShape (int): describes passive hand shape of user's sign
+            dbSignType (str): the database sign type, one of:
+                'single hand', 'both the same', 'passive hand'
+            dbPassiveShape (int): describes pass. hand shape of database sign
         
         Returns:
-        a distance [float] 
+            float: a distance
         """
-        
         if dbSignType != uSignType:
             # different type
             typeDist = 1
@@ -346,23 +363,21 @@ class SearchEngine():
         return typeDist
 
     def calcPlaceDist(self, uRelief, uArea, dbPlacement):
-        """Calculate the distance between the uSign and the dbSign in the
+        """Calculate the distance between the user sign and the db sign in the
         Placement dimension.
         
         The distance is calculated as a ratio of the overlapping area (counted
         twice - once for each ellipse) to the total area of the ellipses.
         
         Arguments:
-        uRelief [function] -- fcn of canvas coords describing the user's ellipse
-        uArea [int] -- the area af the user's ellipse
-        dbPlacement [list] -- a list of floats of the form 
-                              [centerx, centery, a , b, angle]
-                              describing the dbSign's placement
+            uRelief: a function of canvas coords describing the user's ellipse
+            uArea (int): the area af the user's ellipse
+            dbPlacement (list ): a list of floats of the form 
+                [centerx, centery, a , b, angle] describing dbSign's placement
                               
         Returns:
-        a distance [float] 
+            float: a distance 
         """
-        
         # area of the db ellipse
         dbRelief = self.getReliefFcn(*dbPlacement)
         dbArea = self.integrateOverCanvas(dbRelief)
@@ -375,8 +390,7 @@ class SearchEngine():
         return placeDist
 
     def integrateOverCanvas(self, fcn):
-        """Integrate the function over the canvas area."""
-        
+        """Integrate the function over the canvas area.""" 
         integral = 0
         for x in range(self.canvasWidth):
             for y in range(self.canvasHeight):
@@ -387,17 +401,17 @@ class SearchEngine():
         """Return a function of canvas coords that describes an elliptic area.
         
         Arguments:
-        centerx [float] -- x coord of the elipse center
-        centery [float] -- y coord of the elipse center
-        a [float] -- major semi-axis length
-        b [float] -- minor semi-axis lenght
-        angle [float] -- angle of rotation of the ellipse
+            centerx (float): x coord of the elipse center
+            centery (float): y coord of the elipse center
+            a (float): major semi-axis length
+            b (float): minor semi-axis lenght
+            angle (float): angle of rotation of the ellipse
         
         Returns:
-        a function of two float args that returns 1 for points inside 
-        the elliptic area, and 0 for points outside of it:
-        f(x, y) = 1     for (x, y) inside the ellipse
-        f(x, y) = 0     for (x, y) outside the ellipse
+            a function of two float args that returns 1 for points inside 
+            the elliptic area, and 0 for points outside of it:
+                f(x, y) = 1     for (x, y) inside the ellipse
+                f(x, y) = 0     for (x, y) outside the ellipse
         """       
         
         def f(x, y):
@@ -419,10 +433,3 @@ class SearchEngine():
                 return 0
         return f
     
-        
-
-
-
-
-
-

@@ -10,7 +10,6 @@ class DrawingCanvas(Canvas):
     """
     
     def __init__(self, parent, **options):
-
         super().__init__(parent, **options)
         self.settings = {'width': 3,          # ellipse settings
                          'outline': 'red', 
@@ -49,23 +48,22 @@ class DrawingCanvas(Canvas):
     
     def onPress(self, event):
         """Remember the topleft corner of a rect. encapsulating the ellipse."""
-        
         if self.drawMode:
             self.topLeft = Vect(event)
     
     def onMotion(self, event):
-        """Draw an ellipse according the mouse movement."""
+        """Draw an ellipse according to the mouse movement."""
         if self.drawMode:
             # draw an ellipse
             if self.id: self.delete(self.id)
-            self.id = self.create_oval(self.topLeft.x, self.topLeft.y, 
+            self.id = self.create_oval(self.topLeft.x, 
+                                       self.topLeft.y, 
                                        event.x, event.y, 
                                        **self.settings, 
                                        tags='ellipse')
         
     def onRelease(self, event):
         """Create an Ellipse object and set the ellipse bindings."""
-    
         if self.drawMode: 
             # create an ellipse object
             bottomRight = Vect(event)
@@ -83,7 +81,6 @@ class DrawingCanvas(Canvas):
 
     def onDoubleClick(self, event):
         """On ellipse double-click, change the mode between scale and rotate."""
-
         if self.id in self.find_withtag(CURRENT):
             # if mouse is over the ellipse:  
             if self.scaleMode: self.switchToRotateMode()
@@ -91,15 +88,13 @@ class DrawingCanvas(Canvas):
 
     def switchToRotateMode(self):
         """Switch to rotate mode and redraw the marks accordingly."""
-    
         self.scaleMode = False               
         self.rotateMode = True
         self.delete('marks')
         self.drawMarks(mode='rotate')
 
     def switchToScaleMode(self):
-        """Switch to scale mode and redraw the marks accordingly."""
-        
+        """Switch to scale mode and redraw the marks accordingly."""   
         self.rotateMode = False               
         self.scaleMode = True
         self.delete('marks')
@@ -110,10 +105,9 @@ class DrawingCanvas(Canvas):
         set the corresponding bindings.
         
         Arguments:
-        mode [str] -- to diferentiate between scaling and rotating marks,
-                      takes a value of 'scale' or 'rotate'
+            mode (str): takes a value of 'scale' or 'rotate' to diferentiate 
+                between scaling and rotating marks
         """
-    
         if mode == 'scale':
             createFcn = self.create_rectangle
             settings = self.scMarkSettings
@@ -137,7 +131,7 @@ class DrawingCanvas(Canvas):
             if mode == 'scale':
                 # change the cursor shape when over the mark
                 def onEnter(mark):
-                    return lambda ev: self.config(cursor = 
+                    return lambda ev: self.config(cursor= 
                                                   self.scMarkCursors[mark])
                 self.tag_bind(markId, '<Enter>', onEnter(mark))
                 # on mark press start scaling of the ellipse
@@ -148,11 +142,11 @@ class DrawingCanvas(Canvas):
         if mode == 'rotate':
             # set the cursor shape over the rotation marks
             self.tag_bind('marks', '<Enter>', 
-                                   lambda ev: self.config(cursor = 'exchange'))
+                                   lambda ev: self.config(cursor='exchange'))
             # on mark press start rotation of the ellipse
             self.tag_bind('marks', '<ButtonPress-1>', self.startRotate)
             
-        self.tag_bind('marks', '<Leave>', lambda ev: self.config(cursor = ''))
+        self.tag_bind('marks', '<Leave>', lambda ev: self.config(cursor=''))
     
     def calcShapesDict(self):
         """Calculate the dictionary with cursor shapes according to 
@@ -183,15 +177,12 @@ class DrawingCanvas(Canvas):
     
     def startMove(self, event):
         """Remember the start point and set bindings to move the ellipse."""
-    
         self.startPoint = Vect(event)
         self.bind('<B1-Motion>', self.doMove)
         self.bind('<ButtonRelease-1>', self.stopMove)
     
     def doMove(self, event):
         """Recalculate the ellipse parameters and redraw the items on canvas."""
-
-        # update the parameters of the ellipse
         endPoint = Vect(event)
         shift = endPoint - self.startPoint
         self.ellipse.recalcCornersOnMove(shift)
@@ -202,14 +193,13 @@ class DrawingCanvas(Canvas):
     
     def stopMove(self, event):
         """Reset the bindings to state before moving the ellipse."""
-        
         self.bind('<B1-Motion>', self.onMotion)
         self.bind('<ButtonRelease-1>', self.onRelease)
             
     def startScale(self, event, mark):
         """Remember the start point and the mark that is being dragged. 
-        Set the bindings."""
-        
+        Set the bindings.
+        """
         self.startPoint = Vect(event)
         self.movingMark = mark
         
@@ -223,8 +213,6 @@ class DrawingCanvas(Canvas):
     
     def doScale(self, event):
         """Recalculate the ellipse parameters and redraw the items on canvas."""
-        
-        # update the parameters of the ellipse
         endPoint = Vect(event)
         mouseMove = endPoint - self.startPoint
         self.ellipse.recalcCornersOnScale(mouseMove, self.movingMark)
@@ -235,18 +223,16 @@ class DrawingCanvas(Canvas):
     
     def stopScale(self, event):
         """Reset cursor shape and bindings to state before scaling."""
-
         # reset the cursor shape
-        self.config(cursor = '')
+        self.config(cursor='')
         self.tag_bind(self.markIds[self.movingMark], '<Leave>', 
-                      lambda ev: self.config(cursor = ''))
+                      lambda ev: self.config(cursor=''))
         # set the bindings to the initial ones
         self.bind('<B1-Motion>', self.onMotion)
         self.bind('<ButtonRelease-1>', self.onRelease)
     
     def startRotate(self, event):
-        """Remember the start point and set the bindings."""
-        
+        """Remember the start point and set the bindings."""    
         self.startPoint = Vect(event)
         
         # make the cursor keep the same shape during the rotation
@@ -259,7 +245,6 @@ class DrawingCanvas(Canvas):
     
     def doRotate(self, event):
         """Recalculate the ellipse parameters and redraw the items on canvas."""
-        
         # calculate the angle difference
         startAngle = self.startPoint.getAngle(self.ellipse.center)
         endAngle = Vect(event).getAngle(self.ellipse.center)
@@ -274,9 +259,8 @@ class DrawingCanvas(Canvas):
     
     def stopRotate(self, event):
         """Reset cursor shape and bindings to state before rotation."""
-
         # reset the cursor shape
-        self.config(cursor = '')
+        self.config(cursor='')
         self.tag_bind('marks', '<Leave>', lambda ev: self.config(cursor=''))
         # set the bindings to the initial ones
         self.bind('<B1-Motion>', self.onMotion)
@@ -288,7 +272,6 @@ class DrawingCanvas(Canvas):
         If the angle of the ellipse rotation is zero (i.e. the ellipse 
         is horizontal) draw it as an oval, otherwise draw it as a polygon.
         """
-        
         # redraw the ellipse
         self.delete(self.id)
         if self.ellipse.angle == 0:
@@ -313,14 +296,13 @@ class DrawingCanvas(Canvas):
         self.drawMarks(mode=mode)
     
     def getPolygonPoints(self, steps=100):
-        """Get the coordinates of points placed around the ellipse border.
+        """Get coordinates of points placed around the ellipse border.
         
-        Keyword arguments:
-        steps [int] -- the number of points, default 100
+        Arguments:
+            steps (int): the number of points (default 100)
         Returns:
-        a tuple of points' coords: (x0, y0, x1, y1, ...)
+            a tuple of points' coords: (x0, y0, x1, y1, ...)
         """
-        
         points = []
         for i in range(steps):
             # the angle for this step
@@ -333,22 +315,21 @@ class DrawingCanvas(Canvas):
         return tuple(points)    
     
 
-
 class Ellipse():
     """A class that keeps track of the parameters defining position and 
     size of an ellipse, as well as positions of the scale/rotate marks.
     
     Attributes:
-    topLeft [Vect] -- top left point of the rectangle encapsulating the ellipse
-    bottomRight [Vect] -- bottom right point of the rectangle
-    angle [float] -- angle of rotation of the ellipse (its major axis)
-                     in the (x, y) coord system of the canvas;
-                     takes values from interval [0, 2 pi)
-    center [Vect] -- the center of the ellipse
-    a [Vect] -- major semi-axis
-    b [Vect] -- minor semi-axis
-    markCoords [dict] -- a dictionary of form {mark-name: mark-position} where:
-                         mark-name [str], mark-position [Vect]
+        topLeft (Vect): top left point of rectangle encapsulating the ellipse
+        bottomRight (Vect): bottom right point of the rectangle
+        angle (float): angle of rotation of the ellipse (its major axis)
+            in the (x, y) coord system of the canvas; 
+            takes values from interval [0, 2 pi)
+        center (Vect): the center of the ellipse
+        a (Vect): major semi-axis
+        b (Vect): minor semi-axis
+        markCoords (dict): a dictionary of form {mark-name: mark-position}
+            where: mark-name (str), mark-position (Vect)
     """
     
     def __init__(self, topLeft, bottomRight):
@@ -358,22 +339,20 @@ class Ellipse():
         axis parallel to the x-axis of the canvas).
         
         Arguments:
-        topLeft [Vect] -- top left point of the rectangle encapsulating
-                          the ellipse
-        bottomRight [Vect] -- bottom right point of the rectangle encapsulating
-                              the ellipse
+            topLeft (Vect): top left point of rect. encapsulating the ellipse
+            bottomRight (Vect): bottom right point of the rectangle
         """
     
         self.topLeft = topLeft
         self.bottomRight = bottomRight
         self.angle = 0
         self.markCoords = {}
+        
         # calculate initial values of parameters and positions of marks
         self.calcMarkCoords()
     
     def calcMarkCoords(self):
         """Calculate the coords of the scaling/rotating marks."""
-        
         self.calcParams()
         self.markCoords['r']  = self.center + self.a
         self.markCoords['tr'] = self.center + self.a - self.b
@@ -390,7 +369,6 @@ class Ellipse():
         Calculate the 'center', 'a', and 'b' parameters 
         from 'topLeft', 'bottomRight', and 'angle'.
         """
-        
         self.center = (self.topLeft + self.bottomRight) / 2
         ab = self.bottomRight - self.center # ab = self.a + self.b
         
@@ -406,9 +384,8 @@ class Ellipse():
         when the ellipse has been moved.
         
         Arguments:
-        shift [Vect] -- a vector by which the ellipse has been moved
+            shift (Vect): a vector by which the ellipse has been moved
         """
-
         self.topLeft += shift
         self.bottomRight += shift
         
@@ -417,8 +394,8 @@ class Ellipse():
         when the ellipse has been scaled.
         
         Arguments:
-        mouseMove [Vect] -- a vector by which the mouse cursor has been moved
-        movingMark [str] -- name of the mark that has beed dragged
+            mouseMove (Vect): a vector by which the mouse cursor has been moved
+            movingMark (str): name of the mark that has beed dragged
         """
         
         # movement parallel to the major axis                
@@ -450,38 +427,37 @@ class Ellipse():
         when the ellipse has been rotated.
         
         Arguments:
-        diffAngle [float] -- angle by which the ellipse has been rotated
+            diffAngle (float): angle by which the ellipse has been rotated
         """
-        
         self.angle = (self.angle + diffAngle) % (2 * math.pi)
         self.topLeft = self.topLeft.rotate(diffAngle, self.center)
         self.bottomRight = self.bottomRight.rotate(diffAngle, self.center)  
 
     def __str__(self):
-        return 'Ellipse: center = {}, a = {}, b = {}, angle = {}'\
-               .format(self.center, self.a, self.b, self.angle)
-
+        return 'Ellipse: center = {}, a = {}, b = {}, angle = {}'.format(
+                self.center, self.a, self.b, self.angle)
 
 
 class Vect():
-    """Class representing a vector in 2D plane.
+    """A class representing a vector in 2D plane.
     
     A vector may be regarded as representing a point in plane as well. 
     (the point = endpoint of the vector)
     
     Attributes:
-    x [float] -- x coordinate
-    y [float] -- y coordinate
+        x (float): x coordinate
+        y (float): y coordinate
     """
     
     def __init__(self, *args):
         """Initialize a Vect object.
         
-        May be passed: 
-        one argument - i.e. an object that has some 'x' and 'y' attributes
-        or two arguments - i.e. the x and y coords
+        Arguments:
+            *args: may be either 
+                one argument - i.e. an object that has some
+                               'x' and 'y' attributes
+                or two arguments - i.e. the x and y coords
         """
-        
         assert len(args) in (1, 2), \
                "Can't initialize a Vect with {}".format(args)
         
@@ -495,20 +471,20 @@ class Vect():
             self.y = y
     
     def __add__(self, other):
-        """Add: self + other.
+        """Add 'self' and 'other'.
          
-        'other' might be of type Vect, 2-tuple"""
-        
+        'other' might be of type Vect, 2-tuple.
+        """
         try:
             return Vect(self.x + other.x, self.y + other.y)
         except AttributeError:
             return self + Vect(*other)
 
     def __sub__(self, other):
-        """Subtract: self - other.
+        """Subtract 'other' from 'self'.
         
-        'other' might be of type Vect, 2-tuple"""
-        
+        'other' might be of type Vect, 2-tuple.
+        """
         try:
             return Vect(self.x - other.x, self.y - other.y)
         except AttributeError:
@@ -549,7 +525,7 @@ class Vect():
         """Othogonal projection of 'self' into the direction of 'vect'.
         
         Arguments:
-        vect [Vect] 
+            vect (Vect) 
         """
         unitVect = vect / abs(vect)
         scalProduct = self.scalProd(unitVect)
@@ -566,12 +542,10 @@ class Vect():
         around a given center.
         
         Arguments:
-        alpha [float] - angle in radians
-        Keyword arguments:
-        center [Vect] - the axis of rotation, default None 
-                        if not provided, the axis defaults to Vect(0, 0)
+            alpha (float): angle in radians
+            center (Vect): the axis of rotation (default is None),
+                if not provided, the axis eventually defaults to Vect(0, 0)
         """
-        
         if not center: center = Vect(0, 0) 
         cSelf = complex(self)
         cCenter = complex(center)
@@ -580,6 +554,3 @@ class Vect():
         cRotatedPoint = phaseFactor * (cSelf - cCenter) + cCenter
         return Vect(cRotatedPoint.real, cRotatedPoint.imag)
 
-
-
-        

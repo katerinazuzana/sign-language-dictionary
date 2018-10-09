@@ -9,26 +9,22 @@ class CatFrm(Frame):
     """A frame where a word for translation might be selected from 
     a category or a subcategory of words.
     
-    Contains:
-    a category-combobox for choosing a category,
-    a subcategory-combobox for choosing a corresponding subcategory,
-    a scrolledlist displaying the words from the choosen (sub)category.
+    Contains widgets:
+    'self.catcb' combobox for choosing a category,
+    'self.subcatcb' combobox for choosing one of the category's subcategories,
+    'self.scrolledlist' displaying the words from the choosen (sub)category.
         
-    The user selects the word to be translated from the scrolled list.
-    On creation, a CatFrm instance takes a search function as an argument
-    so that it can be called when a word is selected.
+    The user selects the word to be translated from the scrolled list, then 
+    a function is called to find and display the sign language translation.
     """
     
     def __init__(self, parent, dbpath, searchfcn, **options):
-        """Create a category selection combobox 'self.catcb',
-                  a subcategory selection combobox 'self.subcacb' and
-                  a 'self.scrolledlist'.
+        """Create the frame with the comboboxes and the scrolled list.
         
         Arguments:
-        parent -- the parent tkinter widget 
-        dbpath -- [str] the database file path
-        searchfcn -- a function that does the search,
-                     takes one [str] argument
+            parent: the parent tkinter widget 
+            dbpath (str): the database file path
+            searchfcn: function that does the search, takes one (str) argument
         """
         super().__init__(parent, **options)
         self.dbpath = dbpath
@@ -39,7 +35,10 @@ class CatFrm(Frame):
         self.topSpace = 10   # additional padding at the top of the frame
         self.makeWidgets()
        
-    def makeWidgets(self):    
+    def makeWidgets(self):
+        """Create a combobox for choosing a category, a combobox for choosing
+        a subcategory, and a scrolled list for choosing a word.
+        """
         self.columnconfigure(0, weight=1)  # empty column
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=2)  # empty column
@@ -90,15 +89,15 @@ class CatFrm(Frame):
     
     def findCats(self):
         """Look up available categories in the database and return
-        a list of options for the category combobox."""
-        
+        a list of options for the category combobox.
+        """
         SQLquery = 'SELECT DISTINCT upperlevel FROM cathierarchy'
         return self.findCboxItems(SQLquery)
     
     def findSubcats(self):
         """Find subcategories corresponding to the selected category 
-        and return a list of options for the subcategory combobox."""
-        
+        and return a list of options for the subcategory combobox.
+        """
         cat = self.catvar.get().lstrip()
         SQLquery = 'SELECT lowerlevel FROM cathierarchy WHERE \
                         upperlevel="{}"'.format(cat)
@@ -106,12 +105,13 @@ class CatFrm(Frame):
     
     def findCboxItems(self, SQLquery):
         """Return a list of options for a combobox."""
-        
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
             cursor.execute(SQLquery)
             find = cursor.fetchall()
         find = tools.listOfTuplesToList(find)
+        # the inner padding in a combobox doesn't work, to simmulate the
+        # padding on the left side, add a space at the begining of each line
         return tools.leftPadItems(find)
     
     def catHandler(self, event):
@@ -149,13 +149,15 @@ class CatFrm(Frame):
         return self.mySort(find)
 
     def subcatHandler(self, event):
-        """Update the options in the scrolledlist to the words
-        of the selectected subcategory."""
+        """Update the options in the scrolled list to the words
+        of the selectected subcategory.
+        """
         self.subcatcb.selection_clear() # remove highlighting from the combobox
         wordlist = self.findWords(self.subcatvar)
         self.scrolledlist.setOptions(wordlist)
         
     def mySort(self, alist):
+        """Sort a list alphabetically, items starting with a number go last."""
         return sorted(alist, key = lambda x: (x[0].isdigit(), x.lower()))
                 
 
