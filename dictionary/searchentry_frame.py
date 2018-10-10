@@ -19,9 +19,10 @@ class EntFrm(Frame):
         super().__init__(parent, **options)
         self.dbpath = dbpath
         self.searchfcn = searchfcn
+        self.bgcolor = options.get('bg', self['bg'])
         self.defaultText = 'Zadejte výraz'
         self.iconPath = os.path.join(imgdir, 'search_icon.png')
-        self.iconSize = 30
+        self.iconSize = 22
         self.makeWidgets()
 
     def makeWidgets(self):
@@ -30,17 +31,21 @@ class EntFrm(Frame):
         self.rowconfigure(0, weight=1)
         
         # create the search button
-        bfrm = Frame(self, height=30, width=60)
+        bfrm = Frame(self, height=27, width=50)
         bfrm.grid_propagate(0)  # size of child doesn't affect size of parent
         bfrm.grid(column=1, row=0, sticky=N)
         bfrm.rowconfigure(0, weight=1)
+        bfrm.columnconfigure(0, weight=1)
         
         self.iconImg = tools.getImage(self.iconPath, 
                                       width=self.iconSize, 
                                       height=self.iconSize)
         Button(bfrm, 
                image=self.iconImg,
-               command=self.startSearch
+               command=self.startSearch, 
+               bg=self.bgcolor, 
+               activebackground='ghost white', 
+               borderwidth=0
                ).grid(column=0, row=0, sticky=N+E+S+W)
         
         # create a list of all the words contained in the database

@@ -415,8 +415,8 @@ class SearchEngine():
         """       
         
         def f(x, y):
-            center = Point(centerx, centery)
-            point = Point(x, y)
+            center = Vect(centerx, centery)
+            point = Vect(x, y)
             # angle coord of the point with respect to the ellipse center:
             phi = point.getAngle(center)
             # radial coord of the point with respect to the ellipse center:

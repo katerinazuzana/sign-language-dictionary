@@ -13,7 +13,7 @@ class ShapeSelectFrm(Frame):
     - a label with a title
     - 'self.selectionfrm' frame with two places where the selected handshapes
                           are displayed
-    - 'self.selectBut' - Select button that opens a popup window with
+    - 'self.addBut' - Add button that opens a popup window with
                          an offer of handshapes
     - 'self.delBut' - Delete button for deleting a handshape from selection
     """
@@ -30,9 +30,10 @@ class ShapeSelectFrm(Frame):
         self.bgcolor = options.get('bg', self['bg'])
         self.labPady = 3   # title label y-padding
         
-        self.selectIconPath = os.path.join(imgdir, 'select_icon.png')
+        self.addIconPath = os.path.join(imgdir, 'add_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
-        self.iconSize = 30
+        self.iconSize = 28#
+        self.butSize = 35
         self.butPadx = 20    # Select and Delete buttons x-padding
         self.delay = 1000 # how long to wait before button description shows up
         self.captFont = None
@@ -41,7 +42,7 @@ class ShapeSelectFrm(Frame):
         
         self.submitIconPath = os.path.join(imgdir, 'submit_icon.png')
         self.closeIconPath = os.path.join(imgdir, 'close_icon.png')
-        self.popupWinIconSize = 20
+        self.popupWinIconSize = 15
         
         self.labwidth = 65
         self.labheight = 80
@@ -113,33 +114,45 @@ class ShapeSelectFrm(Frame):
         self.sep.grid(column=1, row=0, sticky=N+S)
         
     def makeButtons(self):
-        """Create Select and Delete buttons."""
+        """Create Add and Delete buttons."""
         self.caption = None
         
-        # create select button
-        self.selectImg = tools.getImage(self.selectIconPath, 
-                                        width=self.iconSize, 
-                                        height=self.iconSize)
-        self.selectBut = Button(self, 
-                                image=self.selectImg, 
-                                command=self.openPopup)
-        self.selectBut.grid(column=2, row=1, sticky=W, padx=self.butPadx)
+        # create Add button
+        self.addImg = tools.getImage(self.addIconPath, 
+                                     width=self.iconSize, 
+                                     height=self.iconSize)
+        self.addBut = Button(self, 
+                             image=self.addImg, 
+                             command=self.openPopup, 
+                             width=self.butSize, 
+                             height=self.butSize, 
+                             bg=self.bgcolor, 
+                             activebackground=self.bgcolor, 
+                             borderwidth=0, 
+                             highlightthickness=0)
+        self.addBut.grid(column=2, row=1, sticky=W+S, padx=self.butPadx)
         
         # when mouse is over the button for a while, show a caption
-        self.selectBut.bind('<Enter>', lambda ev: self.onButEnter('Vybrat'))
-        self.selectBut.bind('<Leave>', self.onButLeave)
+        self.addBut.bind('<Enter>', lambda ev: self.onButEnter('Přidat'))
+        self.addBut.bind('<Leave>', self.onButLeave)
         
-        # create delete button
+        # create Delete button
         self.delImg = tools.getImage(self.delIconPath, 
                                      width=self.iconSize, 
                                      height=self.iconSize)
         self.delBut = Button(self, 
                              image=self.delImg, 
-                             command=self.onDelete)      
-        self.delBut.grid(column=2, row=2, sticky=W, padx=self.butPadx)
+                             command=self.onDelete, 
+                             width=self.butSize, 
+                             height=self.butSize, 
+                             bg=self.bgcolor, 
+                             activebackground=self.bgcolor, 
+                             borderwidth=0, 
+                             highlightthickness=0)
+        self.delBut.grid(column=2, row=2, sticky=W+N, padx=self.butPadx)
         
         # when mouse is over the button for a while, show a caption
-        self.delBut.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
+        self.delBut.bind('<Enter>', lambda ev: self.onButEnter('Odstranit'))
         self.delBut.bind('<Leave>', self.onButLeave)
     
     def onButEnter(self, text):
@@ -270,7 +283,7 @@ class ShapeSelectFrm(Frame):
                                         width=self.popupWinIconSize, 
                                         height=self.popupWinIconSize)
         submitButton = ttk.Button(buttonsfrm, 
-                                  text='Použít', 
+                                  text=' Použít', 
                                   image=self.submitImg, 
                                   command=self.onSubmit)
         submitButton.grid(column=0, row=0, 
@@ -283,7 +296,7 @@ class ShapeSelectFrm(Frame):
                                        width=self.popupWinIconSize, 
                                        height=self.popupWinIconSize)
         closeButton = ttk.Button(buttonsfrm, 
-                                 text='Zavřít', 
+                                 text=' Zavřít', 
                                  image=self.closeImg, 
                                  command=self.onPopupClose)
         closeButton.grid(column=1, row=0, 
@@ -472,7 +485,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
     The frame contains:
     - 'self.selectionfrm' frame with one place where the selected handshape
                           is displayed
-    - 'self.selectBut' - Select button that opens a popup window with
+    - 'self.addBut' - Add button that opens a popup window with
                          an offer of handshapes
     - 'self.delBut' - Delete button for deleting the handshape from selection
     """
@@ -533,7 +546,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         
     def deactivate(self):
         """Disable the buttons and darken the widgets."""
-        self.selectBut.config(state='disabled')
+        self.addBut.config(state='disabled')
         self.delBut.config(state='disabled')        
         
         self.darkscreen = Label(self.selectionfrm, 
@@ -546,7 +559,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         
     def activate(self):
         """Reset the buttons to normal state and remove the darkening layer."""
-        self.selectBut.config(state='normal')
+        self.addBut.config(state='normal')
         self.delBut.config(state='normal')
         self.darkscreen.destroy()
 

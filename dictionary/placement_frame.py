@@ -29,17 +29,20 @@ class PlacementFrm(Frame):
         self.bgcolor = options.get('bg', self['bg'])
         
         self.hintIconPath = os.path.join(imgdir, 'hint_icon.png')
-        self.hintSize = 14
+        self.hintSize = 20
         self.hintText = 'Klepnutím a tažením nakreslete elipsu,'+\
                        ' která bude vyznačovat umístění znaku.'+\
                        ' Elipsu lze myší přesouvat.'+\
                        ' Po dvojkliku na elipsu je možné měnit její velikost.'+\
                        ' Po dalším dvojkliku lze elipsou otáčet.'
         
-        self.delIconPath = os.path.join(imgdir, 'del_icon.png')
-        self.delIconSize = 30
+        self.delIconPath = os.path.join(imgdir, 'del_draw.png')
+        self.delIconSize = 28#
+        self.delButSize = 35
         self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
-        self.searchIconSize = 40
+        self.searchIconSize = 30
+        self.searchButWidth = 52
+        self.searchButHeight = 35
         
         self.delay = 1000 # how long to wait before button description shows up
         self.caption = None
@@ -49,8 +52,9 @@ class PlacementFrm(Frame):
         
         self.labPady = 3
         self.hintPadx = 8
-        self.butPadx = 15
-        self.butVertSpace = 8 # vertical space between Delete and Search buttons
+        self.delButPadx = 15
+        self.searchButPadx = 5
+        self.butVertSpace = 5 # vertical space between Delete and Search buttons
         
         self.canvasBorder = 2
         self.canvasWidth, self.canvasHeight = canvasSize
@@ -73,9 +77,9 @@ class PlacementFrm(Frame):
         self.icon = tools.getImage(self.hintIconPath, 
                                    width=self.hintSize, 
                                    height=self.hintSize)
-        self.hintIcon = Label(self, image=self.icon)
+        self.hintIcon = Label(self, image=self.icon, bg=self.bgcolor)
         self.hintIcon.grid(column=1, row=0, 
-                           sticky=W, 
+                           sticky=N+W, 
                            padx=(self.hintPadx, 0))
         # when mouse is over the icon, show the hintText
         self.hintIcon.bind('<Enter>', self.showHint)
@@ -91,16 +95,22 @@ class PlacementFrm(Frame):
         
         # create delete button
         self.delImg = tools.getImage(self.delIconPath, 
-                                       width=self.delIconSize, 
-                                       height=self.delIconSize)
+                                     width=self.delIconSize, 
+                                     height=self.delIconSize)
         delButton = Button(self, 
                            image=self.delImg, 
-                           command=self.onDelete)
+                           command=self.onDelete, 
+                           width=self.delButSize, 
+                           height=self.delButSize, 
+                           bg=self.bgcolor, 
+                           activebackground=self.bgcolor, 
+                           borderwidth=0, 
+                           highlightthickness=0)
         delButton.grid(column=2, row=1, 
                        sticky=S+W, 
-                       padx=(self.butPadx, 0))       
+                       padx=(self.delButPadx, 0))
         # when mouse is over the button for a while, show a caption
-        delButton.bind('<Enter>', lambda ev: self.onButEnter('Zrušit'))
+        delButton.bind('<Enter>', lambda ev: self.onButEnter('Smazat'))
         delButton.bind('<Leave>', self.onButLeave)
         
         # create search button
@@ -109,10 +119,17 @@ class PlacementFrm(Frame):
                                         height=self.searchIconSize)
         searchButton = Button(self, 
                               image=self.searchImg, 
-                              command=self.master.onSearchPress)
+                              command=self.master.onSearchPress, 
+                              width=self.searchButWidth,
+                              height=self.searchButHeight, 
+                              bg=self.bgcolor, 
+                              activebackground='ghost white', 
+                              borderwidth=0, 
+                              highlightthickness=2, 
+                              highlightbackground='light gray')
         searchButton.grid(column=2, row=2, 
                           sticky=S+W, 
-                          padx=(self.butPadx, 0), 
+                          padx=(self.searchButPadx, 0), 
                           pady=(self.butVertSpace, 0))
         # when mouse is over the button for a while, show a caption
         searchButton.bind('<Enter>', lambda ev: self.onButEnter('Vyhledat'))
