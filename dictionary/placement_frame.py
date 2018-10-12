@@ -37,7 +37,7 @@ class PlacementFrm(Frame):
                        ' Po dalším dvojkliku lze elipsou otáčet.'
         
         self.delIconPath = os.path.join(imgdir, 'del_draw.png')
-        self.delIconSize = 28#
+        self.delIconSize = 28
         self.delButSize = 35
         self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
         self.searchIconSize = 30

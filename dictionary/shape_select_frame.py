@@ -32,7 +32,7 @@ class ShapeSelectFrm(Frame):
         
         self.addIconPath = os.path.join(imgdir, 'add_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
-        self.iconSize = 28#
+        self.iconSize = 28
         self.butSize = 35
         self.butPadx = 20    # Select and Delete buttons x-padding
         self.delay = 1000 # how long to wait before button description shows up
@@ -330,7 +330,7 @@ class ShapeSelectFrm(Frame):
     def redrawPlace1(self):
         """Update 'self.sel1' label."""
         if self.var1.get() != 0:
-            image = self.images[self.var1.get() - 1]    
+            image = self.images[self.shapes.index(self.var1.get())]
             if self.sel1 != None: self.sel1.destroy()
             self.sel1 = Label(self.selectionfrm, 
                               image=image, 
@@ -353,7 +353,7 @@ class ShapeSelectFrm(Frame):
     def redrawPlace2(self):
         """Update 'self.sel2' label."""
         if self.var2.get() != 0:
-            image = self.images[self.var2.get() - 1]
+            image = self.images[self.shapes.index(self.var2.get())]
             if self.sel2 != None: self.sel2.destroy()    
             self.sel2 = Label(self.selectionfrm, 
                               image=image, 
@@ -433,7 +433,7 @@ class ShapeSelectFrm(Frame):
         """Highlight the label in red."""
         # remove highlighting from the previously selected label
         if self.var.get() != 0:
-            j = self.var.get() - 1
+            j = self.shapes.index(self.var.get())
             self.labels[j].config(highlightthickness=0)
             self.labels[j].grid(column=(j % self.numcols) * 2, 
                                 row=(j // self.numcols) * 2,
@@ -445,7 +445,7 @@ class ShapeSelectFrm(Frame):
         self.labels[i].grid(column=(i % self.numcols) * 2, 
                             row=(i // self.numcols) * 2,
                             padx=0, pady=0)
-        self.var.set(i+1)
+        self.var.set(self.shapes[i])
     
     def onLabDoubleClick(self, i):
         self.onLabClick(i)
@@ -453,7 +453,8 @@ class ShapeSelectFrm(Frame):
                 
     def onLabEnter(self, i):
         """Highlight the label in blue."""
-        if self.var.get() != i+1:
+        if self.var.get() == 0 or self.shapes.index(self.var.get()) != i:
+            # the ith label is not selected
             self.labels[i].config(highlightthickness=self.labborder, 
                               highlightbackground='LightBlue1')
             self.labels[i].grid(column=(i % self.numcols) * 2, 
@@ -462,7 +463,8 @@ class ShapeSelectFrm(Frame):
         
     def onLabLeave(self, i):
         """Remove the blue highlighting from the label."""
-        if self.var.get() != i+1:
+        if self.var.get() == 0 or self.shapes.index(self.var.get()) != i:
+            # the ith label is not selected
             self.labels[i].config(highlightthickness=0)
             self.labels[i].grid(column=(i % self.numcols) * 2, 
                                 row=(i // self.numcols) * 2,
