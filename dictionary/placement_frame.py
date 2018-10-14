@@ -58,6 +58,7 @@ class PlacementFrm(Frame):
         
         self.canvasBorder = 2
         self.canvasWidth, self.canvasHeight = canvasSize
+        self.canvasImagePath = os.path.join(imgdir, 'interpreter.png')
         self.makeWidgets()
         
     def makeWidgets(self):
@@ -91,7 +92,11 @@ class PlacementFrm(Frame):
                                     height=self.canvasHeight, 
                                     borderwidth=self.canvasBorder, 
                                     relief='groove')
-        self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)        
+        self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)
+        self.image = tools.getImage(self.canvasImagePath, 
+                                    width=self.canvasWidth, 
+                                    height=self.canvasHeight)
+        self.canvas.create_image(0, 0, image=self.image, anchor=NW)        
         
         # create delete button
         self.delImg = tools.getImage(self.delIconPath, 
@@ -165,8 +170,9 @@ class PlacementFrm(Frame):
         self.hint.destroy()
         
     def onDelete(self):
-        """Delete the canvas items reset the canvas to its initial state."""
+        """Delete the ellipse, reset the canvas to its initial state."""
         self.canvas.delete(ALL)
+        self.canvas.create_image(0, 0, image=self.image, anchor=NW)
         self.canvas.ellipse = None
         self.canvas.drawMode = True
         self.canvas.moveMode = False

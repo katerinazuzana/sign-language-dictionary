@@ -11,16 +11,18 @@ class DrawingCanvas(Canvas):
     
     def __init__(self, parent, **options):
         super().__init__(parent, **options)
-        self.settings = {'width': 3,          # ellipse settings
+        self.settings = {'width': 4,          # ellipse settings
                          'outline': 'red', 
-                         'fill': 'gray90'}
+                         'fill': 'black', 
+                         'stipple': 'gray25'}
         
         self.markSize = 3   # half side of a square, or a radius
         self.scMarkSettings = {'width': 1, 
                                'outline': 'darkgreen', 
                                'fill': 'green'}
-        self.rotMarkSettings = {'width': 1, 
-                                'fill': 'black'}
+        self.rotMarkSettings = {'width': 2, 
+                                'outline': 'darkblue', 
+                                'fill': 'blue'}
                                 
         self.markNames = ['r', 'tr', 't', 'tl', 'l', 'bl', 'b', 'br']
         self.cursorShapes = ['right_side', 
@@ -276,18 +278,18 @@ class DrawingCanvas(Canvas):
         self.delete(self.id)
         if self.ellipse.angle == 0:
             self.id = self.create_oval(self.ellipse.topLeft.x, 
-                                   self.ellipse.topLeft.y, 
-                                   self.ellipse.bottomRight.x, 
-                                   self.ellipse.bottomRight.y, 
-                                   **self.settings, 
-                                   tags='ellipse')
+                                       self.ellipse.topLeft.y, 
+                                       self.ellipse.bottomRight.x, 
+                                       self.ellipse.bottomRight.y, 
+                                       **self.settings, 
+                                       tags='ellipse')
         else:
             # get a tuple of points covering (densely enough) the ellipse border
             polygonPoints = self.getPolygonPoints()
             # draw the rotated ellipse - as a polygon
             self.id = self.create_polygon(polygonPoints, 
-                                      **self.settings, 
-                                      tags='ellipse')
+                                          **self.settings, 
+                                          tags='ellipse')
         
         # redraw the marks
         if self.scaleMode: mode = 'scale'
