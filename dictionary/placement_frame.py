@@ -96,7 +96,7 @@ class PlacementFrm(Frame):
         self.image = tools.getImage(self.canvasImagePath, 
                                     width=self.canvasWidth, 
                                     height=self.canvasHeight)
-        self.canvas.create_image(0, 0, image=self.image, anchor=NW)        
+        self.canvas.create_image(2, 2, image=self.image, anchor=NW)        
         
         # create delete button
         self.delImg = tools.getImage(self.delIconPath, 
@@ -172,7 +172,7 @@ class PlacementFrm(Frame):
     def onDelete(self):
         """Delete the ellipse, reset the canvas to its initial state."""
         self.canvas.delete(ALL)
-        self.canvas.create_image(0, 0, image=self.image, anchor=NW)
+        self.canvas.create_image(2, 2, image=self.image, anchor=NW)
         self.canvas.ellipse = None
         self.canvas.drawMode = True
         self.canvas.moveMode = False

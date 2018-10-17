@@ -78,11 +78,11 @@ class SignInputFrm(Frame):
         """Call 'self.signSearchFcn' to start the search for similar signs."""
         if self.placementfrm.canvas.ellipse:
             # an ellipse object exists
-            ellipseParams = (self.placementfrm.canvas.ellipse.center.x, 
-                             self.placementfrm.canvas.ellipse.center.y, 
-                         abs(self.placementfrm.canvas.ellipse.a), 
-                         abs(self.placementfrm.canvas.ellipse.b), 
-                             self.placementfrm.canvas.ellipse.angle)
+            ellipseParams = (round(self.placementfrm.canvas.ellipse.center.x), 
+                             round(self.placementfrm.canvas.ellipse.center.y), 
+                         round(abs(self.placementfrm.canvas.ellipse.a)), 
+                         round(abs(self.placementfrm.canvas.ellipse.b)), 
+                             round(self.placementfrm.canvas.ellipse.angle, 4))
         else:
             # no ellipse was drawn
             ellipseParams = None

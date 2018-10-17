@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import math
+import numpy as np
 from difflib import SequenceMatcher
 from drawing_canvas import Vect
 import tools
@@ -39,20 +40,20 @@ class SearchEngine():
         self.vflist = os.listdir(self.vfdir)
         
         self.allsigns = []
-        self.signsmax = 10
+        self.signsmax = 20
         self.groups = {1: 'I', 2: 'I', 3: 'I', 4: 'I', 5: 'I', 
                        6: 'II', 7: 'II', 8: 'II', 9: 'III', 10: 'III', 
                        11: 'III', 12: 'IV', 13: 'IV', 14: 'IV', 15: 'III', 
                        16: 'III', 17: 'IV', 18: 'III', 19: 'III', 20: 'IV', 
                        21: 'II', 22: 'V', 23: 'V', 24: 'V', 25: 'V', 
-                       26: 'VI', 27: 'VI', 28: 'VII', 29: 'VII', 30: 'VII', 
-                       31: 'VII', 32: 'VII', 33: 'VII', 34: 'VII', 35: 'VII',
-                       36: 'VIII', 37: 'VIII', 38: 'VIII', 39: 'VIII', 
-                       40: 'VIII', 41: 'IX', 42: 'IX', 43: 'IX', 44: 'IX', 
-                       45: 'IX', 46: 'IX', 47: 'IX', 48: 'X', 49: 'XI', 
-                       50: 'XI', 51: 'XII'}
+                       26: 'V', 27: 'II', 28: 'VI', 29: 'VI', 30: 'VI', 
+                       31: 'VI', 32: 'VI', 33: 'VI', 34: 'VI', 35: 'VI',
+                       36: 'VII', 37: 'VII', 38: 'VII', 39: 'VII', 
+                       40: 'VII', 41: 'VII', 42: 'VII', 43: 'VII', 44: 'VII', 
+                       45: 'VII', 46: 'VII', 47: 'VII', 48: 'VIII', 49: 'IX', 
+                       50: 'IX', 51: 'X'}
                        # all the possible 51 handshapes are divided into 
-                       # 12 groups of visually similar shapes (roman nums I-XII)
+                       # 10 groups of visually similar shapes (roman nums I-X)
                        
         self.canvasWidth, self.canvasHeight = canvasSize
 
@@ -218,68 +219,78 @@ class SearchEngine():
         uActiveShape = set(uActiveShape) # a set of ints
         uShapeGroups = set(self.groups[shape] for shape in uActiveShape 
                            if shape != 0) # a set of strings
-        
+
         if uPlacement:
             # used for comparing the signs placement:
-            uRelief = self.getReliefFcn(*uPlacement)
-            uArea = self.integrateOverCanvas(uRelief)
-        """
+            uReliefFcn = self.getReliefFcn(*uPlacement)
+            uRelief = self.getRelief(uReliefFcn)  # numpy array
+            uArea = (uRelief == 1).sum() 
+        print('uArea: ', uArea)
+        
+        
         if self.allsigns == []:
             # create a list of all the signs in the database - a list of tuples:
-            # (videofile, activeShape, signType, passiveShape, placement)
+            # (videofile, activeShape, signType, passiveShape, placement, area)
             with sqlite3.connect(self.dbpath) as conn:
                 cursor = conn.cursor()
                 cursor.execute('SELECT * FROM signs')
                 allsigns = cursor.fetchall()
 
-        result = []
-        placeDist = 1        
+        result = []        
         
         for dbSign in allsigns: 
             # unpack the dbSign's components
-            videofile, dbActiveShape, dbSignType, dbPassiveShape, dbPlacemet \
-            = dbSign
+            videofile, dbActiveShape, dbSignType, dbPassiveShape, ellipse, \
+                dbPlacement, dbArea = dbSign
+            print('db videofile: ', videofile)
+            # dbActiveShape is a str of comma separated numbers or None
+            if dbActiveShape:
+                dbActiveShape = set(int(item) for item in 
+                                    dbActiveShape.split(','))
+                dbShapeGroups = set(self.groups[shape] for shape in 
+                                    dbActiveShape)
+            else:
+                dbActiveShape = set()
+                dbActiveShape = set()
             
-            # dbActiveShape is a str of comma separated numbers -> change to set
-            dbActiveShape = set(int(item) for item in dbActiveShape.split(','))
-            dbShapeGroups = set(self.groups[shape] for shape in dbActiveShapes)
+            # dbPassiveShape is a str or None
+            if dbPassiveShape:
+                dbPassiveShape = int(dbPassiveShape)
             
-            # change dbPlacement from str "centerx,centery,a,b,angle" to tuple
-            dbPlacement = tuple(float(item) for item in dbPlacement.split(','))
-            
+            # dbPlacement is ... or None
+            if dbPlacement:
+                # get numpy array
+                dbRelief = self.getDbRelief(dbPlacement)  # numpy array
             
             # distance in the Active Hand Shape dimension
             actDist = self.calcActDist(uActiveShape, uShapeGroups, 
                                        dbActiveShape, dbShapeGroups)
-                        
-            # distance in the Sign Type dimension - dbPassiveShape-is type int?
+            print('actDist: ', actDist)
+            # distance in the Sign Type dimension
             typeDist = self.calcTypeDist(uSignType, uPassiveShape, 
                                          dbSignType, dbPassiveShape)
-            
+            print('typeDist: ', typeDist)
             # distance in the Sign Placement dimension
-            if uPlacement:
-                placeDist = self.calcPlaceDist(uRelief, uArea, dbPlacement)
-            
+            placeDist = 1
+            if uPlacement and dbPlacement:
+                placeDist = self.calcPlaceDist(uRelief, uArea, dbRelief, dbArea)
+            print('placeDist: ', placeDist)
             # the total distance
-            dist  = math.sqrt(actDist**2 + typeDist**2 + placeDist**2)
-             
+            dist  = actDist + typeDist + placeDist
+            print('total dist: ', dist)
             result.append((videofile, dist))
 
         # choose the first 'self.signmax' closest signs
         result = sorted(result, key = lambda x: x[1])
         result = result[:self.signsmax]
         # remove the distance values
-        result = self.listOfTuplesToList(result)"""
-        # demo result:
-        result = ['bezecke_lyzovani', 
-                  'biatlon', 
-                  'bowling', 
-#                  'bolivie', 
-#                  'box', 
-#                  'cerna_hora', 
-#                  'cesko', 
-                  'brazilie_2']
-                  
+        result = tools.listOfTuplesToList(result)
+        # remove duplicates
+        for i in range(len(result)-1, -1, -1):
+            if result[i] in result[:i]:
+                del result[i]
+        print(result)
+            
         # find the words corresponding to individual videofiles
         for i, videofile in enumerate(result):
             with sqlite3.connect(self.dbpath) as conn:
@@ -311,10 +322,10 @@ class SearchEngine():
             float: a distance
         """
     
-        if dbActiveShape == uActiveShape:
+        if dbShape == uShape:
             # all the same shapes
             actDist = 0
-        elif len(dbActiveShape & uActiveShape) >= 1 and \
+        elif len(dbShape & uShape) >= 1 and \
              len(dbGroups ^ uGroups) == 0:
             # at least one common shape, other similar shapes
             actDist = 0.25
@@ -340,7 +351,7 @@ class SearchEngine():
             uPassiveShape (int): describes passive hand shape of user's sign
             dbSignType (str): the database sign type, one of:
                 'single hand', 'both the same', 'passive hand'
-            dbPassiveShape (int): describes pass. hand shape of database sign
+            dbPassiveShape (int or None): describes pass. hand shape of db sign
         
         Returns:
             float: a distance
@@ -362,40 +373,26 @@ class SearchEngine():
                 typeDist = 0
         return typeDist
 
-    def calcPlaceDist(self, uRelief, uArea, dbPlacement):
+    def calcPlaceDist(self, uRelief, uArea, dbRelief, dbArea):
         """Calculate the distance between the user sign and the db sign in the
         Placement dimension.
-        
-        The distance is calculated as a ratio of the overlapping area (counted
-        twice - once for each ellipse) to the total area of the ellipses.
-        
+
         Arguments:
-            uRelief: a function of canvas coords describing the user's ellipse
+            uRelief: ... describing the user's ellipse
             uArea (int): the area af the user's ellipse
-            dbPlacement (list ): a list of floats of the form 
-                [centerx, centery, a , b, angle] describing dbSign's placement
+            dbRelief: ... describing the db ellipse
+            dbArea (int): the area af the database ellipse
                               
         Returns:
             float: a distance 
         """
-        # area of the db ellipse
-        dbRelief = self.getReliefFcn(*dbPlacement)
-        dbArea = self.integrateOverCanvas(dbRelief)
-        
-        # overlap of the two ellipses
-        fcn = lambda x, y: uRelief(x, y) * dbRelief(x, y)
-        overlap = self.integrateOverCanvas(fcn)
-        
-        placeDist = (2 * overlap) / (uArea + dbArea)
-        return placeDist
 
-    def integrateOverCanvas(self, fcn):
-        """Integrate the function over the canvas area.""" 
-        integral = 0
-        for x in range(self.canvasWidth):
-            for y in range(self.canvasHeight):
-                integral += fcn(x, y)
-        return integral
+        # overlap of the two ellipses
+        sumArr = uRelief + dbRelief
+        overlap = (sumArr == 2).sum()
+
+        placeDist = 1 - (2 * overlap) / (uArea + dbArea)
+        return placeDist
 
     def getReliefFcn(self, centerx, centery, a, b, angle):
         """Return a function of canvas coords that describes an elliptic area.
@@ -433,3 +430,24 @@ class SearchEngine():
                 return 0
         return f
     
+    def getRelief(self, reliefFcn):
+        matrix = []
+        for y in range(self.canvasHeight):
+            row = []
+            for x in range(self.canvasWidth):
+                row.append(reliefFcn(x, y))
+            matrix.append(row)
+        return np.array(matrix)
+
+    def getDbRelief(self, dbPlacement):
+        placement = [[int(item) for item in line.split(",")] for line in dbPlacement.split(";")]
+        # empty matrix
+        matrix = [[0] * self.canvasWidth for _ in range(self.canvasHeight)]
+        
+        for lineNum, n1, n2, n3 in placement:
+        # line number, num of 0s, num of 1s, num of 0s
+            matrix[lineNum] = [0] * n1 + [1] * n2 + [0] * n3 
+        return np.array(matrix)
+        
+
+
