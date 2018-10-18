@@ -45,8 +45,8 @@ class ScrolledFrame(Frame):
             canvas.config(yscrollcommand=vsbar.set)
             canvas.grid(column=0, row=0, sticky=N+E+S+W)
             # enable scrolling the canvas with the mouse wheel
-            canvas.bind_all('<Button-5>', self.scrollDown) # wheel down
-            canvas.bind_all('<Button-4>', self.scrollUp)   # wheel up
+            self.bind('<Enter>', self.bindToWheelVertical)
+            self.bind('<Leave>', self.unbindWheel)
 
         self.rowconfigure(0, weight=1)
         canvas.config(highlightthickness=0)
@@ -68,48 +68,45 @@ class ScrolledFrame(Frame):
                 # hide scrollbar when not needed
                 if interior.winfo_reqwidth() <= canvas.winfo_width():
                     hsbar.grid_forget()
-                    # disable scrolling the canvas with the mouse wheel
-                    self.canvas.unbind_all('<Button-5>')
-                    self.canvas.unbind_all('<Button-4>')
+                    # disable scrolling the canvas with the mouse wheel                  
+                    self.unbind('<Enter>')
+                    self.canvas.unbind('<Leave>')
                 else:
                     hsbar.grid(column=0, row=1, sticky=N+E+W, columnspan=3)
                     # enable scrolling the canvas with the mouse wheel
-                    self.canvas.bind_all('<Button-5>', self.scrollRight)
-                    self.canvas.bind_all('<Button-4>', self.scrollLeft)
+                    self.bind('<Enter>', self.bindToWheelHorizontal)
+                    self.bind('<Leave>', self.unbindWheel)
                     
         interior.bind('<Configure>', configureInterior)
 
+    def bindToWheelVertical(self, event):
+        """Bind vertical scrolling of the canvas to the mouse wheel."""
+        self.canvas.bind_all('<Button-5>', self.scrollDown)
+        self.canvas.bind_all('<Button-4>', self.scrollUp)
+    
+    def bindToWheelHorizontal(self, event):
+        """Bind horizontal scrolling of the canvas to the mouse wheel."""
+        self.canvas.bind_all('<Button-5>', self.scrollRight)
+        self.canvas.bind_all('<Button-4>', self.scrollLeft)
+        
+    def unbindWheel(self, event):
+        """Unbind the mouse wheel events."""
+        self.canvas.unbind_all('<Button-5>')
+        self.canvas.unbind_all('<Button-4>')
+
     def scrollDown(self, event):
-        """Scroll the canvas down if the mouse pointer is over it."""
-        if self.isMouseOverCanvas():
-            self.canvas.yview_scroll(1, 'units')
+        """Scroll the canvas down."""
+        self.canvas.yview_scroll(1, 'units')
 
     def scrollUp(self, event):
-        """Scroll the canvas up if the mouse pointer is over it."""
-        if self.isMouseOverCanvas():
-            self.canvas.yview_scroll(-1, 'units')
+        """Scroll the canvas up."""
+        self.canvas.yview_scroll(-1, 'units')
         
     def scrollRight(self, event):
-        """Scroll the canvas to the right if the mouse pointer is over it."""
-        if self.isMouseOverCanvas():        
-            self.canvas.xview_scroll(1, 'units')
+        """Scroll the canvas to the right."""
+        self.canvas.xview_scroll(1, 'units')
         
     def scrollLeft(self, event):
-        """Scroll the canvas to the left if the mouse pointer is over it."""
-        if self.isMouseOverCanvas():
-            self.canvas.xview_scroll(-1, 'units')
-    
-    def isMouseOverCanvas(self):
-        """Return a bool saying whether the cursor is over the canvas."""
-        x0, y0, x1, y1 = self.getCanvasCoords()
-        x, y = self.winfo_pointerxy()
-        return x0 < x < x1 and y0 < y < y1
-    
-    def getCanvasCoords(self):
-        """Return a 4-tuple with canvas coords."""
-        x0 = self.canvas.winfo_rootx()
-        y0 = self.canvas.winfo_rooty()
-        x1 = x0 + self.canvas.winfo_width() 
-        y1 = y0 + self.canvas.winfo_height()
-        return x0, y0, x1, y1
+        """Scroll the canvas to the left."""
+        self.canvas.xview_scroll(-1, 'units')
         

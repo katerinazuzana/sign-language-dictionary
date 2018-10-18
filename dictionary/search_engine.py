@@ -274,8 +274,7 @@ class SearchEngine():
 
             # the total distance
             dist  = actDist + typeDist + placeDist
-            if dist < 1.5:
-                result.append((videofile, dist))
+            result.append((videofile, dist))
 
         # choose the first 'self.signmax' closest signs
         result = sorted(result, key = lambda x: x[1])
