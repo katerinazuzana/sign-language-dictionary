@@ -217,6 +217,8 @@ class SearchEngine():
         uActiveShape, uSignType, uPassiveShape, uPlacement = userSign
         
         uActiveShape = set(uActiveShape) # a set of ints
+        if len(uActiveShape) == 2 and (0 in uActiveShape):
+            uActiveShape.remove(0)
         uShapeGroups = set(self.groups[shape] for shape in uActiveShape 
                            if shape != 0) # a set of strings
 
@@ -224,25 +226,24 @@ class SearchEngine():
             # used for comparing the signs placement:
             uReliefFcn = self.getReliefFcn(*uPlacement)
             uRelief = self.getRelief(uReliefFcn)  # numpy array
-            uArea = (uRelief == 1).sum() 
-        print('uArea: ', uArea)
-        
+            uArea = (uRelief == 1).sum()         
         
         if self.allsigns == []:
             # create a list of all the signs in the database - a list of tuples:
             # (videofile, activeShape, signType, passiveShape, placement, area)
             with sqlite3.connect(self.dbpath) as conn:
                 cursor = conn.cursor()
-                cursor.execute('SELECT * FROM signs')
+                cursor.execute('SELECT videofile, activeshape, signtype, \
+                    passiveshape, placement, area FROM signs')
                 allsigns = cursor.fetchall()
 
         result = []        
         
         for dbSign in allsigns: 
             # unpack the dbSign's components
-            videofile, dbActiveShape, dbSignType, dbPassiveShape, ellipse, \
+            videofile, dbActiveShape, dbSignType, dbPassiveShape, \
                 dbPlacement, dbArea = dbSign
-            print('db videofile: ', videofile)
+
             # dbActiveShape is a str of comma separated numbers or None
             if dbActiveShape:
                 dbActiveShape = set(int(item) for item in 
@@ -253,11 +254,7 @@ class SearchEngine():
                 dbActiveShape = set()
                 dbActiveShape = set()
             
-            # dbPassiveShape is a str or None
-            if dbPassiveShape:
-                dbPassiveShape = int(dbPassiveShape)
-            
-            # dbPlacement is ... or None
+            # dbPlacement is a str "line#, # of 0s, # of 1s, # of 0s" or None
             if dbPlacement:
                 # get numpy array
                 dbRelief = self.getDbRelief(dbPlacement)  # numpy array
@@ -265,20 +262,20 @@ class SearchEngine():
             # distance in the Active Hand Shape dimension
             actDist = self.calcActDist(uActiveShape, uShapeGroups, 
                                        dbActiveShape, dbShapeGroups)
-            print('actDist: ', actDist)
+
             # distance in the Sign Type dimension
             typeDist = self.calcTypeDist(uSignType, uPassiveShape, 
                                          dbSignType, dbPassiveShape)
-            print('typeDist: ', typeDist)
+
             # distance in the Sign Placement dimension
             placeDist = 1
             if uPlacement and dbPlacement:
                 placeDist = self.calcPlaceDist(uRelief, uArea, dbRelief, dbArea)
-            print('placeDist: ', placeDist)
+
             # the total distance
             dist  = actDist + typeDist + placeDist
-            print('total dist: ', dist)
-            result.append((videofile, dist))
+            if dist < 1.5:
+                result.append((videofile, dist))
 
         # choose the first 'self.signmax' closest signs
         result = sorted(result, key = lambda x: x[1])
@@ -289,7 +286,6 @@ class SearchEngine():
         for i in range(len(result)-1, -1, -1):
             if result[i] in result[:i]:
                 del result[i]
-        print(result)
             
         # find the words corresponding to individual videofiles
         for i, videofile in enumerate(result):
