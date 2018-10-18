@@ -101,8 +101,8 @@ class MainFrm(Frame):
         
         # create the main video frame
         self.videofrm = VideoFrm(self, 
-                              self.VIDEO_WIDTH,
-                              self.VIDEO_HEIGHT)
+                                 self.VIDEO_WIDTH,
+                                 self.VIDEO_HEIGHT)
         self.videofrm.grid(column=0, row=3)
         
         # frame for displaying thumbnail videos
@@ -145,7 +145,7 @@ class MainFrm(Frame):
             # the word was found
             # or it was a sign search (that always returns successFlag = True)
             word, videofile = alist[0]
-            self.showVideoAndWord(word, videofile)
+            self.showWordAndVideo(word, videofile)
             if len(alist) > 1:                
                 # there's more than one match
                 # (this is always the case for the sign search)
@@ -155,7 +155,7 @@ class MainFrm(Frame):
             # display alternative options
             self.showNotFound(alist)
         
-    def showVideoAndWord(self, word, videofile):
+    def showWordAndVideo(self, word, videofile):
         """Show 'word' on 'self.lab' label and play the corresponding video.
         
         Arguments:
@@ -205,9 +205,9 @@ class MainFrm(Frame):
             
             # double-click on the thumbnail plays the thumbnail video
             # in the large video frame
-            def callback(vf, i):
-                return lambda event: self.onThumbClick(vf, i)            
-            thumb.canvas.bind('<Double-Button-1>', callback(find[i][1], i))
+            def callback(word, vf, i):
+                return lambda event: self.onThumbClick(word, vf, i)            
+            thumb.canvas.bind('<Double-Button-1>', callback(*find[i], i))
             
             # when the mouse cursor enters a thumbnail,
             # the thumbnail video is played (in the thumbnail frame)
@@ -220,7 +220,7 @@ class MainFrm(Frame):
         # in the large video frame (i.e. the 1st one)    
         self.thumbs[0].lightOn()
    
-    def onThumbClick(self, vf, i):
+    def onThumbClick(self, word, vf, i):
         """Highlight the clicked-on thumbnail and play its video.
         
         Remove highlighting from the previously highlighted thumbnail.
@@ -229,7 +229,7 @@ class MainFrm(Frame):
         self.thumbs[i].lightOn()
         for thumb in self.thumbs[:i]+self.thumbs[i+1:]:
             thumb.lightOff()   
-        self.videofrm.play(video_source=vf)
+        self.showWordAndVideo(word, vf)
      
     def deleteThumbnails(self):
         """Delete the thumbnail video frames."""

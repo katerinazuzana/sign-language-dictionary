@@ -40,7 +40,7 @@ class SearchEngine():
         self.vflist = os.listdir(self.vfdir)
         
         self.allsigns = []
-        self.signsmax = 20
+        self.signsmax = 15
         self.groups = {1: 'I', 2: 'I', 3: 'I', 4: 'I', 5: 'I', 
                        6: 'II', 7: 'II', 8: 'II', 9: 'III', 10: 'III', 
                        11: 'III', 12: 'IV', 13: 'IV', 14: 'IV', 15: 'III', 
