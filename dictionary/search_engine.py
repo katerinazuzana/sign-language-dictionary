@@ -193,9 +193,9 @@ class SearchEngine():
         
         Sign Placement dimension:
         The placement of a sign is given by an elliptic area on a canvas
-        (see drawing_canvas.py). The distance between two signs is calculated
-        as a ratio of an area where the two ellipses overlap (counted twice -
-        once for each ellipse) to the total area of the ellipses.
+        (see drawing_canvas.py). The distance is calculated using a ratio
+        of an area where the two ellipses overlap to the total area of the 
+        ellipses. The higher the ratio, the shorter the distance.
         
         After calculating the distance for all the database signs, choose the
         'self.signsmax' number of the closest signs as a result of the search.
@@ -374,9 +374,9 @@ class SearchEngine():
         Placement dimension.
 
         Arguments:
-            uRelief: ... describing the user's ellipse
+            uRelief (numpy.array): describing the user's ellipse
             uArea (int): the area af the user's ellipse
-            dbRelief: ... describing the db ellipse
+            dbRelief (numpy.array): describing the db ellipse
             dbArea (int): the area af the database ellipse
                               
         Returns:
