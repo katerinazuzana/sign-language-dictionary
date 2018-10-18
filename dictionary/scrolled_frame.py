@@ -38,7 +38,8 @@ class ScrolledFrame(Frame):
         if orient == 'horizontal':
             self.rowconfigure(0, minsize=height)
             self.rowconfigure(1, minsize=40)  # to fit a scrollbar
-            canvas.grid(column=0, row=0, sticky=N+S+W)
+            canvas.config(xscrollcommand=hsbar.set)
+            canvas.grid(column=0, row=0, sticky=N+S+W, columnspan=3)
         
         else:   # vertical:
             canvas.config(yscrollcommand=vsbar.set)
