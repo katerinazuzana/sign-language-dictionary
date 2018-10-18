@@ -72,6 +72,12 @@ class ShapeSelectFrm(Frame):
         self.sep = None     # separator-like frame separating the labels
         self.sel2 = None    # label with 2nd selected shape
         
+        # popup canvas size
+        self.canvasWidth = (self.numcols*(self.labwidth + 2*self.labborder) + 
+                            (self.numcols-1)*self.sepwidth)
+        self.canvasHeight = (self.numrows*(self.labheight + 2*self.labborder) + 
+                             (self.numrows-1)*self.sepwidth)
+        
         self.columnconfigure(0, weight=1)  # empty column
         self.columnconfigure(2, weight=1)
         self.columnconfigure(3, weight=1)  # empty column
@@ -226,13 +232,11 @@ class ShapeSelectFrm(Frame):
         
         # make a scrolled frame for displaying labels with images
         self.scrollfrm = ScrolledFrame(self.popupWin, 
-                             self.numcols*(self.labwidth + 2*self.labborder) + 
-                             (self.numcols-1)*self.sepwidth,
-                             self.numrows*(self.labheight + 2*self.labborder) + 
-                             (self.numrows-1)*self.sepwidth, 
-                             orient='vertical', 
-                             border=True, 
-                             bg=self.bgcolor)
+                                       self.canvasWidth,
+                                       self.canvasHeight, 
+                                       orient='vertical', 
+                                       border=True, 
+                                       bg=self.bgcolor)
         self.scrollfrm.grid(column=0, row=1, padx=10)
         self.popupWin.rowconfigure(1, weight=1)
         
@@ -249,9 +253,8 @@ class ShapeSelectFrm(Frame):
         from the center of the main app window, so that the selected shapes 
         in the main window are visible.
         """
-        self.popupWin.update_idletasks()
-        width = self.popupWin.winfo_reqwidth()
-        height = self.popupWin.winfo_reqheight()
+        width = self.canvasWidth
+        height = self.canvasHeight
         
         # get the main application window object
         root = self.getRoot()
@@ -264,7 +267,7 @@ class ShapeSelectFrm(Frame):
         rootCenterY = rootY + rootHeight // 2
         
         xoffset = rootCenterX - width * 2 // 3
-        yoffset = rootCenterY - height // 2
+        yoffset = rootCenterY - height * 2 // 3
         self.popupWin.geometry('+{}+{}'.format(xoffset, yoffset))
     
     def getRoot(self):
@@ -503,6 +506,12 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
          
         self.shapes = [1, 2, 4, 6, 9, 12, 13, 14, 16, 17, 23, 28, 41]
         self.numrows = 3
+        
+        # popup canvas size
+        self.canvasWidth = (self.numcols*(self.labwidth + 2*self.labborder) + 
+                            (self.numcols-1)*self.sepwidth)
+        self.canvasHeight = (self.numrows*(self.labheight + 2*self.labborder) + 
+                             (self.numrows-1)*self.sepwidth)
         
         self.title = 'Tvar pasivní ruky'
         self.popuptext = 'Zvolte tvar pasivní ruky'
