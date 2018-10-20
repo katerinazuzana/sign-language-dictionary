@@ -33,9 +33,8 @@ class VideoFrm(Frame):
         """
         super().__init__(parent, **options)
         self.thumb = thumb
-        if self.thumb: self.light = False  # a boolean flag showing whether
-                                   # the thumbnail is currently highlighted
         self.border = border
+        self.bgcolor = options.get('bg', self['bg'])
         self.job = None  # keeps reference to a job scheduled with an after call
         
         # create a canvas for displaying the video
@@ -43,8 +42,9 @@ class VideoFrm(Frame):
         self.height = height
         self.canvas = Canvas(self, width=self.width, 
                                    height=self.height, 
-                                   highlightthickness=0)
-        self.canvas.grid(column=0, row=0, padx=self.border, pady=self.border)
+                                   highlightthickness=self.border, 
+                                   highlightbackground=self.bgcolor)
+        self.canvas.grid(column=0, row=0)
         self.canvas.config(bg='black')
         # canvas center coords
         self.centerX =  int(self.width / 2) + self.border
@@ -84,7 +84,8 @@ class VideoFrm(Frame):
                                      image=self.image, 
                                      anchor=CENTER)
             # after delay, call self.update method again   
-            self.job = self.after(self.video.delay, lambda: self.update(video_source))
+            self.job = self.after(self.video.delay, 
+                                  lambda: self.update(video_source))
         else:
             # there are no more frames in the video source
             self.showFirstPic(video_source)
@@ -103,20 +104,12 @@ class VideoFrm(Frame):
         self.canvas.unbind('<Button-1>')
     
     def lightOn(self):
-        """Draw a highlighting border around the canvas."""
-        if not self.light:
-            self.light = True
-            self.canvas.config(highlightthickness=self.border, 
-                               highlightbackground='red')
-            self.canvas.grid(column=0, row=0, padx=0, pady=0)
+        """Highlight the canvas."""
+        self.canvas.config(highlightbackground='red')
     
     def lightOff(self):
-        """Remove the highlighting border from around the canvas."""
-        if self.light:
-            self.light = False
-            self.canvas.config(highlightthickness=0)
-            self.canvas.grid(column=0, row=0, 
-                             padx=self.border, pady=self.border)
+        """Remove the highlighting from the canvas."""
+        self.canvas.config(highlightbackground=self.bgcolor)
     
     def showFirstPic(self, video_source):
         """Display the first frame from the video source on self.canvas.
