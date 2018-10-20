@@ -32,9 +32,10 @@ class ShapeSelectFrm(Frame):
         
         self.addIconPath = os.path.join(imgdir, 'add_icon.png')
         self.delIconPath = os.path.join(imgdir, 'del_icon.png')
-        self.iconSize = 28
+        self.iconSize = 32
         self.butSize = 35
-        self.butPadx = 20    # Select and Delete buttons x-padding
+        self.butPadx = 20   # Select and Delete buttons padding
+        self.butPady = 2
         self.delay = 1000 # how long to wait before button description shows up
         self.captFont = None
         self.captFontSize = 10   # font size of the captions messages
@@ -136,7 +137,11 @@ class ShapeSelectFrm(Frame):
                              activebackground=self.bgcolor, 
                              borderwidth=0, 
                              highlightthickness=0)
-        self.addBut.grid(column=2, row=1, sticky=W+S, padx=self.butPadx)
+        self.addBut.grid(column=2, 
+                         row=1, 
+                         sticky=W+S, 
+                         padx=self.butPadx, 
+                         pady=self.butPady)
         
         # when mouse is over the button for a while, show a caption
         self.addBut.bind('<Enter>', lambda ev: self.onButEnter('Přidat'))
@@ -155,7 +160,11 @@ class ShapeSelectFrm(Frame):
                              activebackground=self.bgcolor, 
                              borderwidth=0, 
                              highlightthickness=0)
-        self.delBut.grid(column=2, row=2, sticky=W+N, padx=self.butPadx)
+        self.delBut.grid(column=2, 
+                         row=2, 
+                         sticky=W+N, 
+                         padx=self.butPadx, 
+                         pady=self.butPady)
         
         # when mouse is over the button for a while, show a caption
         self.delBut.bind('<Enter>', lambda ev: self.onButEnter('Odstranit'))

@@ -189,8 +189,8 @@ class Dictionary():
         
 if __name__ == '__main__':
     dbpath = os.path.abspath('dict.db')
-    vfdir = os.path.abspath('demo_videofiles')
-    imgdir = os.path.abspath('demo_images')
+    vfdir = os.path.abspath('videofiles')
+    imgdir = os.path.abspath('images')
     
     dictionary = Dictionary(dbpath, vfdir, imgdir)
     dictionary.positionWindow()

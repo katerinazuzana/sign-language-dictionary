@@ -37,10 +37,10 @@ class PlacementFrm(Frame):
                        ' Po dalším dvojkliku lze elipsou otáčet.'
         
         self.delIconPath = os.path.join(imgdir, 'del_draw.png')
-        self.delIconSize = 28
+        self.delIconSize = 32
         self.delButSize = 35
         self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
-        self.searchIconSize = 30
+        self.searchIconSize = 32
         self.searchButWidth = 52
         self.searchButHeight = 35
         
@@ -54,7 +54,7 @@ class PlacementFrm(Frame):
         self.hintPadx = 8
         self.delButPadx = 15
         self.searchButPadx = 5
-        self.butVertSpace = 5 # vertical space between Delete and Search buttons
+        self.butVertSpace = 7 # vertical space between Delete and Search buttons
         
         self.canvasBorder = 2
         self.canvasWidth, self.canvasHeight = canvasSize

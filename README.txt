@@ -20,17 +20,13 @@ This serves as a sample code for the purpose of .......... application and is no
 
 Credit
 
-Used icons from findicons.com:
-findicons.com/icon/455110/light_bulb_on - licence: Creative Commons Attribution (by)
-findicons.com/icon/544334/search - licence: Freeware
-findicons.com/icon/544272/add - licence: Freeware
-findicons.com/icon/544321/denided - licence: Freeware
-findicons.com/icon/544381/error - licence: Freeware
-findicons.com/icon/544352/checkmark - licence: Freeware
-findicons.com/icon/544267/error_symbol - licence: Freeware
-findicons.com/icon/454622/arrow_circle_right# - licence: Creative Commons Attribution Share Alike (by-sa)
+In the Sign Language Dictionary application the following icons (located at ./dictionary/images directory) are used:
 
-Used ttk Style:
+hint_icon.png is an icon (findicons.com/icon/455110/light_bulb_on) by Janik Baumgartner (kinaj.com) licensed under CC BY (creativecommons.org/licenses/by/4.0/)
+
+add_icon.png, close_icon.png, del_draw.png, del_icon.png, search_icon.png, submit_icon.png, valid.png are icons from the Koloria icons set: www.graphicrating.com/2012/06/14/koloria-free-icons-set/
+
+replay_arrow.png is an icon (findicons.com/icon/454622/arrow_circle_right) by The Working Group (blog.twg.ca) licensed under CC BY-SA (creativecommons.org/licenses/by-sa/4.0/)
 
 
 
