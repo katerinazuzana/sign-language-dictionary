@@ -111,7 +111,10 @@ class Dictionary():
         
         # style settings
         self.style = style = ttk.Style()
-        style.theme_use('clearlooks')
+        try:
+            style.theme_use('clearlooks')
+        except TclError:
+            style.theme_use('clam')
         
         style.configure('Gray.TEntry', foreground='gray')   # for default text
         style.configure('Black.TEntry', foreground='black') # for user input
