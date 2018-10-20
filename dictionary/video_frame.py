@@ -36,6 +36,7 @@ class VideoFrm(Frame):
         if self.thumb: self.light = False  # a boolean flag showing whether
                                    # the thumbnail is currently highlighted
         self.border = border
+        self.job = None  # keeps reference to a job scheduled with an after call
         
         # create a canvas for displaying the video
         self.width = width
@@ -55,6 +56,7 @@ class VideoFrm(Frame):
         Arguments:
             video_source (str): a path to the video file to be played
         """
+        if self.job: self.after_cancel(self.job)
         self.video = MyVideoCapture(video_source)
         self.update(video_source)
     
@@ -65,8 +67,8 @@ class VideoFrm(Frame):
         called every 'self.video.delay' milliseconds until there are no frames
         left in the video source.
         """
-        ret, frame = self.video.getFrame()
-        if ret:
+        flag, frame = self.video.getFrame()
+        if flag:
             # there is a frame in the video source
             img = PIL.Image.fromarray(frame)
             # resize the image
@@ -82,7 +84,7 @@ class VideoFrm(Frame):
                                      image=self.image, 
                                      anchor=CENTER)
             # after delay, call self.update method again   
-            self.after(self.video.delay, lambda: self.update(video_source))
+            self.job = self.after(self.video.delay, lambda: self.update(video_source))
         else:
             # there are no more frames in the video source
             self.showFirstPic(video_source)
@@ -123,7 +125,7 @@ class VideoFrm(Frame):
             video_source (str): a path to the video file
         """
         vid = MyVideoCapture(video_source)
-        ret, frame = vid.getFrame()                    
+        flag, frame = vid.getFrame()                    
         img = PIL.Image.fromarray(frame)
         # resize the image
         newwidth = self.width
@@ -191,10 +193,10 @@ class MyVideoCapture:
     def getFrame(self):
         """Return a tuple of a boolean success flag and the current frame."""
         if self.vid.isOpened():
-            ret, frame = self.vid.read()
-            if ret:
-                return (ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            flag, frame = self.vid.read()
+            if flag:
+                return (flag, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             else:
-                return (ret, None)
+                return (flag, None)
         return (False, None)
 
