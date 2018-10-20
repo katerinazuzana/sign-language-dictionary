@@ -28,6 +28,7 @@ findicons.com/icon/544321/denided - licence: Freeware
 findicons.com/icon/544381/error - licence: Freeware
 findicons.com/icon/544352/checkmark - licence: Freeware
 findicons.com/icon/544267/error_symbol - licence: Freeware
+findicons.com/icon/454622/arrow_circle_right# - licence: Creative Commons Attribution Share Alike (by-sa)
 
 Used ttk Style:
 

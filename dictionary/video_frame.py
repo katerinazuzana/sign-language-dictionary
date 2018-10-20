@@ -9,6 +9,8 @@ classes:
 from tkinter import *
 import cv2
 import PIL.Image, PIL.ImageTk
+import os
+import tools
 
 
 class VideoFrm(Frame):
@@ -18,13 +20,15 @@ class VideoFrm(Frame):
     videos.
     """
    
-    def __init__(self, parent, width, height, thumb=False, border=0, **options):
+    def __init__(self, parent, width, height, imgdir=None, thumb=False, 
+                 border=0, **options):
         """Initialize a VideoFrm object. Create a 'self.canvas' widget.
         
         Arguments:
             parent: the parent tkinter widget
             width (int): the width of the canvas
             height (int): the height of the canvas
+            imgdir (str): a path to the directory with images (default is None)
             thumb (bool): a boolean flag indicating whether the VideoFrm 
                 object is used as the large video screen (thumb=False), 
                 or as a thumbnail video (thumb=True), (default is False)
@@ -36,6 +40,9 @@ class VideoFrm(Frame):
         self.border = border
         self.bgcolor = options.get('bg', self['bg'])
         self.job = None  # keeps reference to a job scheduled with an after call
+        
+        self.replayArrowPath = os.path.join(imgdir, 'replay_arrow.png')
+        self.arrowSize = 40
         
         # create a canvas for displaying the video
         self.width = width
@@ -136,11 +143,20 @@ class VideoFrm(Frame):
         to indicate that the video may be replayed.
         """
         # darken the video screen
-        transparentRect = self.canvas.create_rectangle(0, 0, self.width,
+        transparentRect = self.canvas.create_rectangle(0, 0, 
+                                                       self.width,
                                                        self.height,
                                                        fill='black',
                                                        stipple='gray25')
-        color = 'ghost white'
+        self.arrow = tools.getImage(self.replayArrowPath, 
+                                    width=self.arrowSize, 
+                                    height=self.arrowSize)
+        self.canvas.create_image(self.centerX, 
+                                 self.centerY, 
+                                 image=self.arrow, 
+                                 anchor=CENTER)
+        
+        """color = 'ghost white'
         thickness = 3
         # draw the arc
         perimeter = 20
@@ -162,7 +178,7 @@ class VideoFrm(Frame):
                                         fill=color)
         line2 = self.canvas.create_line(point2[0], point2[1], arrowhead[0],
                                         arrowhead[1], width=thickness,
-                                        fill=color)
+                                        fill=color)"""
     
 
 class MyVideoCapture:

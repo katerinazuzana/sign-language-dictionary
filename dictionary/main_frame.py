@@ -102,7 +102,8 @@ class MainFrm(Frame):
         # create the main video frame
         self.videofrm = VideoFrm(self, 
                                  self.VIDEO_WIDTH,
-                                 self.VIDEO_HEIGHT)
+                                 self.VIDEO_HEIGHT, 
+                                 self.imgdir)
         self.videofrm.grid(column=0, row=3)
         
         # frame for displaying thumbnail videos
