@@ -18,5 +18,21 @@ url of the main source
 This serves as a sample code for the purpose of .......... application and is not intended for public use. Hence, the above mentioned videos do not contain the actual sign language translations, but demo animations instead.
 
 
+Credit
+
+Used icons from findicons.com:
+findicons.com/icon/455110/light_bulb_on - licence: Creative Commons Attribution (by)
+findicons.com/icon/544334/search - licence: Freeware
+findicons.com/icon/544272/add - licence: Freeware
+findicons.com/icon/544321/denided - licence: Freeware
+findicons.com/icon/544381/error - licence: Freeware
+findicons.com/icon/544352/checkmark - licence: Freeware
+findicons.com/icon/544267/error_symbol - licence: Freeware
+
+Used ttk Style:
+
+
+
+
 The Dictionary application is started by running the 'main.py' python script.
 
