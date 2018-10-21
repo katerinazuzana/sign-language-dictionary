@@ -18,16 +18,6 @@ url of the main source
 This serves as a sample code for the purpose of .......... application and is not intended for public use. Hence, the above mentioned videos do not contain the actual sign language translations, but demo animations instead.
 
 
-Credit
-
-In the Sign Language Dictionary application the following icons (located at ./dictionary/images directory) are used:
-
-hint_icon.png is an icon (findicons.com/icon/455110/light_bulb_on) by Janik Baumgartner (kinaj.com) licensed under CC BY (creativecommons.org/licenses/by/4.0/)
-
-add_icon.png, close_icon.png, del_draw.png, del_icon.png, search_icon.png, submit_icon.png, valid.png are icons from the Koloria icons set: www.graphicrating.com/2012/06/14/koloria-free-icons-set/
-
-replay_arrow.png is an icon (findicons.com/icon/454622/arrow_circle_right) by The Working Group (blog.twg.ca) licensed under CC BY-SA (creativecommons.org/licenses/by-sa/4.0/)
-
 
 
 

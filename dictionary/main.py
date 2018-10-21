@@ -1,8 +1,48 @@
-#######################################################################
+#############################################################################
 #                                                      
 # Czech Sign Language Dictionary 
+#
+#
+# A GUI application that serves as a bilingual dictionary for translating
+# expressions in both directions: to and from czech and czech sign language.
+#    
+# A czech expression may be entered by typing into an entry or by 
+# selecting from a chosen category (or subcategory) of words.
+# If a sign language translation of the expression is found in the database,
+# a video with the sign is played. If there's more than one possible 
+# translation, all the possibilities are displayed in thumbnail videos.
+#    
+# An expression in sign language is entered by specifying the sign's
+# components (handshapes, placement) and the sign type.
+# The application tries to find signs that correspond the best to the
+# components entered by the user. These signs are then displayed as thumbnail
+# videos. After double clicking on them, the video with corresponding czech
+# translation is shown.
 #                                                      
-#######################################################################
+#
+# The application is released under the MIT license.
+#
+# Copyright (c) 2018 Katerina Zuzanakova
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in 
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+#############################################################################
 
 
 from tkinter import *
@@ -16,23 +56,11 @@ from sign_input_frame import SignInputFrm
 
 
 class Dictionary():
-    """A Czech Sign Language Dictionary application.
-
-    A GUI application that serves as a bilingual dictionary for translating
-    expressions in both directions: to and from czech and czech sign language.
+    """The main Czech Sign Language Dictionary application class.
     
-    A czech expression may be entered by typing into an entry or by 
-    selecting from a chosen category (or subcategory) of words.
-    If a sign language translation of the expression is found in the database,
-    a video with the sign is played. If there's more than one possible 
-    translation, all the possibilities are displayed in thumbnail videos.
-    
-    An expression in sign language is entered by specifying the sign's
-    components (handshapes, placement) and the sign type.
-    The application tries to find signs that correspond the best to the
-    components entered by the user. These signs are then displayed as thumbnail
-    videos. After clicking on them, the video with corresponding czech
-    translation is shown.
+    Creates the root application window with all its descending widgets, 
+    as well as an object (self.searchEng) that provides the logic behind 
+    the application.
     
     The root application window (self.root) contains:
     - the main frame (self.mainfrm) where the result of search is displayed,
