@@ -41,8 +41,9 @@ class VideoFrm(Frame):
         self.bgcolor = options.get('bg', self['bg'])
         self.job = None  # keeps reference to a job scheduled with an after call
         
-        self.replayArrowPath = os.path.join(imgdir, 'replay_arrow.png')
-        self.arrowSize = 40
+        if imgdir:
+            self.replayArrowPath = os.path.join(imgdir, 'replay_arrow.png')
+            self.arrowSize = 40
         
         # create a canvas for displaying the video
         self.width = width
