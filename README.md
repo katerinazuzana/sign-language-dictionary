@@ -9,9 +9,7 @@ Note: As I don't have permission to share publically the videos with sign langua
 
 ## Requirements
 
-* Linux
-    * might not work properly, if at all, on other platforms
-    * tested on Ubuntu 16.04
+* Linux - tested on Ubuntu 16.04
 * Python 3
 * Pillow - the PIL fork: https://python-pillow.org/
 * OpenCV: https://opencv.org/

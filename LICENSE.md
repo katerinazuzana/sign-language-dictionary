@@ -3,15 +3,16 @@ Credit
 In the Czech Sign Language Dictionary application the following icons 
 (located at ./dictionary/images directory) are used:
 
-hint_icon.png is an [icon] (findicons.com/icon/455110/light_bulb_on) by [Janik Baumgartner] (kinaj.com) licensed under [CC BY] (creativecommons.org/licenses/by/4.0/)
+* hint\_icon.png is an [icon](findicons.com/icon/455110/light\_bulb\_on) by [Janik Baumgartner](kinaj.com) licensed under [CC BY](creativecommons.org/licenses/by/4.0/)
 
-add_icon.png, close_icon.png, del_draw.png, del_icon.png, search_icon.png, 
-submit_icon.png are icons from the [Koloria icons set] (www.graphicrating.com/2012/06/14/koloria-free-icons-set/)
+* add\_icon.png, close\_icon.png, del\_draw.png, del\_icon.png, search\_icon.png, 
+submit\_icon.png are icons from the [Koloria icons set](www.graphicrating.com/2012/06/14/koloria-free-icons-set/)
 
-replay_arrow.png is an [icon] (findicons.com/icon/454622/arrow_circle_right) by [The Working Group] (blog.twg.ca) licensed under [CC BY-SA] (creativecommons.org/licenses/by-sa/4.0/)
+* replay\_arrow.png is an [icon](findicons.com/icon/454622/arrow\_circle\_right) by [The Working Group](blog.twg.ca) licensed under [CC BY-SA](creativecommons.org/licenses/by-sa/4.0/)
 
 
-The rest of the project is released under the MIT license.
+
+The Czech Sign Language Dictionary is released under the MIT license.
 
 Copyright (c) 2018 Katerina Zuzanakova
 
