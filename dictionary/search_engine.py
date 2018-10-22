@@ -55,7 +55,9 @@ class SearchEngine():
                        # all the possible 51 handshapes are divided into 
                        # 10 groups of visually similar shapes (roman nums I-X)
                        
-        self.canvasWidth, self.canvasHeight = canvasSize
+        self.maxTextLength = 42  # length that fits into the label
+                                 # where czech translation is shown
+        self.canvasWidth, self.canvasHeight = canvasSize 
 
     def search(self, lookupword):
         """Look up the word in the database. Call a fcn to display the result.
@@ -293,14 +295,15 @@ class SearchEngine():
                 cursor.execute('SELECT word FROM translation WHERE \
                                videofile=?', (videofile,))
                 words = cursor.fetchall()
-            text = ', '.join(tools.listOfTuplesToList(words))
+            wordslist = tools.listOfTuplesToList(words)
+            text = ', '.join(wordslist)
+            while len(text) > self.maxTextLength:  
+                del wordslist[-1]
+                text = ', '.join(wordslist)
             result[i] = (text, videofile)
-        # add suffixes
+
         result = self.addSuffixes(result)
-        
-        # add success flag
         res = (True, result)
-        # show the result
         self.showResultFcn(res)
 
     def calcActDist(self, uShape, uGroups, dbShape, dbGroups):
