@@ -216,9 +216,9 @@ class SearchEngine():
         """
         
         # unpack the user's sign input
-        uActiveShape, uSignType, uPassiveShape, uPlacement = userSign
+        uActShape, uSignType, uPassiveShape, uPlacement = userSign
         
-        uActiveShape = set(uActiveShape) # a set of ints
+        uActiveShape = set(uActShape) # a set of ints
         if len(uActiveShape) == 2 and (0 in uActiveShape):
             uActiveShape.remove(0)
         uShapeGroups = set(self.groups[shape] for shape in uActiveShape 
@@ -243,18 +243,18 @@ class SearchEngine():
         
         for dbSign in allsigns: 
             # unpack the dbSign's components
-            videofile, dbActiveShape, dbSignType, dbPassiveShape, \
-                dbPlacement, dbArea = dbSign
+            (videofile, dbActShape, dbSignType, dbPassiveShape, dbPlacement, 
+                dbArea) = dbSign
 
             # dbActiveShape is a str of comma separated numbers or None
-            if dbActiveShape:
+            if dbActShape:
                 dbActiveShape = set(int(item) for item in 
                                     dbActiveShape.split(','))
                 dbShapeGroups = set(self.groups[shape] for shape in 
                                     dbActiveShape)
             else:
                 dbActiveShape = set()
-                dbActiveShape = set()
+                dbShapeGroups = set()
             
             # dbPlacement is a str "line#, # of 0s, # of 1s, # of 0s" or None
             if dbPlacement:
