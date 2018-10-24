@@ -20,8 +20,8 @@ Note: As I don't have permission to share publically the videos with sign langua
 
 Linux:
 
-The application can be run from source:
-```python dictionary/main.py
+The application can be run from `dictionary` directory by:
+```python main.py
 ```
 after installing the dependencies:
 

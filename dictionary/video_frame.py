@@ -43,7 +43,7 @@ class VideoFrm(Frame):
         
         if imgdir:
             self.replayArrowPath = os.path.join(imgdir, 'replay_arrow.png')
-            self.arrowSize = 40
+            self.arrowSize = 35
         
         # create a canvas for displaying the video
         self.width = width
