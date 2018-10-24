@@ -68,7 +68,7 @@ class AutocompleteEntry(ttk.Entry):
         root = self.master.master.master
         
         # bind listbox window movement to the main app window movement
-        root.bind('<Configure>', self.onConfigure)
+        root.bind('<Configure>', self.placeListboxWin)
         
         # on mouse click out of listboxWin, hide it
         # (binding to <FocusOut> event on .overrideredirect(True) 
@@ -100,9 +100,11 @@ class AutocompleteEntry(ttk.Entry):
     
     def placeListboxWin(self, event=None):
         """Place the window with listbox just below the entry."""
-        xoffset = self.winfo_rootx()
-        yoffset = self.winfo_rooty() + self.winfo_height() - 1
-        self.listboxWin.geometry('+{}+{}'.format(xoffset, yoffset))
+        if self.winfo_exists():
+            xoffset = self.winfo_rootx()
+            yoffset = self.winfo_rooty() + self.winfo_height() - 1
+            if self.listboxWin.winfo_exists():
+                self.listboxWin.geometry('+{}+{}'.format(xoffset, yoffset))
     
     def showListboxWin(self):
         """Show the listbox window."""
@@ -131,11 +133,6 @@ class AutocompleteEntry(ttk.Entry):
         if self.listbox.curselection()[0] == 0:
             self.focus_set()
             self.icursor(END)
-
-    def onConfigure(self, event):
-        """Place the listbox window if 'self' still exists."""
-        if self.winfo_exists():
-            self.placeListboxWin()
 
     def onRootClick(self, event):
         """Hide the listbox if widget other that entry/listbox was clicked."""
