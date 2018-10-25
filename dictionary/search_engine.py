@@ -249,7 +249,7 @@ class SearchEngine():
             # dbActiveShape is a str of comma separated numbers or None
             if dbActShape:
                 dbActiveShape = set(int(item) for item in 
-                                    dbActiveShape.split(','))
+                                    dbActShape.split(','))
                 dbShapeGroups = set(self.groups[shape] for shape in 
                                     dbActiveShape)
             else:
