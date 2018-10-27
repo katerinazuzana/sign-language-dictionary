@@ -55,7 +55,7 @@ class ShapeSelectFrm(Frame):
         
         self.images = []     # images of the handshapes
         self.labels = []     # labels with handshape pics in the popup window
-        self.shapes = [i+1 for i in range(51)]
+        self.shapes = [i+1 for i in range(54)]
                 
         self.title = 'Tvar aktivní ruky'
         self.popuptext = 'Zvolte tvar aktivní ruky'
@@ -513,7 +513,7 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         """
         super().__init__(parent, imgdir, **options)
          
-        self.shapes = [1, 2, 4, 6, 9, 12, 13, 14, 16, 17, 23, 28, 41]
+        self.shapes = [1, 2, 4, 6, 9, 11, 12, 13, 15, 16, 22, 29, 42]
         self.numrows = 3
         
         # popup canvas size
