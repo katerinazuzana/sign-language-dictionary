@@ -164,7 +164,8 @@ class Dictionary():
         style.layout('Treeview.Item',
                      [('Treeitem.padding', {'sticky': 'nswe', 'children':
                        [('Treeitem.indicator', {'side': 'left', 'sticky': ''}),
-                        ('Treeitem.image', {'side': 'left', 'sticky': ''})]})])
+                        ('Treeitem.image', {'side': 'left', 'sticky': ''}),
+                        ('Treeitem.text', {'side': 'left', 'sticky': ''})]})])
 
         style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0,
                                                   self.TAB_PAD, 0))
