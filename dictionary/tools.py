@@ -9,7 +9,7 @@ def getImage(path, width, height):
     return image
 
 
-def listOfTuplesToList(listOfTuples):    
+def listOfTuplesToList(listOfTuples):
     """Convert a list of tuples into a simple list of tuple[0] items."""
     res = []
     for item in listOfTuples:
@@ -20,5 +20,3 @@ def listOfTuplesToList(listOfTuples):
 def leftPadItems(alist):
     """Add a space to the begining of each string in a given list."""
     return [' ' + item for item in alist]
-    
-
