@@ -41,19 +41,19 @@ class SearchEngine():
 
         self.allsigns = []
         self.signsmax = 15
-        # all the possible 51 handshapes are divided into
-        # 10 groups of visually similar shapes (roman nums I-X)
+        # all the possible 54 handshapes are divided into
+        # 11 groups of visually similar shapes (roman nums I-XI)
         self.groups = {1: 'I', 2: 'I', 3: 'I', 4: 'I', 5: 'I',
                        6: 'II', 7: 'II', 8: 'II', 9: 'III', 10: 'III',
-                       11: 'III', 12: 'IV', 13: 'IV', 14: 'IV', 15: 'III',
-                       16: 'III', 17: 'IV', 18: 'III', 19: 'III', 20: 'IV',
-                       21: 'II', 22: 'V', 23: 'V', 24: 'V', 25: 'V',
-                       26: 'V', 27: 'II', 28: 'VI', 29: 'VI', 30: 'VI',
+                       11: 'IV', 12: 'IV', 13: 'IV', 14: 'III', 15: 'III',
+                       16: 'IV', 17: 'III', 18: 'III', 19: 'IV', 20: 'II',
+                       21: 'V', 22: 'V', 23: 'V', 24: 'V', 25: 'V',
+                       26: 'V', 27: 'V', 28: 'II', 29: 'VI', 30: 'VI',
                        31: 'VI', 32: 'VI', 33: 'VI', 34: 'VI', 35: 'VI',
-                       36: 'VII', 37: 'VII', 38: 'VII', 39: 'VII',
+                       36: 'VI', 37: 'VII', 38: 'VII', 39: 'VII',
                        40: 'VII', 41: 'VII', 42: 'VII', 43: 'VII', 44: 'VII',
-                       45: 'VII', 46: 'VII', 47: 'VII', 48: 'VIII', 49: 'IX',
-                       50: 'IX', 51: 'X'}
+                       45: 'VII', 46: 'VII', 47: 'VII', 48: 'VII', 49: 'VIII',
+                       50: 'IX', 51: 'IX', 52: 'X', 53: 'XI', 54: 'XI'}
 
         # length that fits into the label where czech translation is shown
         self.maxTextLength = 42
