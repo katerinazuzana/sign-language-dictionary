@@ -1,14 +1,14 @@
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from autoscrollbar import AutoScrollbar
 
 
-class ScrolledList(Frame):
+class ScrolledList(tk.Frame):
     """A scrolled list for displaying words."""
-    
+
     def __init__(self, parent, searchfcn, height):
         """Create an empty scrolled list.
-        
+
         Arguments:
             parent: a parent tkinter widget
             searchfcn: a function that does the search, takes a (str) argument
@@ -21,19 +21,19 @@ class ScrolledList(Frame):
 
     def makeWidgets(self):
         """Create a treeview with a scrollbar."""
-        sbar = AutoScrollbar(self, orient=VERTICAL)
-        treeview = ttk.Treeview(self,                                 
-                                height=self.height,  
-                                selectmode='browse', 
+        sbar = AutoScrollbar(self, orient=tk.VERTICAL)
+        treeview = ttk.Treeview(self,
+                                height=self.height,
+                                selectmode='browse',
                                 show='tree')
-        sbar.config(command=treeview.yview)    
+        sbar.config(command=treeview.yview)
         treeview.config(yscrollcommand=sbar.set)
-        
+
         sbar.grid(column=1, row=0)
-        treeview.grid(column=0, row=0, sticky=N+E+S+W)
+        treeview.grid(column=0, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-            
+
         treeview.bind('<Double-1>', self.handler)
         treeview.bind('<Return>', self.handler)
         self.treeview = treeview
@@ -42,16 +42,15 @@ class ScrolledList(Frame):
         """Fetch the selection text and start the search."""
         iid = self.treeview.selection()[0]
         selection = self.treeview.item(iid, option='text')
-        self.searchfcn(selection)       
+        self.searchfcn(selection)
 
     def setOptions(self, options):
         """Update the content of the scrolled list.
-        
+
         Arguments:
             options: a list of strings
         """
         items = self.treeview.get_children()
         self.treeview.delete(*items)
         for option in options:
-            self.treeview.insert("", END, text=option)
-
+            self.treeview.insert("", tk.END, text=option)
