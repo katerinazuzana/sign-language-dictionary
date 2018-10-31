@@ -129,6 +129,7 @@ class CatFrm(tk.Frame):
         self.subcatvar.set(' -- Zvolte podkategorii --')
         wordlist = self.findWords(self.catvar)
         self.scrolledlist.setOptions(wordlist)
+        self.scrolledlist.treeview.yview_moveto(0)
 
     def findWords(self, var):
         """Return a list of the words contained in a given (sub)category."""
@@ -155,6 +156,7 @@ class CatFrm(tk.Frame):
         self.subcatcb.selection_clear()  # remove highlighting from combobox
         wordlist = self.findWords(self.subcatvar)
         self.scrolledlist.setOptions(wordlist)
+        self.scrolledlist.treeview.yview_moveto(0)
 
     def mySort(self, alist):
         """Sort a list alphabetically, items starting with a number go last."""
