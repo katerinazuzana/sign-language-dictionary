@@ -119,7 +119,9 @@ class AutocompleteEntry(ttk.Entry):
 
     def setEntry(self, event):
         """Set the entry variable to the value currently selected."""
-        self.var.set(self.listbox.get(tk.ACTIVE).lstrip())
+        index = self.listbox.curselection()
+        selection = self.listbox.get(index).lstrip()
+        self.var.set(selection)
 
     def focusOnListbox(self, event):
         """Set focus on the listbox and select the first item."""
