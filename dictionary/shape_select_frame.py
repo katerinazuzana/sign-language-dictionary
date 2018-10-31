@@ -587,4 +587,5 @@ class PassiveShapeSelectFrm(ShapeSelectFrm):
         """Reset the buttons to normal state and remove the darkening layer."""
         self.addBut.config(state='normal')
         self.delBut.config(state='normal')
+        self.darkscreen.grid_forget()
         self.darkscreen.destroy()
