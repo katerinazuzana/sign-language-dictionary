@@ -184,7 +184,8 @@ class MainFrm(tk.Frame):
             self.altsfrm = None
             self.videofrm = VideoFrm(self,
                                      self.VIDEO_WIDTH,
-                                     self.VIDEO_HEIGHT)
+                                     self.VIDEO_HEIGHT,
+                                     self.imgdir)
             self.videofrm.grid(column=0, row=3)
         # play the video file
         self.videofrm.play(video_source=videofile)
