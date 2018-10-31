@@ -160,7 +160,9 @@ class Dictionary():
         # the bottom padding is necessary for the treeview bottom border
         # to be visible
 
-        style.map('Treeview', background=[('selected', 'lightgrey')])
+        style.map('Treeview',
+                  background=[('selected', 'lightgrey')],
+                  foreground=[('selected', 'black')])
         style.configure('Treeview.Item', padding=(-15, 0, 0, 0))
 
         # ged rid of dashed rectangle around the highlighted item in treeview
