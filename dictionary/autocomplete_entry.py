@@ -51,7 +51,8 @@ class AutocompleteEntry(ttk.Entry):
         self.listboxWin = tk.Toplevel()
         self.listbox = tk.Listbox(self.listboxWin,
                                   height=self.maxEntries,
-                                  borderwidth=0)
+                                  borderwidth=0,
+                                  exportselection=False)
         self.listboxWin.columnconfigure(0, minsize=self.winfo_width())
         self.listbox.grid(column=0, row=0, sticky=tk.E+tk.W)
 
@@ -119,9 +120,10 @@ class AutocompleteEntry(ttk.Entry):
 
     def setEntry(self, event):
         """Set the entry variable to the value currently selected."""
-        index = self.listbox.curselection()
-        selection = self.listbox.get(index).lstrip()
-        self.var.set(selection)
+        indx = self.listbox.curselection()
+        if indx != ():
+            selection = self.listbox.get(indx).lstrip()
+            self.var.set(selection)
 
     def focusOnListbox(self, event):
         """Set focus on the listbox and select the first item."""
