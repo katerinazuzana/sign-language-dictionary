@@ -71,9 +71,10 @@ class Dictionary():
     """
 
     BORDER = 38  # the main window border width
-    WIN_MIN_WIDTH = 1012  # minimal width of the main application window
+    WIN_MIN_WIDTH = 1029  # minimal width of the main application window
     WIN_MIN_HEIGHT = 670  # minimal height of the main application window
-    TAB_PAD = 22  # initial notebook's tab padding
+    TAB_PADX = 25  # notebook's tab padding
+    TAB_PADY = 2
     BGCOLOR = 'white'  # background color
 
     def __init__(self, dbpath, vfdir, imgdir):
@@ -109,7 +110,7 @@ class Dictionary():
         self.root.minsize(width=self.WIN_MIN_WIDTH,
                           height=self.WIN_MIN_HEIGHT)
 
-        self.font = tkFont.Font(family='Nimbus Sans L', size=12)
+        self.font = tkFont.Font(family='DejaVu Sans', size=11)
         self.root.option_add('*Font', self.font)
 
         self.root.columnconfigure(0, weight=2)  # empty column
@@ -147,7 +148,9 @@ class Dictionary():
         style.configure('Gray.TEntry', foreground='gray')  # for default text
         style.configure('Black.TEntry', foreground='black')  # for user input
 
-        style.configure('TCombobox', background=self.BGCOLOR)
+        style.configure('TCombobox',
+                        background=self.BGCOLOR,
+                        padding=(0, 2, 0, 0))
         style.map('TCombobox', background=[('disabled', self.BGCOLOR)])
 
         style.configure('Treeview',
@@ -167,10 +170,12 @@ class Dictionary():
                         ('Treeitem.image', {'side': 'left', 'sticky': ''}),
                         ('Treeitem.text', {'side': 'left', 'sticky': ''})]})])
 
-        style.configure('TNotebook.Tab', padding=(self.TAB_PAD, 0,
-                                                  self.TAB_PAD, 0))
-        style.map('TNotebook.Tab', padding=[('selected', (self.TAB_PAD, 0,
-                                                          self.TAB_PAD, 0))])
+        style.configure('TNotebook.Tab', padding=(self.TAB_PADX, self.TAB_PADY,
+                                                  self.TAB_PADX, 0))
+        style.map('TNotebook.Tab', padding=[('selected', (self.TAB_PADX,
+                                                          self.TAB_PADY,
+                                                          self.TAB_PADX,
+                                                          0))])
 
         # tabs' font:
         style.configure('.', font=self.font)

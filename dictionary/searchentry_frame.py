@@ -31,7 +31,7 @@ class EntFrm(tk.Frame):
         self.rowconfigure(0, weight=1)
 
         # create the search button
-        bfrm = tk.Frame(self, height=27, width=50)
+        bfrm = tk.Frame(self, height=28, width=50)
         bfrm.grid_propagate(0)  # size of child doesn't affect size of parent
         bfrm.grid(column=1, row=0, sticky=tk.N)
         bfrm.rowconfigure(0, weight=1)
@@ -69,7 +69,7 @@ class EntFrm(tk.Frame):
                                      self.startSearch,
                                      maxEntries=10,
                                      textvariable=self.var)
-        self.ent.grid(column=0, row=0, sticky=tk.N+tk.E+tk.W)
+        self.ent.grid(column=0, row=0, sticky=tk.N+tk.E+tk.W, ipady=2)
         self.ent.config(style="Gray.TEntry")
 
     def startSearch(self, event=None):

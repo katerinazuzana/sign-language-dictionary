@@ -38,6 +38,10 @@ class MainFrm(tk.Frame):
     TOP_SPACE = 5  # additional padding at the top of the frame
     LAB_PADY = 20  # space between the label and the main video frame widgets
     LAB_FONT_SIZE = 20  # font size of the label
+    LAB_FONT_SIZE_SMALL = 19
+    LAB_FONT_SIZE_SMALLEST = 16
+    LENGTH_NORMAL_FONT = 33  # max word length for using normal font size
+    LENGTH_SMALL_FONT = 37  # max word length for using small font size
 
     def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, altsmax,
                  border, **options):
@@ -101,10 +105,6 @@ class MainFrm(tk.Frame):
         self.lab.grid(column=0, row=2,
                       sticky=tk.N+tk.S+tk.W,
                       pady=(0, self.LAB_PADY))
-
-        font = tkFont.Font(font=self.lab['font'])  # get current app font
-        font.configure(size=self.LAB_FONT_SIZE, weight='bold')  # adjust it
-        self.lab.config(font=font)  # use the changed font in the label
 
         # create the main video frame
         self.videofrm = VideoFrm(self,
@@ -171,6 +171,12 @@ class MainFrm(tk.Frame):
             videofile (str): name of the video file
         """
         self.labvar.set(word)
+        if len(word) <= self.LENGTH_NORMAL_FONT:
+            self.setLabFontSize(self.LAB_FONT_SIZE)
+        elif len(word) <= self.LENGTH_SMALL_FONT:
+            self.setLabFontSize(self.LAB_FONT_SIZE_SMALL)
+        else:
+            self.setLabFontSize(self.LAB_FONT_SIZE_SMALLEST)
 
         # if there is an AltsFrm, create a VideoFrm instead of it
         if self.altsfrm is not None:
@@ -256,6 +262,7 @@ class MainFrm(tk.Frame):
             self.labvar.set('Výraz nebyl nalezen')
         else:
             self.labvar.set('Výraz nebyl nalezen - nechtěli jste hledat:')
+            self.setLabFontSize(self.LAB_FONT_SIZE_SMALLEST)
             self.videofrm.destroy()
             if self.altsfrm is not None:
                 self.altsfrm.destroy()
@@ -272,3 +279,10 @@ class MainFrm(tk.Frame):
         if self.altsfrm is not None:
             self.altsfrm.destroy()
         self.labvar.set('Zadejte výraz, který chcete vyhledat')
+        self.setLabFontSize(self.LAB_FONT_SIZE_SMALL)
+
+    def setLabFontSize(self, size):
+        """Set font size in 'self.lab'."""
+        font = tkFont.Font(font=self.lab['font'])  # get current app font
+        font.configure(size=size, weight='bold')  # adjust it
+        self.lab.config(font=font)  # use the changed font in the label

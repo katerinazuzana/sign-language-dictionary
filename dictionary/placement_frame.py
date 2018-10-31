@@ -41,7 +41,7 @@ class PlacementFrm(tk.Frame):
         self.delButSize = 35
         self.searchIconPath = os.path.join(imgdir, 'search_icon.png')
         self.searchIconSize = 32
-        self.searchButWidth = 52
+        self.searchButWidth = 60
         self.searchButHeight = 35
 
         self.delay = 1000  # how long wait before button description shows up
@@ -52,7 +52,7 @@ class PlacementFrm(tk.Frame):
 
         self.labPady = 3
         self.hintPadx = 8
-        self.delButPadx = 15
+        self.delButPadx = 20
         self.searchButPadx = 5
         self.butVertSpace = 7  # vertical space between Del and Search buttons
 
@@ -64,8 +64,8 @@ class PlacementFrm(tk.Frame):
     def makeWidgets(self):
         """Create a title label, a hint icon, a drawing canvas, and buttons."""
         self.rowconfigure(1, weight=1)
-        self.columnconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
 
         tk.Label(self,
@@ -92,7 +92,10 @@ class PlacementFrm(tk.Frame):
                                     height=self.canvasHeight,
                                     borderwidth=self.canvasBorder,
                                     relief='groove')
-        self.canvas.grid(column=0, row=1, columnspan=2, rowspan=2)
+        self.canvas.grid(column=0, row=1,
+                         sticky=tk.S,
+                         columnspan=2,
+                         rowspan=2)
         self.image = tools.getImage(self.canvasImagePath,
                                     width=self.canvasWidth,
                                     height=self.canvasHeight)

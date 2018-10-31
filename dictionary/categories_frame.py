@@ -29,7 +29,7 @@ class CatFrm(tk.Frame):
         super().__init__(parent, **options)
         self.dbpath = dbpath
         self.searchfcn = searchfcn
-        self.width = 33
+        self.width = 31
         self.height = 14   # scrolled list height in lines
         self.verticalSpace = 40   # space between widgets
         self.topSpace = 10   # additional padding at the top of the frame
