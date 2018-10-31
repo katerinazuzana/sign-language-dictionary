@@ -209,6 +209,9 @@ class Dictionary():
         self.signfrm.grid(column=0, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
         self.notebook.add(self.signfrm, text='Překlad z ČZJ do ČJ')
 
+        # update to make sure that toplevel windows will be placed correctly
+        self.root.update()
+
     def positionWindow(self):
         """Position the application window in the center of the screen."""
         self.root.update_idletasks()
