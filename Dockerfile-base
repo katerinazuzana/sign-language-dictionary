@@ -1,0 +1,58 @@
+# Dockerfile that sets up environment for running the Dictionary app.
+# Used to create katerinazuzana/dictionary-base
+#
+# Python + NumPy + Pillow + OpenCV (not full) + Clearlooks
+
+
+FROM python:3.7-slim
+
+MAINTAINER Katerina Zuzanakova <katerina.zuzanakova@gmail.com>
+
+# Clearlooks theme
+COPY /clearlooks /usr/share/ttkthemes/clearlooks
+
+ENV TCLLIBPATH=/usr/share/ttkthemes \
+    DISPLAY=:0 \
+    CV_VERSION=3.4.2
+
+# Install NumPy, Pillow, and OpenCV dependencies
+RUN pip3 install numpy \
+                 Pillow \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        libavformat-dev \
+        libswscale-dev \
+        pkg-config \
+        tcl \
+        tk \
+        unzip \
+        wget \
+
+# Install OpenCV
+    && wget https://github.com/opencv/opencv/archive/${CV_VERSION}.zip \
+    && unzip ${CV_VERSION}.zip \
+    && mkdir -p /opencv-${CV_VERSION}/build \
+    && cd /opencv-${CV_VERSION}/build \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=RELEASE \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DPYTHON_EXECUTABLE=$(which python3) \
+        .. \
+    && make -j$(nproc) \
+    && make install \
+    
+# Clean
+    && rm /${CV_VERSION}.zip \
+    && rm -r /opencv-${CV_VERSION} \
+    && apt-get -y remove \
+        build-essential \
+        cmake \
+        libavformat-dev \
+        libswscale-dev \
+        pkg-config \
+        unzip \
+        wget \  
+    && apt-get -y clean all \
+    && rm -rf /var/lib/apt/lists/*
