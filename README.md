@@ -29,37 +29,18 @@ after installing the dependencies:
 ```$ pip3 install Pillow numpy
 ```
 **OpenCV**
-```
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install build-essential \
-    cmake \
-    libavformat-dev \
-    libswscale-dev \
-    pkg-config
-cd ~
-wget -O opencv.zip https://github.com/opencv/opencv/archive/3.4.2.zip
-unzip opencv.zip
-mkdir -p ~/opencv-3.4.2/build
-cd /opencv-3.4.2/build
-cmake -DCMAKE\_BUILD_TYPE=RELEASE \
-    -DCMAKE\_INSTALL_PREFIX=/usr/local \
-    -DPYTHON_EXECUTABLE=$(which python3) ..
-make -j$(nproc)
-sudo make install
-rm ~/opencv.zip
-rm -r /opencv-3.4.2
-```
+To install OpenCV, see for example Adrian Rosebrock's [tutorial](https://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/) (for Ubuntu)
 **Clearlooks theme** (Optional)
 ```
 cd ~
 git clone https://github.com/RedFantom/ttkthemes.git
-mkdir -p /usr/share/ttkthemes
-cp -r ttkthemes/ttkthemes/themes/clearlooks /usr/share/ttkthemes
-mv /usr/share/ttkthemes/clearlooks/clearlooks.tcl /usr/share/ttkthemes/clearlooks/clearlooks8.5.tcl
-echo "export TCLLIBPATH=/usr/share/ttkthemes" >> ~/.bashrc
-rm -r ttkthemes
+mkdir -p ~/.local/share/ttkthemes
+cp -r ttkthemes/ttkthemes/themes/clearlooks ~/.local/share/ttkthemes
+mv ~/.local/share/ttkthemes/clearlooks/clearlooks.tcl ~/.local/share/ttkthemes/clearlooks/clearlooks8.5.tcl
+echo "export TCLLIBPATH=~/.local/share/ttkthemes" >> ~/.bashrc
+rm -rf ttkthemes
 ```
+(based on Stephan Sokolow's blog post [Installing a new Ttk/Tile theme] (http://blog.ssokolow.com/archives/2011/10/01/installing-a-new-ttktile-theme/))
 
 ### Running from a docker container
 Another way of running the application is from a docker container:
