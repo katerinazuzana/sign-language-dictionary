@@ -1,6 +1,6 @@
 # Czech Sign Language Dictionary
 
-> A bilingual dictionary for translating expressions to and from czech and czech sign language.
+> A bilingual dictionary for translating expressions to and from Czech and Czech Sign Language.
 
 The Dictionary is built in Python 3 using the tkinter library and SQLite database.
 
