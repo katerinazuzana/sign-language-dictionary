@@ -1,7 +1,7 @@
 # Dockerfile that sets up environment for running the Dictionary app.
 # Used to create katerinazuzana/dictionary-base
 #
-# Python + NumPy + Pillow + OpenCV (not full) + Clearlooks
+# Python + NumPy + Pillow + OpenCV + Clearlooks
 
 
 FROM python:3.7-slim
