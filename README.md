@@ -1,11 +1,14 @@
 # Czech Sign Language Dictionary
+
 > A bilingual dictionary for translating expressions to and from czech and czech sign language.
 
 The Dictionary is built in Python 3 using the tkinter library and SQLite database.
 
-**Note:** As I don't have permission to share publically the videos with sign language translations, the videos in the application don't capture actual signing persons -- there are demo animations (with a piece of text running across the screen) instead.
+
 
 ![screenshot](screenshot.png)
+
+**Note:** As I don't have permission to share publically the videos with sign language translations, the videos in the application don't capture actual signing persons -- there are demo animations (with a piece of text running across the screen) instead.
 
 ## Requirements
 
@@ -21,15 +24,20 @@ The Dictionary is built in Python 3 using the tkinter library and SQLite databas
 Linux:
 
 The application can be run from `dictionary` directory by:
-```python main.py
+```
+python main.py
 ```
 after installing the dependencies:
 
 **Pillow and NumPy**
-```$ pip3 install Pillow numpy
+
+```
+$ pip3 install Pillow numpy
 ```
 **OpenCV**
+
 To install OpenCV, see for example Adrian Rosebrock's [tutorial](https://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/) (for Ubuntu)
+
 **Clearlooks theme** (Optional)
 ```
 cd ~
@@ -40,9 +48,10 @@ mv ~/.local/share/ttkthemes/clearlooks/clearlooks.tcl ~/.local/share/ttkthemes/c
 echo "export TCLLIBPATH=~/.local/share/ttkthemes" >> ~/.bashrc
 rm -rf ttkthemes
 ```
-(based on Stephan Sokolow's blog post [Installing a new Ttk/Tile theme] (http://blog.ssokolow.com/archives/2011/10/01/installing-a-new-ttktile-theme/))
+(based on Stephan Sokolow's blog post [Installing a new Ttk/Tile theme](http://blog.ssokolow.com/archives/2011/10/01/installing-a-new-ttktile-theme/))
 
 ### Running from a docker container
+
 Another way of running the application is from a docker container:
 ```
 docker build -t dictionary .
