@@ -1,18 +1,17 @@
-Credit
+#### Credit
 
 In the Czech Sign Language Dictionary application the following icons 
 (located at ./dictionary/images directory) are used:
 
 * hint\_icon.png is an [icon](findicons.com/icon/455110/light_bulb_on) by [Janik Baumgartner](kinaj.com) licensed under [CC BY](creativecommons.org/licenses/by/4.0/)
 
+* replay\_arrow.png is an [icon](https://findicons.com/icon/261425/arrow_clockwise) by [Momenticons](https://momentumdesignlab.com/) licensed under [CC BY](creativecommons.org/licenses/by/4.0/)
+
 * add\_icon.png, close\_icon.png, del\_draw.png, del\_icon.png, search\_icon.png, 
 submit\_icon.png are icons from the [Koloria icons set](www.graphicrating.com/2012/06/14/koloria-free-icons-set/)
 
-* replay\_arrow.png is an [icon](https://findicons.com/icon/261425/arrow_clockwise) by [Momenticons](https://momentumdesignlab.com/) licensed under [CC BY](creativecommons.org/licenses/by/4.0/)
 
-
-
-The Czech Sign Language Dictionary is released under the MIT license.
+#### The Czech Sign Language Dictionary is released under the MIT license.
 
 Copyright (c) 2018 Katerina Zuzanakova
 
@@ -33,4 +32,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
