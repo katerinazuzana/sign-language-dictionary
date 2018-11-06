@@ -23,7 +23,7 @@ The Dictionary is built in Python 3 using the tkinter library and SQLite databas
 
 Linux:
 
-The application can be run from `dictionary` directory by:
+The application can be run from `dictionary` directory by
 ```
 python main.py
 ```
@@ -60,7 +60,7 @@ sudo mkdir /usr/share/ttkthemes
 sudo cp -r ttkthemes/themes/clearlooks /usr/share/ttkthemes
 echo "export TCLLIBPATH=/usr/share/ttkthemes" >> ~/.bashrc
 ```
-Clean after yourself
+Clean up
 ```
 cd ..
 rm -rf newtheme
@@ -68,16 +68,16 @@ rm -rf newtheme
 
 ### Running from a docker container
 
-Another way of running the application is from a docker container:
+Another way of running the application is from a docker container
 ```
 docker build -t dictionary .
 docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY dictionary
 ```
-Might require additional settings in order to enable the container to connect to a host's X server. The easiest (but not the most secure) way to do that is by setting:
+Might require additional settings in order to enable the container to connect to a host's X server. The easiest (but not the most secure) way to do that is by setting
 ```
 xhost +local:root
 ```
-and resetting after we are finished using the container:
+and resetting after we are finished using the container
 ```
 xhost -local:root
 ```
