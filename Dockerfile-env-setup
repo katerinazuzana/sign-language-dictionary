@@ -1,5 +1,5 @@
 # Dockerfile that sets up environment for running the Dictionary app.
-# Used to create katerinazuzana/dictionary-base
+# Used to create katerinazuzana/dictionary-env
 #
 # Python + NumPy + Pillow + OpenCV + Clearlooks
 
