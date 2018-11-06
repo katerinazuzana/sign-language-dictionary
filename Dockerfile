@@ -1,4 +1,4 @@
-FROM katerinazuzana/dictionary-base
+FROM katerinazuzana/dictionary-env
 
 MAINTAINER Katerina Zuzanakova <katerina.zuzanakova@gmail.com>
 
