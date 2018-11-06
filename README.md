@@ -8,7 +8,7 @@ The Dictionary is built in Python 3 using the tkinter library and SQLite databas
 
 ![screenshot](screenshot.png)
 
-**Note:** As I don't have permission to share publically the videos with sign language translations, the videos in the application don't capture actual signing persons -- there are demo animations (with a piece of text running across the screen) instead.
+**Note:** As I don't have permission to share publically the videos with sign language translations, the videos in the application don't capture actual signing persons – there are demo animations (with a piece of text running across the screen) instead.
 
 ## Requirements
 
@@ -39,23 +39,47 @@ $ pip3 install Pillow numpy
 To install OpenCV, see for example Adrian Rosebrock's [tutorial](https://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/) (for Ubuntu)
 
 **Clearlooks theme** (Optional)
+
+Download the Clearlooks theme from [RedFantom's repo](https://github.com/RedFantom/ttkthemes/tree/master/ttkthemes/themes/clearlooks) using Git sparse checkout
 ```
-cd ~
-git clone https://github.com/RedFantom/ttkthemes.git
-mkdir -p ~/.local/share/ttkthemes
-cp -r ttkthemes/ttkthemes/themes/clearlooks ~/.local/share/ttkthemes
-mv ~/.local/share/ttkthemes/clearlooks/clearlooks.tcl ~/.local/share/ttkthemes/clearlooks/clearlooks8.5.tcl
-echo "export TCLLIBPATH=~/.local/share/ttkthemes" >> ~/.bashrc
-rm -rf ttkthemes
+mkdir newtheme
+cd newtheme
+git init
+git config core.sparsecheckout true
+echo "ttkthemes/themes/clearlooks" > .git/info/sparse-checkout
+git remote add -f origin https://github.com/RedFantom/ttkthemes.git
+git pull origin master
 ```
-(based on Stephan Sokolow's blog post [Installing a new Ttk/Tile theme](http://blog.ssokolow.com/archives/2011/10/01/installing-a-new-ttktile-theme/))
+Rename `clearlooks.tcl`
+```
+mv ttkthemes/themes/clearlooks/clearlooks.tcl ttkthemes/themes/clearlooks/clearlooks8.5.tcl
+```
+Set the `TCLLIBPATH` variable
+```
+sudo mkdir /usr/share/ttkthemes
+sudo cp -r ttkthemes/themes/clearlooks /usr/share/ttkthemes
+echo "export TCLLIBPATH=/usr/share/ttkthemes" >> ~/.bashrc
+```
+Clean after yourself
+```
+cd ..
+rm -rf newtheme
+```
 
 ### Running from a docker container
 
 Another way of running the application is from a docker container:
 ```
 docker build -t dictionary .
-docker run --rm -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY dictionary
+docker run -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY dictionary
+```
+Might require additional settings in order to enable the container to connect to a host's X server. The easiest (but not the most secure) way to do that is by setting:
+```
+xhost +local:root
+```
+and resetting after we are finished using the container:
+```
+xhost -local:root
 ```
 
 ## Meta
