@@ -40,7 +40,7 @@ class SearchEngine():
         self.allwords = []
 
         # create a list of video file names for searching with unknown suffix
-        # used in findVideoFile() method
+        # used in _findVideoFile() method
         self.vflist = os.listdir(self.vfdir)
 
         self.allsigns = []
@@ -76,7 +76,7 @@ class SearchEngine():
         a list of options for the category combobox.
         """
         SQLquery = 'SELECT DISTINCT upperlevel FROM cathierarchy'
-        return self.findCboxItems(SQLquery)
+        return self._findCboxItems(SQLquery)
 
     def findSubcats(self, catvar):
         """Find subcategories corresponding to the selected category
@@ -88,9 +88,9 @@ class SearchEngine():
         cat = catvar.get().lstrip()
         SQLquery = 'SELECT lowerlevel FROM cathierarchy WHERE \
                         upperlevel="{}"'.format(cat)
-        return self.findCboxItems(SQLquery)
+        return self._findCboxItems(SQLquery)
 
-    def findCboxItems(self, SQLquery):
+    def _findCboxItems(self, SQLquery):
         """Return a list of options for a combobox."""
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
@@ -124,9 +124,9 @@ class SearchEngine():
             cursor.execute(SQLquery, (vartext,))
             find = cursor.fetchall()
         find = tools.listOfTuplesToList(find)
-        return self.mySort(find)
+        return self._mySort(find)
 
-    def mySort(self, alist):
+    def _mySort(self, alist):
         """Sort a list alphabetically, items starting with a number go last."""
         return sorted(alist, key=lambda x: (x[0].isdigit(), x.lower()))
 
@@ -152,10 +152,10 @@ class SearchEngine():
         else:
             # the word was not found
             # search the database for similar words
-            altoptions = self.findAltOpts(lookupword)
+            altoptions = self._findAltOpts(lookupword)
             return (False, altoptions)
 
-    def findVideoFile(self, videofile):
+    def _findVideoFile(self, videofile):
         """Return the full name of a video file, including suffix.
 
         Arguments:
@@ -177,11 +177,11 @@ class SearchEngine():
             alist (list): items take form (word (str), videofile (str))
         """
         for i, (word, filename) in enumerate(alist):
-            withsuffix = self.findVideoFile(filename)
+            withsuffix = self._findVideoFile(filename)
             alist[i] = (word, withsuffix)
         return alist
 
-    def findAltOpts(self, lookupword):
+    def _findAltOpts(self, lookupword):
         """Search the database for words similar to 'lookupword'.
 
         Find words that have the longest common substrings with 'lookupword'.
@@ -194,7 +194,7 @@ class SearchEngine():
             list: a list of expressions (str) that are closest to 'lookupword'
         """
         if self.allwords == []:
-            # on first call of findAltOpts()
+            # on first call of _findAltOpts()
             # create a list of all the words contained in the database
             with sqlite3.connect(self.dbpath) as conn:
                 cursor = conn.cursor()
@@ -301,8 +301,8 @@ class SearchEngine():
 
         if uPlacement:
             # used for comparing the signs placement:
-            uReliefFcn = self.getReliefFcn(*uPlacement)
-            uRelief = self.getRelief(uReliefFcn)  # numpy array
+            uReliefFcn = self._getReliefFcn(*uPlacement)
+            uRelief = self._getRelief(uReliefFcn)  # numpy array
             uArea = (uRelief == 1).sum()
 
         if self.allsigns == []:
@@ -334,23 +334,23 @@ class SearchEngine():
             # dbPlacement is a str "line#, # of 0s, # of 1s, # of 0s" or None
             if dbPlacement:
                 # get numpy array
-                dbRelief = self.getDbRelief(dbPlacement)  # numpy array
+                dbRelief = self._getDbRelief(dbPlacement)  # numpy array
 
             # distance in the Active Hand Shape dimension
-            actDist = self.calcActDist(uActiveShape, uShapeGroups,
-                                       dbActiveShape, dbShapeGroups)
+            actDist = self._calcActDist(uActiveShape, uShapeGroups,
+                                        dbActiveShape, dbShapeGroups)
 
             # distance in the Sign Type dimension
-            typeDist = self.calcTypeDist(uSignType, uPassiveShape,
-                                         dbSignType, dbPassiveShape)
+            typeDist = self._calcTypeDist(uSignType, uPassiveShape,
+                                          dbSignType, dbPassiveShape)
 
             # distance in the Sign Placement dimension
             placeDist = 1
             if uPlacement and dbPlacement:
-                placeDist = self.calcPlaceDist(uRelief,
-                                               uArea,
-                                               dbRelief,
-                                               dbArea)
+                placeDist = self._calcPlaceDist(uRelief,
+                                                uArea,
+                                                dbRelief,
+                                                dbArea)
 
             # the total distance
             dist = actDist + typeDist + placeDist
@@ -383,7 +383,7 @@ class SearchEngine():
         result = self.addSuffixes(result)
         return (True, result)
 
-    def calcActDist(self, uShape, uGroups, dbShape, dbGroups):
+    def _calcActDist(self, uShape, uGroups, dbShape, dbGroups):
         """Calculate the distance between the user sign and the db sign in the
         Active Hand Shape dimension.
 
@@ -414,7 +414,7 @@ class SearchEngine():
             actDist = 1
         return actDist
 
-    def calcTypeDist(self, uSignType, uPassiveShape,
+    def _calcTypeDist(self, uSignType, uPassiveShape,
                      dbSignType, dbPassiveShape):
         """Calculate the distance between the user sign and the db sign in the
         Sign Type dimension.
@@ -447,7 +447,7 @@ class SearchEngine():
                 typeDist = 0
         return typeDist
 
-    def calcPlaceDist(self, uRelief, uArea, dbRelief, dbArea):
+    def _calcPlaceDist(self, uRelief, uArea, dbRelief, dbArea):
         """Calculate the distance between the user sign and the db sign in the
         Placement dimension.
 
@@ -468,7 +468,7 @@ class SearchEngine():
         placeDist = 1 - (2 * overlap) / (uArea + dbArea)
         return placeDist
 
-    def getReliefFcn(self, centerx, centery, a, b, angle):
+    def _getReliefFcn(self, centerx, centery, a, b, angle):
         """Return a function of canvas coords that describes an elliptic area.
 
         Arguments:
@@ -504,7 +504,7 @@ class SearchEngine():
                 return 0
         return f
 
-    def getRelief(self, reliefFcn):
+    def _getRelief(self, reliefFcn):
         matrix = []
         for y in range(self.canvasHeight):
             row = []
@@ -513,7 +513,7 @@ class SearchEngine():
             matrix.append(row)
         return np.array(matrix)
 
-    def getDbRelief(self, dbPlacement):
+    def _getDbRelief(self, dbPlacement):
         placement = [[int(item) for item in line.split(",")] for line
                      in dbPlacement.split(";")]
         # empty matrix
