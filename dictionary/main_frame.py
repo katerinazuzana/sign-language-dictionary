@@ -36,6 +36,7 @@ class MainFrm(tk.Frame):
     # the width of the scrollbar used in the frame with thumbnail videos
     SCROLLBAR_WIDTH = 15
     TOP_SPACE = 5  # additional padding at the top of the frame
+    LAB_MIN_HEIGHT = 60  # min height of the label
     LAB_PADY = 20  # space between the label and the main video frame widgets
     LAB_FONT_SIZE = 20  # font size of the label
     LAB_FONT_SIZE_SMALL = 19
@@ -78,6 +79,7 @@ class MainFrm(tk.Frame):
         self.columnconfigure(0, minsize=self.VIDEO_WIDTH)
         self.rowconfigure(0, weight=1)  # empty row
         self.rowconfigure(1, weight=4)
+        self.rowconfigure(2, minsize=self.LAB_MIN_HEIGHT)
         self.rowconfigure(3, minsize=self.VIDEO_HEIGHT)
         self.rowconfigure(4,
                           minsize=self.THUMB_HEIGHT +
