@@ -61,7 +61,6 @@ class MainFrm(tk.Frame):
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.imgdir = imgdir
-        self.searchfcn = searchEng.search
         self.searchEng = searchEng
         self.thumbs = []   # a list of frames where thumbnail videos live
 
@@ -273,7 +272,8 @@ class MainFrm(tk.Frame):
         # create a frame with an offer of alternative options
         self.altsfrm = AltsFrm(self,
                                altoptions,
-                               self.searchfcn,
+                               self.searchEng,
+                               self.showResult,
                                bg=self.bgcolor)
         self.altsfrm.grid(column=0, row=3, sticky=tk.N+tk.E+tk.S+tk.W)
 

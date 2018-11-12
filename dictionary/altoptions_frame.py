@@ -10,17 +10,20 @@ class AltsFrm(tk.Frame):
     options are displayed in AltsFrm object, each option in its own label.
     """
 
-    def __init__(self, parent, altoptions, searchfcn, **options):
+    def __init__(self, parent, altoptions, searchEng, showResultFcn,
+                 **options):
         """Create a frame with an offer of options.
 
         Arguments:
             parent: the parent tkinter widget
             altoptions: a list of (str) options
-            searchfcn: a function that does the search, takes a str argument
+            searchEng: an object that provides searching operations
+            showResultFcn: function that displays the search result
         """
         super().__init__(parent, **options)
         self.altoptions = altoptions
-        self.searchfcn = searchfcn
+        self.searchEng = searchEng
+        self.showResultFcn = showResultFcn
         self.labbgcolor = options.get('bg', self['bg'])
         self.labFont = None
         self.labFontSize = 13
@@ -45,5 +48,9 @@ class AltsFrm(tk.Frame):
 
             # when a label is clicked on, the corresponding video is played
             def onLabelClick(i):
-                return lambda event: self.searchfcn(self.altoptions[i])
+                return lambda event: self.doSearchAndShowResult(i)
             lab.bind('<Button-1>', onLabelClick(i))
+
+    def doSearchAndShowResult(self, i):
+        result = self.searchEng.search(self.altoptions[i])
+        self.showResultFcn(result)
