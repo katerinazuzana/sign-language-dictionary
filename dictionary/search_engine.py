@@ -415,7 +415,7 @@ class SearchEngine():
         return actDist
 
     def _calcTypeDist(self, uSignType, uPassiveShape,
-                     dbSignType, dbPassiveShape):
+                      dbSignType, dbPassiveShape):
         """Calculate the distance between the user sign and the db sign in the
         Sign Type dimension.
 
