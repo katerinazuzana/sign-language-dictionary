@@ -4,3 +4,4 @@ Dockerfile-env-setup
 .gitignore
 README.md
 screenshot.png
+tests
