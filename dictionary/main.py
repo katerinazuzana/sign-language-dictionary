@@ -192,6 +192,7 @@ class Dictionary():
         self.catfrm = CatFrm(self.notebook,
                              self.dbpath,
                              self.searchEng.search,
+                             self.mainfrm.showResult,
                              bg=self.BGCOLOR,
                              padx=self.BORDER,
                              pady=self.BORDER)

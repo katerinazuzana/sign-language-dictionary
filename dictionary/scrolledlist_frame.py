@@ -6,16 +6,16 @@ from autoscrollbar import AutoScrollbar
 class ScrolledList(tk.Frame):
     """A scrolled list for displaying words."""
 
-    def __init__(self, parent, searchfcn, height):
+    def __init__(self, parent, handlerfcn, height):
         """Create an empty scrolled list.
 
         Arguments:
             parent: a parent tkinter widget
-            searchfcn: a function that does the search, takes a (str) argument
+            handlerfcn: a function that does the search, takes a (str) argument
             height (int): height of the scrolled list in lines
         """
         super().__init__(parent)
-        self.searchfcn = searchfcn
+        self.handlerfcn = handlerfcn
         self.height = height
         self.makeWidgets()
 
@@ -39,10 +39,10 @@ class ScrolledList(tk.Frame):
         self.treeview = treeview
 
     def handler(self, event):
-        """Fetch the selection text and start the search."""
+        """Fetch the selection text and do the search."""
         iid = self.treeview.selection()[0]
         selection = self.treeview.item(iid, option='text')
-        self.searchfcn(selection)
+        self.handlerfcn(selection)
 
     def setOptions(self, options):
         """Update the content of the scrolled list.

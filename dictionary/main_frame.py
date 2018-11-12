@@ -90,6 +90,7 @@ class MainFrm(tk.Frame):
                              self.dbpath,
                              self.imgdir,
                              self.searchfcn,
+                             self.showResult,
                              bg=self.bgcolor)
         self.entfrm.grid(column=0, row=1,
                          sticky=tk.N+tk.E+tk.S+tk.W,
@@ -144,7 +145,9 @@ class MainFrm(tk.Frame):
 
         Arguments:
             result: a 2-tuple of form (boolean-flag, a-list) where a-list
-                contains items of form (word (str), video-file (str))
+            contains items of form:
+                (word (str), video-file (str)) - for boolean-flag True
+                alternative-word (str) - for boolean-flag False
         """
         self.deleteThumbnails()
 

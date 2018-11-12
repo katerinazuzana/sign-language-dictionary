@@ -60,12 +60,12 @@ class SearchEngine():
         self.canvasWidth, self.canvasHeight = canvasSize
 
     def search(self, lookupword):
-        """Look up the word in the database. Call a fcn to display the result.
+        """Look up the word in the database.
 
         Arguments:
             lookupword (str): the word to be looked up
         Returns:
-            None
+            2-tuple: (boolean-success-flag, a-list)
         """
         with sqlite3.connect(self.dbpath) as conn:
             cursor = conn.cursor()
@@ -76,13 +76,13 @@ class SearchEngine():
         if find != []:
             # the word was found
             find = self.addSuffixes(find)
-            self.showResultFcn((True, find))
+            return (True, find)
 
         else:
             # the word was not found
             # search the database for similar words
             altoptions = self.findAltOpts(lookupword)
-            self.showResultFcn((False, altoptions))
+            return (False, altoptions)
 
     def findVideoFile(self, videofile):
         """Return the full name of a video file, including suffix.

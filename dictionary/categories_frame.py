@@ -18,17 +18,20 @@ class CatFrm(tk.Frame):
     a function is called to find and display the sign language translation.
     """
 
-    def __init__(self, parent, dbpath, searchfcn, **options):
+    def __init__(self, parent, dbpath, searchfcn, showresultfcn, **options):
         """Create the frame with the comboboxes and the scrolled list.
 
         Arguments:
             parent: the parent tkinter widget
             dbpath (str): the database file path
             searchfcn: function that does the search, takes one (str) argument
+            showresultfcn: function that displays the search result,
+                takes a 2-tuple argument: (boolean-flag, a-list)
         """
         super().__init__(parent, **options)
         self.dbpath = dbpath
-        self.searchfcn = searchfcn
+        self.searchFcn = searchfcn
+        self.showResultFcn = showresultfcn
         self.width = 31
         self.height = 14   # scrolled list height in lines
         self.verticalSpace = 40   # space between widgets
@@ -80,7 +83,7 @@ class CatFrm(tk.Frame):
 
         # create empty scrolledlist
         self.scrolledlist = ScrolledList(self,
-                                         self.searchfcn,
+                                         self.scrolledlistHandler,
                                          self.height)
         self.scrolledlist.grid(column=1, row=5,
                                sticky=tk.N+tk.E+tk.W,
@@ -157,6 +160,11 @@ class CatFrm(tk.Frame):
         wordlist = self.findWords(self.subcatvar)
         self.scrolledlist.setOptions(wordlist)
         self.scrolledlist.treeview.yview_moveto(0)
+
+    def scrolledlistHandler(self, selection):
+        """Search for the word translation and display the result."""
+        result = self.searchFcn(selection)
+        self.showResultFcn(result)
 
     def mySort(self, alist):
         """Sort a list alphabetically, items starting with a number go last."""

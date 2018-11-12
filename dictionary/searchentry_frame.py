@@ -8,17 +8,21 @@ import tools
 class EntFrm(tk.Frame):
     """A frame with an entry and a search button."""
 
-    def __init__(self, parent, dbpath, imgdir, searchfcn, **options):
+    def __init__(self, parent, dbpath, imgdir, searchfcn, showresultfcn,
+                 **options):
         """Create an AutocompleteEntry and a Search button.
 
         Arguments:
             parent: a parent tkinter widget
             dbpath (str): the database file path
             searchfcn: function that does the search, takes one (str) argument
+            showresultfcn: function that displays the search result,
+                takes a 2-tuple argument: (boolean-flag, a-list)
         """
         super().__init__(parent, **options)
         self.dbpath = dbpath
-        self.searchfcn = searchfcn
+        self.searchFcn = searchfcn
+        self.showResultFcn = showresultfcn
         self.bgcolor = options.get('bg', self['bg'])
         self.defaultText = 'Zadejte výraz'
         self.iconPath = os.path.join(imgdir, 'search_icon.png')
@@ -42,7 +46,7 @@ class EntFrm(tk.Frame):
                                       height=self.iconSize)
         tk.Button(bfrm,
                   image=self.iconImg,
-                  command=self.startSearch,
+                  command=self.doSearch,
                   bg=self.bgcolor,
                   activebackground='ghost white',
                   borderwidth=0).grid(column=0, row=0,
@@ -66,13 +70,13 @@ class EntFrm(tk.Frame):
         self.ent = AutocompleteEntry(self,
                                      entries,
                                      self.defaultText,
-                                     self.startSearch,
+                                     self.doSearch,
                                      maxEntries=10,
                                      textvariable=self.var)
         self.ent.grid(column=0, row=0, sticky=tk.N+tk.E+tk.W, ipady=2)
         self.ent.config(style="Gray.TEntry")
 
-    def startSearch(self, event=None):
+    def doSearch(self, event=None):
         """Hide listbox and do the search if there's some text in the entry."""
         if self.var.get() in ('', self.defaultText):
             # user didn't enter any text, prompt them to enter an expression
@@ -81,4 +85,5 @@ class EntFrm(tk.Frame):
             self.ent.hideListboxWin()
             self.ent.focus_set()
             self.ent.icursor(tk.END)
-            self.searchfcn(self.var.get())
+            result = self.searchFcn(self.var.get())
+            self.showResultFcn(result)
