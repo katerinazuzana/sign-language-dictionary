@@ -12,7 +12,7 @@ class SearchEngine():
 
     Methods:
         search(lookupword):
-            Look up the word in the database. Call a fcn to display the result.
+            Look up the word in the database.
         signSearch(userSign):
             Search the database for signs similar to the sign from user input.
     """
@@ -30,10 +30,6 @@ class SearchEngine():
         self.vfdir = vfdir
         self.altsmax = altsmax
         self.allwords = []
-
-        # a function that shows the result of the search in the main frame,
-        # the function is assigned in main.py after mainfrm is created
-        self.showResultFcn = None
 
         # create a list of video file names for searching with unknown suffix
         # used in findVideoFile() method
@@ -203,8 +199,6 @@ class SearchEngine():
 
         After calculating the distance for all the database signs, choose the
         'self.signsmax' number of the closest signs as a result of the search.
-        When the search is done, call 'self.showSignsFcn' to display it in
-        the application's 'mainfrm' frame.
 
         Arguments:
             userSign: a tuple of:
@@ -215,6 +209,10 @@ class SearchEngine():
                 uPassiveShape (int): describes the shape of the passive hand
                 uPlacement (tuple of floats): describes the sign placement,
                     takes the form of (centerx, centery, a , b, angle)
+        
+        Returns:
+            2-tuple of form (True, a-list) where a-list contains items of form
+            (word (str), videofile (str))
         """
 
         # unpack the user's sign input
@@ -308,8 +306,7 @@ class SearchEngine():
             result[i] = (text, videofile)
 
         result = self.addSuffixes(result)
-        res = (True, result)
-        self.showResultFcn(res)
+        return (True, result)
 
     def calcActDist(self, uShape, uGroups, dbShape, dbGroups):
         """Calculate the distance between the user sign and the db sign in the

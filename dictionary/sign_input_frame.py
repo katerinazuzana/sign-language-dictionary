@@ -20,14 +20,18 @@ class SignInputFrm(tk.Frame):
         in SignInputFrm
     """
 
-    def __init__(self, parent, imgdir, signSearchFcn, canvasSize, **options):
+    def __init__(self, parent, imgdir, signSearchFcn, showResultFcn,
+                 canvasSize, **options):
         """Initialize the SignInputFrm object.
 
         Arguments:
             parent: a parent tkinter widget
             imgdir (str): a path to the directory with images
-            signSearchFcn: a function that does a search to find the most
-                similar signs to the one from the user input
+            signSearchFcn: a function that does the search to find the most
+                similar signs to the one from the user input,
+                takes a 4-tuple specifying sign components as an argument
+            showResultFcn: function that displays the result of the search,
+                takes a 2-tuple argument: (boolean-flag, a-list)
             canvasSize (tuple): a tuple of the form (width (int), height (int))
                 defining the size of a canvas that serves to insert the desired
                 placement of the sign
@@ -35,6 +39,7 @@ class SignInputFrm(tk.Frame):
         super().__init__(parent, **options)
         self.imgdir = imgdir
         self.signSearchFcn = signSearchFcn
+        self.showResultFcn = showResultFcn
         self.canvasSize = canvasSize
         self.bgcolor = options.get('bg', self['bg'])
         self.verticalSpace = 20   # vertical space between the widgets
@@ -75,7 +80,7 @@ class SignInputFrm(tk.Frame):
         self.placementfrm.grid(column=1, row=3, sticky=tk.N+tk.E+tk.S+tk.W)
 
     def onSearchPress(self):
-        """Call 'self.signSearchFcn' to start the search for similar signs."""
+        """Do the search for similar signs and display the result."""
         if self.placementfrm.canvas.ellipse:
             # an ellipse object exists
             ellipseParams = (round(self.placementfrm.canvas.ellipse.center.x),
@@ -92,4 +97,5 @@ class SignInputFrm(tk.Frame):
                           self.radiofrm.var.get(),
                           self.radiofrm.passhapes.var1.get(),
                           ellipseParams)
-        self.signSearchFcn(signComponents)
+        result = self.signSearchFcn(signComponents)
+        self.showResultFcn(result)

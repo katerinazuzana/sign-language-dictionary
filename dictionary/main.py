@@ -130,10 +130,6 @@ class Dictionary():
                                padx=self.BORDER)
         self.mainfrm.grid(column=1, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
 
-        # when the searchEng is done searching, it calls a function to show
-        # the result - this function is defined in the mainfrm object
-        self.searchEng.showResultFcn = self.mainfrm.showResult
-
         # create notebook
         self.notebook = ttk.Notebook(self.root)
         self.notebook.grid(column=3, row=0, sticky=tk.N+tk.E+tk.S+tk.W)
@@ -203,6 +199,7 @@ class Dictionary():
         self.signfrm = SignInputFrm(self.notebook,
                                     self.imgdir,
                                     self.searchEng.signSearch,
+                                    self.mainfrm.showResult,
                                     self.canvasSize,
                                     bg=self.BGCOLOR,
                                     padx=self.BORDER,
