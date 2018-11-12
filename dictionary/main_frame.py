@@ -43,7 +43,7 @@ class MainFrm(tk.Frame):
     LENGTH_NORMAL_FONT = 33  # max word length for using normal font size
     LENGTH_SMALL_FONT = 37  # max word length for using small font size
 
-    def __init__(self, parent, dbpath, vfdir, imgdir, searchfcn, altsmax,
+    def __init__(self, parent, dbpath, vfdir, imgdir, searchEng, altsmax,
                  border, **options):
         """Initialize a MainFrm object, create the widgets.
 
@@ -52,7 +52,7 @@ class MainFrm(tk.Frame):
             dbpath (str): the database file path
             vfdir (str): a path to the directory with video files
             imgdir (str): a path to the directory with images
-            searchfcn: function that looks up a word and its translation
+            searchEng: an object that provides searching operations
             altsmax (int): number of alternative words shown when the word
                 from the user is not found in the database
             border (int): the main window border width
@@ -61,7 +61,8 @@ class MainFrm(tk.Frame):
         self.dbpath = dbpath
         self.vfdir = vfdir
         self.imgdir = imgdir
-        self.searchfcn = searchfcn
+        self.searchfcn = searchEng.search
+        self.searchEng = searchEng
         self.thumbs = []   # a list of frames where thumbnail videos live
 
         # a frame where alternative options are displayed when the given word
@@ -87,9 +88,8 @@ class MainFrm(tk.Frame):
 
         # create the search entry frame
         self.entfrm = EntFrm(self,
-                             self.dbpath,
                              self.imgdir,
-                             self.searchfcn,
+                             self.searchEng,
                              self.showResult,
                              bg=self.bgcolor)
         self.entfrm.grid(column=0, row=1,

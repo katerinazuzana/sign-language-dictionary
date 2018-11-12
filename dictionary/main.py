@@ -123,7 +123,7 @@ class Dictionary():
                                self.dbpath,
                                self.vfdir,
                                self.imgdir,
-                               self.searchEng.search,
+                               self.searchEng,
                                self.altsmax,
                                self.BORDER,
                                bg=self.BGCOLOR,

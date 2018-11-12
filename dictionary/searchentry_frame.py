@@ -1,6 +1,5 @@
 import tkinter as tk
 import os
-import sqlite3
 from autocomplete_entry import AutocompleteEntry
 import tools
 
@@ -8,20 +7,18 @@ import tools
 class EntFrm(tk.Frame):
     """A frame with an entry and a search button."""
 
-    def __init__(self, parent, dbpath, imgdir, searchfcn, showresultfcn,
+    def __init__(self, parent, imgdir, searchEng, showresultfcn,
                  **options):
         """Create an AutocompleteEntry and a Search button.
 
         Arguments:
             parent: a parent tkinter widget
-            dbpath (str): the database file path
-            searchfcn: function that does the search, takes one (str) argument
+            searchEng: an object that provides the searching operations
             showresultfcn: function that displays the search result,
                 takes a 2-tuple argument: (boolean-flag, a-list)
         """
         super().__init__(parent, **options)
-        self.dbpath = dbpath
-        self.searchFcn = searchfcn
+        self.searchEng = searchEng
         self.showResultFcn = showresultfcn
         self.bgcolor = options.get('bg', self['bg'])
         self.defaultText = 'Zadejte výraz'
@@ -53,11 +50,7 @@ class EntFrm(tk.Frame):
                                       sticky=tk.N+tk.E+tk.S+tk.W)
 
         # create a list of all the words contained in the database
-        with sqlite3.connect(self.dbpath) as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT word FROM words')
-            allwords = cursor.fetchall()
-        entries = tools.listOfTuplesToList(allwords)
+        entries = self.searchEng.findAllWords()
         # The items of 'entries' will be used in AutocompleteEntry's listbox.
         # In a listbox, there's no option of inner padding, hence
         # to simmulate the padding on the left side,
@@ -85,5 +78,5 @@ class EntFrm(tk.Frame):
             self.ent.hideListboxWin()
             self.ent.focus_set()
             self.ent.icursor(tk.END)
-            result = self.searchFcn(self.var.get())
+            result = self.searchEng.search(self.var.get())
             self.showResultFcn(result)

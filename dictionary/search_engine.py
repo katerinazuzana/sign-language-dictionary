@@ -11,6 +11,8 @@ class SearchEngine():
     """A class that provides the logic behind the dictionary application.
 
     Methods:
+        findAllWords():
+            Return a list of all words contained in the database.
         findCats():
             Return a list of options for the category combobox.
         findSubcats(catvar):
@@ -60,6 +62,14 @@ class SearchEngine():
         # length that fits into the label where czech translation is shown
         self.maxTextLength = 42
         self.canvasWidth, self.canvasHeight = canvasSize
+
+    def findAllWords(self):
+        """Return a list of all words contained in the database."""
+        with sqlite3.connect(self.dbpath) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT word FROM words')
+            allwords = cursor.fetchall()
+        return tools.listOfTuplesToList(allwords)
 
     def findCats(self):
         """Look up available categories in the database and return
