@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-import sqlite3
 from scrolledlist_frame import ScrolledList
-import tools
 
 
 class CatFrm(tk.Frame):
@@ -18,24 +16,23 @@ class CatFrm(tk.Frame):
     a function is called to find and display the sign language translation.
     """
 
-    def __init__(self, parent, dbpath, searchfcn, showresultfcn, **options):
+    def __init__(self, parent, searchEng, showresultfcn, **options):
         """Create the frame with the comboboxes and the scrolled list.
 
         Arguments:
             parent: the parent tkinter widget
-            dbpath (str): the database file path
-            searchfcn: function that does the search, takes one (str) argument
+            searchEng: an object providing the search operations
             showresultfcn: function that displays the search result,
                 takes a 2-tuple argument: (boolean-flag, a-list)
         """
         super().__init__(parent, **options)
-        self.dbpath = dbpath
-        self.searchFcn = searchfcn
         self.showResultFcn = showresultfcn
         self.width = 31
         self.height = 14   # scrolled list height in lines
         self.verticalSpace = 40   # space between widgets
         self.topSpace = 10   # additional padding at the top of the frame
+        
+        self.searchEng = searchEng
         self.makeWidgets()
 
     def makeWidgets(self):
@@ -61,7 +58,7 @@ class CatFrm(tk.Frame):
                                   state='readonly')
 
         # set up the options available in category combobox
-        self.catcb['values'] = self.findCats()
+        self.catcb['values'] = self.searchEng.findCats()
 
         self.catcb.bind('<<ComboboxSelected>>', self.catHandler)
         self.catcb.grid(column=1, row=1,
@@ -90,33 +87,6 @@ class CatFrm(tk.Frame):
                                pady=(0, self.verticalSpace))
         self.rowconfigure(2, weight=1)
 
-    def findCats(self):
-        """Look up available categories in the database and return
-        a list of options for the category combobox.
-        """
-        SQLquery = 'SELECT DISTINCT upperlevel FROM cathierarchy'
-        return self.findCboxItems(SQLquery)
-
-    def findSubcats(self):
-        """Find subcategories corresponding to the selected category
-        and return a list of options for the subcategory combobox.
-        """
-        cat = self.catvar.get().lstrip()
-        SQLquery = 'SELECT lowerlevel FROM cathierarchy WHERE \
-                        upperlevel="{}"'.format(cat)
-        return self.findCboxItems(SQLquery)
-
-    def findCboxItems(self, SQLquery):
-        """Return a list of options for a combobox."""
-        with sqlite3.connect(self.dbpath) as conn:
-            cursor = conn.cursor()
-            cursor.execute(SQLquery)
-            find = cursor.fetchall()
-        find = tools.listOfTuplesToList(find)
-        # the inner padding in a combobox doesn't work, to simmulate the
-        # padding on the left side, add a space at the begining of each line
-        return tools.leftPadItems(find)
-
     def catHandler(self, event):
         """Update the subcategory combobox and the scrolled list.
 
@@ -126,46 +96,24 @@ class CatFrm(tk.Frame):
         of the selectected category.
         """
         self.catcb.selection_clear()  # remove highlighting from the combobox
-        subcats = self.findSubcats()
+        subcats = self.searchEng.findSubcats(self.catvar)
         self.subcatcb['values'] = subcats
         self.subcatcb.config(state='readonly')
         self.subcatvar.set(' -- Zvolte podkategorii --')
-        wordlist = self.findWords(self.catvar)
+        wordlist = self.searchEng.findWords(self.catvar, 'cat')
         self.scrolledlist.setOptions(wordlist)
         self.scrolledlist.treeview.yview_moveto(0)
-
-    def findWords(self, var):
-        """Return a list of the words contained in a given (sub)category."""
-        vartext = var.get().lstrip()
-        if var == self.catvar:
-            # looking up the words from a category
-            SQLquery = 'SELECT word FROM words WHERE category IN \
-                      (SELECT lowerlevel FROM cathierarchy WHERE upperlevel=?)'
-        else:
-            # looking up the words from a subcategory
-            SQLquery = 'SELECT word FROM words WHERE category=?'
-
-        with sqlite3.connect(self.dbpath) as conn:
-            cursor = conn.cursor()
-            cursor.execute(SQLquery, (vartext,))
-            find = cursor.fetchall()
-        find = tools.listOfTuplesToList(find)
-        return self.mySort(find)
 
     def subcatHandler(self, event):
         """Update the options in the scrolled list to the words
         of the selectected subcategory.
         """
         self.subcatcb.selection_clear()  # remove highlighting from combobox
-        wordlist = self.findWords(self.subcatvar)
+        wordlist = self.searchEng.findWords(self.subcatvar, 'subcat')
         self.scrolledlist.setOptions(wordlist)
         self.scrolledlist.treeview.yview_moveto(0)
 
     def scrolledlistHandler(self, selection):
         """Search for the word translation and display the result."""
-        result = self.searchFcn(selection)
+        result = self.searchEng.search(selection)
         self.showResultFcn(result)
-
-    def mySort(self, alist):
-        """Sort a list alphabetically, items starting with a number go last."""
-        return sorted(alist, key=lambda x: (x[0].isdigit(), x.lower()))

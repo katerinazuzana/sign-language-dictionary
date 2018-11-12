@@ -11,6 +11,12 @@ class SearchEngine():
     """A class that provides the logic behind the dictionary application.
 
     Methods:
+        findCats():
+            Return a list of options for the category combobox.
+        findSubcats(catvar):
+            Return a list of options for the subcategory combobox.
+        findWords(var, vartype):
+            Return a list of words contained in a given (sub)category.
         search(lookupword):
             Look up the word in the database.
         signSearch(userSign):
@@ -54,6 +60,65 @@ class SearchEngine():
         # length that fits into the label where czech translation is shown
         self.maxTextLength = 42
         self.canvasWidth, self.canvasHeight = canvasSize
+
+    def findCats(self):
+        """Look up available categories in the database and return
+        a list of options for the category combobox.
+        """
+        SQLquery = 'SELECT DISTINCT upperlevel FROM cathierarchy'
+        return self.findCboxItems(SQLquery)
+
+    def findSubcats(self, catvar):
+        """Find subcategories corresponding to the selected category
+        and return a list of options for the subcategory combobox.
+        
+        Arguments:
+            catvar: tk.StringVar() with a name of a category
+        """
+        cat = catvar.get().lstrip()
+        SQLquery = 'SELECT lowerlevel FROM cathierarchy WHERE \
+                        upperlevel="{}"'.format(cat)
+        return self.findCboxItems(SQLquery)
+
+    def findCboxItems(self, SQLquery):
+        """Return a list of options for a combobox."""
+        with sqlite3.connect(self.dbpath) as conn:
+            cursor = conn.cursor()
+            cursor.execute(SQLquery)
+            find = cursor.fetchall()
+        find = tools.listOfTuplesToList(find)
+        # the inner padding in a combobox doesn't work, to simmulate the
+        # padding on the left side, add a space at the begining of each line
+        return tools.leftPadItems(find)
+
+    def findWords(self, var, vartype):
+        """Return a list of words contained in a given (sub)category.
+        
+        Arguments:
+            var: tk.StringVar() containing a name of a category or a
+                subcategory
+            vartype (str): 'cat' or 'subcat' to indicate whether we are
+                looking for words in category or subcategory
+        """
+        vartext = var.get().lstrip()
+        if vartype == 'cat':
+            # looking up the words from a category
+            SQLquery = 'SELECT word FROM words WHERE category IN \
+                      (SELECT lowerlevel FROM cathierarchy WHERE upperlevel=?)'
+        elif vartype == 'subcat':
+            # looking up the words from a subcategory
+            SQLquery = 'SELECT word FROM words WHERE category=?'
+
+        with sqlite3.connect(self.dbpath) as conn:
+            cursor = conn.cursor()
+            cursor.execute(SQLquery, (vartext,))
+            find = cursor.fetchall()
+        find = tools.listOfTuplesToList(find)
+        return self.mySort(find)
+
+    def mySort(self, alist):
+        """Sort a list alphabetically, items starting with a number go last."""
+        return sorted(alist, key=lambda x: (x[0].isdigit(), x.lower()))
 
     def search(self, lookupword):
         """Look up the word in the database.
