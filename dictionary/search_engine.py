@@ -335,7 +335,10 @@ class SearchEngine():
                 dbActiveShape = set()
                 dbShapeGroups = set()
 
-            # dbPlacement is a str "line#, # of 0s, # of 1s, # of 0s" or None
+            # dbPlacement is a string of form:
+            # "y-coord, # of 0s, # of 1s, # of 0s;
+            #  y-coord, # of 0s, # of 1s, # of 0s;
+            #  ...                            ..." or None
             if dbPlacement:
                 # get numpy array
                 dbRelief = self._getDbRelief(dbPlacement)  # numpy array
