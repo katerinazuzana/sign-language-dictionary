@@ -6,7 +6,7 @@ from difflib import SequenceMatcher
 try:  # relative imports used in tests
     from .drawing_canvas import Vect
     from . import tools
-except SystemError:
+except:
     from drawing_canvas import Vect
     import tools
 
