@@ -401,14 +401,14 @@ class SearchEngine():
             float: a distance
         """
 
-        if dbShape == uShape:
-            # all the same shapes
+        if dbShape == uShape and len(dbShape) != 0:
+            # all the same shapes (not empty)
             actDist = 0
         elif len(dbShape & uShape) >= 1 and len(dbGroups ^ uGroups) == 0:
             # at least one common shape, other similar shapes
             actDist = 0.25
-        elif len(dbGroups ^ uGroups) == 0:
-            # all similar shapes
+        elif len(dbGroups ^ uGroups) == 0 and len(dbGroups) != 0:
+            # all similar shapes (not empty)
             actDist = 0.5
         elif len(dbGroups & uGroups) >= 1:
             # at least one similar shape
