@@ -489,6 +489,9 @@ class SearchEngine():
                 f(x, y) = 0     for (x, y) outside the ellipse
         """
 
+        if a == 0 or b == 0:
+            return (lambda x, y: 0)
+
         def f(x, y):
             center = Vect(centerx, centery)
             point = Vect(x, y)
@@ -497,8 +500,8 @@ class SearchEngine():
             # radial coord of the point with respect to the ellipse center:
             r = abs(point - center)
             # radial coord of the ellipse border at angle phi:
-            elRadius = math.sqrt(a**2 * math.cos(phi - angle)**2 +
-                                 b**2 * math.sin(phi - angle)**2)
+            elRadius = (a*b) / math.sqrt(a**2 * math.sin(phi - angle)**2 +
+                                         b**2 * math.cos(phi - angle)**2)
 
             if r <= elRadius:
                 # (x, y) is inside
