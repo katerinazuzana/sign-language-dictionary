@@ -3,8 +3,12 @@ import os
 import math
 import numpy as np
 from difflib import SequenceMatcher
-from drawing_canvas import Vect
-import tools
+try:  # relative imports used in tests
+    from .drawing_canvas import Vect
+    from . import tools
+except SystemError:
+    from drawing_canvas import Vect
+    import tools
 
 
 class SearchEngine():
