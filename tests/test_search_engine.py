@@ -1,5 +1,7 @@
 import unittest
 from unittest import mock
+import math
+import numpy as np
 
 import dictionary.search_engine
 from dictionary.search_engine import SearchEngine
@@ -10,10 +12,11 @@ class SearchEngineTest(unittest.TestCase):
     @mock.patch('dictionary.search_engine.os.listdir')
     def setUp(self, mock_os_listdir):
         """Create an instance of SearchEngine."""
+
         mock_os_listdir.return_value = ['0:0.mp4',
                                         'box.mp4',
                                         'aljaska_1.mkv']
-        self.searchEng = SearchEngine('dbpath', 'vfdirectory', 5, (50, 40))
+        self.searchEng = SearchEngine('dbpath', 'vfdirectory', 5, (3, 2))
 
     def test_mySort(self):
         """Test alphabetical ordering - should be:
@@ -30,6 +33,7 @@ class SearchEngineTest(unittest.TestCase):
 
     def test_findVideoFile(self):
         """Linux specific test."""
+        
         self.assertEqual(self.searchEng._findVideoFile('0:0'),
                          'vfdirectory/0:0.mp4')
         self.assertEqual(self.searchEng._findVideoFile('box'),
@@ -42,6 +46,7 @@ class SearchEngineTest(unittest.TestCase):
         mock_findVideoFile.side_effect = ['0:0.mp4',
                                           'box.mp4',
                                           'aljaska_1.mkv']
+        
         test_input = [('0:0', '0:0'),
                       ('box', 'box'),
                       ('aljaska', 'aljaska_1')]
@@ -96,3 +101,103 @@ class SearchEngineTest(unittest.TestCase):
         self.assertEqual(self.searchEng._calcTypeDist(*test_input), 0)
         test_input = 'single hand', 0, 'single hand', None
         self.assertEqual(self.searchEng._calcTypeDist(*test_input), 0)
+    
+    def test_getReliefFcn_circle(self):
+        """
+        Input is of form: centerx, centery, a, b, angle.
+        'function_to_test' should return 1 inside a circle with radius 10,
+        and 0 outside.
+        """
+        test_input = 0, 0, 10, 10, 0
+        function_to_test = self.searchEng._getReliefFcn(*test_input)
+        
+        for (x, y) in ((-10, 0), (0, 0), (10, 0), (0, 10),
+            (math.sqrt(50), math.sqrt(50))):
+            self.assertEqual(function_to_test(x, y), 1, (x, y))
+        
+        for (x, y) in ((11, 0), (0, 11), (8, 8)):
+            self.assertEqual(function_to_test(x, y), 0, (x, y))
+
+    def test_getReliefFcn_ellipse(self):
+        """
+        Input is of form: centerx, centery, a, b, angle.
+        'function_to_test' should return 1 inside an ellipse with horizontal
+        semi-axis of 20, and vertical semi-axis of 10.
+        """
+        test_input = 0, 0, 20, 10, 0
+        function_to_test = self.searchEng._getReliefFcn(*test_input)
+        
+        for (x, y) in ((-20, 0), (0, 0), (20, 0), (0, 10), (0, -10)):
+            self.assertEqual(function_to_test(x, y), 1, (x, y))
+        
+        for (x, y) in ((-21, 0), (21, 0), (0, 11), (0, -11)):
+            self.assertEqual(function_to_test(x, y), 0, (x, y))
+
+    def test_getReliefFcn_zero_a_axis_ellipse(self):
+        """
+        Input is of form: centerx, centery, a, b, angle.
+        'function_to_test' should always return 0.
+        """
+        test_input = 0, 0, 10, 0, 0        
+        function_to_test = self.searchEng._getReliefFcn(*test_input)
+
+        for (x, y) in ((0, 0), (10, 0), (0, 10), (10, 10)):
+            self.assertEqual(function_to_test(x, y), 0, (x, y))
+
+    def test_getReliefFcn_zero_b_axis_ellipse(self):
+        """
+        Input is of form: centerx, centery, a, b, angle.
+        'function_to_test' should always return 0.
+        """
+        test_input = 0, 0, 0, 10, 0
+        function_to_test = self.searchEng._getReliefFcn(*test_input)
+
+        for (x, y) in ((0, 0), (10, 0), (0, 10), (10, 10)):
+            self.assertEqual(function_to_test(x, y), 0, (x, y))
+
+    def test_getRelief_zero_fcn(self):
+        input_fcn = lambda x, y: 0
+        expected_output = np.array([[0, 0, 0],
+                                    [0, 0, 0]])
+        self.assertTrue(
+            np.array_equal(self.searchEng._getRelief(input_fcn),
+            expected_output)
+        )
+
+    def test_getRelief_nonzero_fcn(self):
+        input_fcn = lambda x, y: 1 if y == 0 else 0
+        expected_output = np.array([[1, 1, 1],
+                                    [0, 0, 0]])
+        self.assertTrue(
+            np.array_equal(self.searchEng._getRelief(input_fcn),
+            expected_output)
+        )
+
+        input_fcn = lambda x, y: 1 if x == 2 else 0
+        expected_output = np.array([[0, 0, 1],
+                                    [0, 0, 1]])
+        self.assertTrue(
+            np.array_equal(self.searchEng._getRelief(input_fcn),
+            expected_output)
+        )
+
+    def test_getDbRelief(self):
+        # input is of form: "y-coord, # of 0s, # of 1s, # of 0s;
+        #                    y-coord, # of 0s, # of 1s, # of 0s;
+        #                    ...                               "
+
+        test_input = '0, 0, 3, 0'
+        expected_output = np.array([[1, 1, 1],
+                                    [0, 0, 0]])
+        self.assertTrue(
+            np.array_equal(self.searchEng._getDbRelief(test_input),
+            expected_output)
+        )
+
+        test_input = '0, 2, 1, 0; 1, 2, 1, 0'
+        expected_output = np.array([[0, 0, 1],
+                                    [0, 0, 1]])
+        self.assertTrue(
+            np.array_equal(self.searchEng._getDbRelief(test_input),
+            expected_output)
+        )
