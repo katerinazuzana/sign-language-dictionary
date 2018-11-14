@@ -515,6 +515,9 @@ class SearchEngine():
         return f
 
     def _getRelief(self, reliefFcn):
+        """Return a 2D numpy array representing the value of a given function
+        at individual pixels of the canvas.
+        """
         matrix = []
         for y in range(self.canvasHeight):
             row = []
