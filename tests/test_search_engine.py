@@ -101,7 +101,45 @@ class SearchEngineTest(unittest.TestCase):
         self.assertEqual(self.searchEng._calcTypeDist(*test_input), 0)
         test_input = 'single hand', 0, 'single hand', None
         self.assertEqual(self.searchEng._calcTypeDist(*test_input), 0)
-    
+
+    def test_calcPlaceDist_totally_overlapping_ellipses(self):
+        # test input:
+        uRelief = np.array ([[0, 1, 1],
+                             [0, 0, 1]])
+        uArea = 3
+        dbRelief = uRelief
+        dbArea = uArea
+
+        expected_output = 0
+        self.assertEqual(self.searchEng._calcPlaceDist(uRelief, uArea,
+                         dbRelief, dbArea), expected_output)
+
+    def test_calcPlaceDist_distinct_ellipses(self):
+        # test input:
+        uRelief = np.array ([[0, 1, 1],
+                             [0, 0, 1]])
+        uArea = 3
+        dbRelief = np.array ([[0, 0, 0],
+                              [1, 1, 0]])
+        dbArea = 2
+
+        expected_output = 1
+        self.assertEqual(self.searchEng._calcPlaceDist(uRelief, uArea,
+                         dbRelief, dbArea), expected_output)
+
+    def test_calcPlaceDist_partially_overlapping_ellipses(self):
+        # test input:
+        uRelief = np.array ([[0, 1, 1],
+                             [0, 1, 1]])
+        uArea = 4
+        dbRelief = np.array ([[1, 1, 0],
+                              [1, 1, 0]])
+        dbArea = 4
+
+        expected_output = 0.5
+        self.assertEqual(self.searchEng._calcPlaceDist(uRelief, uArea,
+                         dbRelief, dbArea), expected_output)
+
     def test_getReliefFcn_circle(self):
         """
         Input is of form: centerx, centery, a, b, angle.
