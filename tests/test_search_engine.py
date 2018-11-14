@@ -125,20 +125,25 @@ class SearchEngineTest(unittest.TestCase):
         semi-axis of 20, and vertical semi-axis of 10.
         """
         test_input = 0, 0, 20, 10, 0
-        function_to_test = self.searchEng._getReliefFcn(*test_input)
-        
+        func_to_test_zero_angle = self.searchEng._getReliefFcn(*test_input)
+
+        test_input = 0, 0, 10, 20, math.pi / 2
+        func_to_test_nonzero_angle = self.searchEng._getReliefFcn(*test_input)
+
         for (x, y) in ((-20, 0), (0, 0), (20, 0), (0, 10), (0, -10)):
-            self.assertEqual(function_to_test(x, y), 1, (x, y))
-        
+            self.assertEqual(func_to_test_zero_angle(x, y), 1, (x, y))
+            self.assertEqual(func_to_test_nonzero_angle(x, y), 1, (x, y))
+
         for (x, y) in ((-21, 0), (21, 0), (0, 11), (0, -11)):
-            self.assertEqual(function_to_test(x, y), 0, (x, y))
+            self.assertEqual(func_to_test_zero_angle(x, y), 0, (x, y))
+            self.assertEqual(func_to_test_nonzero_angle(x, y), 0, (x, y))
 
     def test_getReliefFcn_zero_a_axis_ellipse(self):
         """
         Input is of form: centerx, centery, a, b, angle.
         'function_to_test' should always return 0.
         """
-        test_input = 0, 0, 10, 0, 0        
+        test_input = 0, 0, 10, 0, 0
         function_to_test = self.searchEng._getReliefFcn(*test_input)
 
         for (x, y) in ((0, 0), (10, 0), (0, 10), (10, 10)):
