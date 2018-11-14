@@ -527,12 +527,32 @@ class SearchEngine():
         return np.array(matrix)
 
     def _getDbRelief(self, dbPlacement):
+        """Convert a string that contains info about placement of an ellipse
+        on the canvas to a 2D numpy array.
+        
+        Arguments:
+            dbPlacement (str) of form:
+                "y-coord, # of 0s, # of 1s, # of 0s;
+                 y-coord, # of 0s, # of 1s, # of 0s;
+                 ...                            ..."
+
+                - each canvas pixel is assigned a value 1 (pixel is within
+                  ellipse) or 0 (pixel is outside of ellipse)
+                - each canvas row with at least one non-empty pixel is
+                  represented in 'dbPlacement' string by:
+                      the number of zeros on the left of the non-empty pixels
+                      the number of non-empty pixels
+                      the number of zeros on the right of the non-empty pixels
+
+        Returns:
+            2D numpy array
+        """
         placement = [[int(item) for item in line.split(",")] for line
                      in dbPlacement.split(";")]
         # empty matrix
         matrix = [[0] * self.canvasWidth for _ in range(self.canvasHeight)]
 
-        # line number, num of 0s, num of 1s, num of 0s
+        # replace zeros with ones according to 'placement'
         for lineNum, n1, n2, n3 in placement:
             matrix[lineNum] = [0] * n1 + [1] * n2 + [0] * n3
         return np.array(matrix)
