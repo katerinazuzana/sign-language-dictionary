@@ -8,7 +8,7 @@ The Dictionary is built in Python 3 using the tkinter library and SQLite databas
 
 ![screenshot](screenshot.png)
 
-**Note:** As I don't have permission to share publically the videos with sign language translations, the videos in the application don't capture actual signing persons – there are demo animations (with a piece of text running across the screen) instead.
+**Note:** As I don't have permission to share publicly the videos with sign language translations, the videos in the application don't capture actual signing persons – there are demo animations (with a piece of text running across the screen) instead.
 
 ## Requirements
 
